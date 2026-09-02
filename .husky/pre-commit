@@ -1,5 +1,6 @@
 bunx lint-staged
 bun run check-types
 bun run check:loc
+bun run check:secrets
 bun run lint:tailwind
 bun run code-review
