@@ -19,13 +19,13 @@ function walk(dir, out = []) {
 
 const files = walk(".");
 let failed = false;
-const classRe = /class(?:Name)?\s*=\s*["'`]([^"'`]+)["'`]/g;
+const classRe = /class(?:Name)?\s*=\s*["'`]([^"'`]+)["'`]/gu;
 
 for (const f of files) {
   const src = readFileSync(f, "utf8");
   let m;
   while ((m = classRe.exec(src))) {
-    const classes = m[1].trim().split(/\s+/).filter(Boolean);
+    const classes = m[1].trim().split(/\s+/u).filter(Boolean);
     const seen = new Set();
     for (const c of classes) {
       if (seen.has(c)) {
@@ -36,7 +36,7 @@ for (const f of files) {
       if (c.includes("!") && !c.startsWith("!")) {
         // allow !important only if explicitly needed, warn
       }
-      if (/^\[.*\]$/.test(c) || c.includes("[")) {
+      if (/^\[.*\]$/u.test(c) || c.includes("[")) {
         // arbitrary value like w-[123px] — flag if no comment reason nearby
         // For now just warn if many
       }

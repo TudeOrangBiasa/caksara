@@ -2,7 +2,7 @@
 // oxlint-disable-next-line no-unused-vars
 import { quizSchema } from "../../../apps/web/src/lib/zod/question.ts";
 
-export async function handler(_req: Request): Promise<Response> {
+export function handler(_req: Request): Promise<Response> {
   void quizSchema;
   // 1. rate-limit via quiz_calls
   // 2. query kb_entries by category+level + cache

@@ -57,7 +57,7 @@ if (env.size === 0) {
   process.exit(0);
 }
 
-const LOCAL_VALUE_PATTERN = /localhost|127\.0\.0\.1|0\.0\.0\.0|^file:/i;
+const LOCAL_VALUE_PATTERN = /localhost|127\.0\.0\.1|0\.0\.0\.0|^file:/iu;
 const localKeys = [...env.entries()]
   .filter(([, value]) => LOCAL_VALUE_PATTERN.test(value))
   .map(([key]) => key);
