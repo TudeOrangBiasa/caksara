@@ -63,7 +63,7 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 
 ## 12. Writing & TypeScript Guides
 
-- **Unslop:** `docs/WRITING_UNSTOP.md` — hapus AI patterns, add human voice (puffery, name-dropping, AI vocab, em dash, colon, bold, etc. + adding soul). Berlaku untuk semua docs & PRs.
+- **Unslop:** `docs/WRITING_UNSLOP.md` — hapus AI patterns, add human voice (puffery, name-dropping, AI vocab, em dash, colon, bold, etc. + adding soul). Berlaku untuk semua docs & PRs.
 - **TypeScript Patterns:** `docs/TYPESCRIPT_PATTERNS.md` — branded types, discriminated unions, constructive modeling (NonEmpty, Pairs), simplest total type, unknown over any, schemas before guards, satisfies, boundary validation.
 - **Technical Writing:** `docs/TECHNICAL_WRITING.md` — Diátaxis modes, Google developer style, STE one-thought-per-sentence, Global English, review checklist.
 - **Prove It Works:** `docs/PROVE_IT_WORKS.md` — verify real thing (build + run + full chain), script the check, trust artifacts not self-reports.
