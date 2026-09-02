@@ -7,11 +7,13 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 - TypeScript strict, no `any` tanpa alasan di komentar.
 - Satu sumber kebenaran untuk skema: `src/lib/zod/*` — validasi di FE & Edge (Zod di semua batas).
 - Jangan expose `GEMINI_API_KEY` di frontend; hanya di Edge Function.
+- **Max LOC < 1000** — satu file jangan lebih dari 1000 baris (termasuk komentar & blank). Lewat → split by feature/seam, bukan tambah file `utils.ts` raksasa. CI `check` akan fail jika ada file >1000 LOC.
 
 ## 2. Lint & Format
 
 - `oxlint` (bukan ESLint) + `oxfmt`. Jalankan `bun run check` sebelum commit.
 - Config: `.oxlintrc.json`, `.oxfmtrc.json`. Jangan tambah ESLint/Prettier.
+- **Tailwind lint** — `bun run lint:tailwind` wajib hijau. Cek bad codes Tailwind: class order (via `prettier-plugin-tailwindcss` / `rustywind` / `eslint-plugin-tailwindcss`), no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
 
 ## 3. Struktur (Dev Guide §3)
 

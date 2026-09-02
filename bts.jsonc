@@ -16,11 +16,7 @@
   "backend": "none",
   "runtime": "none",
   "frontend": ["react-router"],
-  "addons": [
-		"oxlint",
-		"skills",
-		"husky"
-	],
+  "addons": ["oxlint", "skills", "husky"],
   "examples": [],
   "auth": "none",
   "payments": "none",

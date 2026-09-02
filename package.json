@@ -34,6 +34,8 @@
     "deploy:prod": "vercel deploy --prod",
     "deploy:check": "vercel deploy --dry",
     "check": "oxlint && oxfmt --write",
+    "check:loc": "node scripts/check-loc.js",
+    "lint:tailwind": "node scripts/lint-tailwind.js",
     "code-review": "echo \"code-review: run /code-review (Standards + Spec) — see docs/CODING_STANDARDS.md + CONTEXT.md\" && oxlint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
