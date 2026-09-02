@@ -16,8 +16,11 @@ const TITLE_TEXT = `
     ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
  `;
 
-export function meta({}: Route.MetaArgs) {
-  return [{ title: "caksara" }, { name: "description", content: "caksara is a web application" }];
+export function meta(_args: Route.MetaArgs) {
+  return [
+    { title: "CAKSARA — Aksara Bali" },
+    { name: "description", content: "CAKSARA — Web Edukasi Aksara Bali" },
+  ];
 }
 
 export default function Home() {

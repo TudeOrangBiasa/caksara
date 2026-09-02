@@ -21,7 +21,6 @@
       "tailwindcss": "^4.3.3"
     }
   },
-  "type": "module",
   "scripts": {
     "dev": "bun run --filter '*' dev",
     "build": "bun run --filter '*' build",
@@ -34,16 +33,23 @@
     "deploy": "vercel deploy",
     "deploy:prod": "vercel deploy --prod",
     "deploy:check": "vercel deploy --dry",
-    "check": "oxlint && oxfmt --write"
+    "check": "oxlint && oxfmt --write",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@caksara/env": "workspace:*",
+    "@supabase/supabase-js": "^2.59.0",
     "dotenv": "catalog:",
+    "drizzle-orm": "^0.44.2",
+    "postgres": "^3.4.5",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@caksara/config": "workspace:*",
     "@types/node": "catalog:",
+    "drizzle-kit": "^0.31.4",
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0",
     "tsx": "^4.23.1",
