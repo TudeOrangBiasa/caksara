@@ -58,8 +58,11 @@ tmp
 temp
 
 # Local spec/plan — GitHub Issues is source (AGENTS.md)
-.scratch/
-.tmp/
+.scratch
+.scratch/**
+**/.scratch/**
+.tmp
+.tmp/**
 *.local.md
 plan.md
 spec.md
