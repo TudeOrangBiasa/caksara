@@ -1,9 +1,13 @@
 @font-face {
   font-family: "Noto Sans Balinese";
   src: url("/fonts/NotoSansBalinese-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
+  unicode-range: U+1B00-1B7F;
 }
 
-[lang="ban"] {
-  font-family: "Noto Sans Balinese", sans-serif;
+[lang="ban"],
+.font-balinese {
+  font-family: "Noto Sans Balinese", var(--font-balinese), sans-serif;
 }

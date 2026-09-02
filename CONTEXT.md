@@ -43,3 +43,19 @@ _Avoid_: progress aksara generik
 **Profil Anon**:
 Akun tanpa login wajib yang menyimpan progres di perangkat; dapat di-upgrade ke akun permanen.
 _Avoid_: guest, user tanpa login
+
+## Design Taste (ADR 0010)
+
+**Taste**: Bali-inspired warm minimal — terracotta candi (`--primary`) + parchment sand (`--secondary`) + gold ukiran (`--accent`), neutral warm hue 38-45 (bukan cold gray), radius M3 medium 0.75rem, motion 150ms ease-out.
+
+**Tokens SSOT**: `packages/ui/src/styles/globals.css` (`:root` + `.dark` + `@theme inline`) — larang `tailwind.config.ts` (Tailwind v4 `@tailwindcss/vite` ignore). `apps/web/src/index.css` re-export. Konsumsi via `bg-primary`, `text-success` dst — larang hex literal di komponen.
+
+**Semantic**:
+
+- Hati = `--destructive` (merah `oklch 27deg`)
+- XP = `--success` (hijau `oklch 145deg`)
+- Streak = `--warning` (amber `65deg`)
+- Mastery: `belum` → `--mastery-belum` (`--muted`), `dipahami` → emas, `ahli` → terracotta (derived `answers.aksaraId` per ADR 0009)
+
+**Typography**: `--font-sans: Inter Variable`, `--font-balinese: Noto Sans Balinese` (self-host woff2, `font-display: swap`, `unicode-range: U+1B00-1B7F`, `[lang="ban"]` + `.font-balinese`). Dark mode primary lightened untuk kontras ≥4.5:1.
+_Avoid_: cold gray shadcn default, hex hardcode, TTS baca aksara (ADR 0005 fallback Latin only)
