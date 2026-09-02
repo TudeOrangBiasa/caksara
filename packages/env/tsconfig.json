@@ -1,0 +1,3 @@
+{
+  "extends": "@caksara/config/tsconfig.base.json"
+}
