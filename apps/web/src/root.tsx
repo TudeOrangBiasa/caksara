@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+// oxlint-disable-next-line import/no-unassigned-import
 import "./index.css";
 import type { Route } from "./+types/root";
 import Header from "./components/header";

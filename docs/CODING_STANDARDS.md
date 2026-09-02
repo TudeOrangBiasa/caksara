@@ -7,11 +7,14 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 - TypeScript strict, no `any` tanpa alasan di komentar.
 - Satu sumber kebenaran untuk skema: `src/lib/zod/*` — validasi di FE & Edge (Zod di semua batas).
 - Jangan expose `GEMINI_API_KEY` di frontend; hanya di Edge Function.
+- **Max LOC < 1000** — satu file jangan lebih dari 1000 baris (termasuk komentar & blank). Lewat → split by feature/seam, bukan tambah file `utils.ts` raksasa. CI `check` akan fail jika ada file >1000 LOC.
+- **No hardcoded fallback for env/API keys** — `process.env.X` wajib, `if (!process.env.X) throw` kalau missing. Jangan `process.env.VITE_SUPABASE_URL || "https://..."` atau `|| "api_key"` (axios/rpc fallback). `bun run check:secrets` akan fail kalau ada `|| "https://` atau hardcoded `*.supabase.co` tanpa env. Trivy gak perlu — ini lint-time check, bukan vuln scan.
 
 ## 2. Lint & Format
 
 - `oxlint` (bukan ESLint) + `oxfmt`. Jalankan `bun run check` sebelum commit.
 - Config: `.oxlintrc.json`, `.oxfmtrc.json`. Jangan tambah ESLint/Prettier.
+- **Tailwind lint** — `bun run lint:tailwind` wajib hijau. Cek bad codes Tailwind: class order (via `prettier-plugin-tailwindcss` / `rustywind` / `eslint-plugin-tailwindcss`), no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
 
 ## 3. Struktur (Dev Guide §3)
 
@@ -42,7 +45,26 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 ## 8. Testing
 
 - Hanya external behavior (Vitest untuk Zod, Playwright untuk alur kuis). Mock Supabase/Gemini di seam, bukan detail internal.
+- **Tautological tests considered harmful** — jangan tulis test yang cuma mengulang implementasi (`expect(add(1,2)).toBe(1+2)` atau `expect(component).toHaveBeenCalledWith(props)` tanpa behavior). Test harus gagal jika behavior eksternal rusak, bukan jika refactor internal berubah. Uji outcome yang dilihat user/seam, bukan baris kode.
 
-## 9. Git
+## 9. Comments
+
+- **Keep comments short.** Hapus klaim dari komentar yang bisa diturunkan dari kode itu sendiri (`// increment i` di `i++` adalah noise). Komentar hanya untuk _why_ & trade-off yang tidak terlihat di kode, bukan _what_.
+
+## 10. Skills & Code Review
+
+- **React Best Practice (Vercel)** — pakai skill `vercel-labs/agent-skills` (terutama `web-design-guidelines` + `react-best-practices` di mana tersedia) sebagai rujukan di `AGENTS.md`/`docs/agents/`. Pattern: server/client boundary, Suspense, key, memo, a11y, Tailwind M3.
+- **Matt Pocock Skills (Code Review)** — skill `code-review` (Standards + Spec two-axis) wajib jalan sebelum merge. Directory `docs/agents/` + `CONTEXT.md` adalah source of truth untuk review.
+- **Pre-commit wajib run code review** — `.husky/pre-commit` akan menjalankan `bun run check` (oxlint+oxfmt) + `bun run check-types` + `code-review` check (via `gh` atau script) sebelum push. Gagal = commit ditolak.
+
+## 11. Git
 
 - Commit tracer-bullet per tiket, blockers-first. `bts.jsonc` jangan dihapus.
+- Branch `feat/<feature-name>` (bukan numbered), PR wajib dengan body, `main` protected (require 1 approving + strict status checks).
+
+## 12. Writing & TypeScript Guides
+
+- **Unslop:** `docs/agents/writing-unslop.md` — hapus AI patterns, add human voice (puffery, name-dropping, AI vocab, em dash, colon, bold, etc. + adding soul). Berlaku untuk semua docs & PRs.
+- **TypeScript Patterns:** `docs/agents/typescript-patterns.md` — branded types, discriminated unions, constructive modeling (NonEmpty, Pairs), simplest total type, unknown over any, schemas before guards, satisfies, boundary validation. Auto-checked: `unknown`/`as`/`!` via oxlint, sisanya code-review.
+- **Technical Writing:** `docs/agents/technical-writing.md` — Diátaxis modes, Google developer style, STE one-thought-per-sentence, Global English, review checklist.
+- **Prove It Works:** `docs/agents/prove-it-works.md` — verify real thing (build + run + full chain), script the check, trust artifacts not self-reports.

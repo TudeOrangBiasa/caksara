@@ -7,7 +7,7 @@ Project: CAKSARA — Web Edukasi Aksara Bali (INVENTION 2026)
 - **Spec & Plan:** GitHub Issues `TudeOrangBiasa/caksara` — `#1` Spec + `#2-#9` Tickets (ready-for-agent). Jangan pakai local `.scratch/` files.
 - **Glosarium:** `CONTEXT.md` — Wresastra, Modul, Sesi Kuis, Hati, XP, Streak, KB Entry, Guru Virtual, Mastery, Profil Anon
 - **Keputusan:** `docs/adr/0001-0009` — stack, anon auth, KB, audio Mendeley, bulk+cache, dll. (ADR adalah sumber kebenaran teknis)
-- **Standar:** `docs/CODING_STANDARDS.md` — oxlint, Zod di semua batas, Drizzle, RLS
+- **Standar:** `docs/CODING_STANDARDS.md` — oxlint, Zod di semua batas, Drizzle, RLS + `docs/agents/writing-unslop.md` (human voice), `docs/agents/typescript-patterns.md` (branded types, discriminated unions), `docs/agents/technical-writing.md` (Diátaxis), `docs/agents/prove-it-works.md` (verify real thing)
 
 ## Stack (ADR-0001)
 
