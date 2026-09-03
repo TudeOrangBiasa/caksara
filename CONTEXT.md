@@ -10,7 +10,13 @@ _Avoid_: aksara Bali (terlalu umum), hanacaraka
 
 **Modul**:
 Learning path berurutan (mod_01 Sapaan & Adat → mod_02 Gerbang Wresastra → mod_03 Jangan Salah Bicara → mod_04 Hari Raya & Tradisi) dengan prereq unlock. Lulus = selesaikan sesi kuis hingga tuntas.
-_Avoid_: lesson, chapter, course
+**Pohon Modul**:
+Tree vertikal di Beranda yang menampilkan 4 Modul berurutan dengan status selesai/aktif/terkunci.
+_Avoid_: lesson tree, pohon lesson
+
+**Detail Modul**:
+Layar pratinjau Modul aktif berisi judul/deskripsi/poin belajar/jumlah soal/estimasi waktu + tombol Mulai Belajar.
+_Avoid_: module detail (EN), detail lesson
 
 **Sesi Kuis**:
 Rangkaian 3–8 soal per modul yang dibuat dari KB untuk satu sesi belajar.
@@ -39,6 +45,13 @@ _Avoid_: chatbot generik, assistant bebas
 **Mastery**:
 Tingkat penguasaan per aksara (belum | dipahami | ahli) berdasarkan riwayat jawaban.
 _Avoid_: progress aksara generik
+**Kartu Prestasi**:
+Gambar 1080×1350 untuk bagikan capaian (XP, Streak, Mastery 18 Wresastra) via share/download.
+_Avoid_: share card generik tanpa konteks prestasi, poster
+
+**Pengaturan**:
+Layar preferensi untuk dark mode, ukuran font Wresastra (20/24/32px), suara efek, dan reset progres.
+_Avoid_: settings generik tanpa konteks Wresastra, preferences
 
 **Profil Anon**:
 Akun tanpa login wajib yang menyimpan progres di perangkat; dapat di-upgrade ke akun permanen.
