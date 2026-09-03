@@ -26,40 +26,58 @@ colors:
   foreground: "oklch(0.145 0 0)"
 typography:
   display:
-    fontFamily: Inter Variable
+    fontFamily: "Inter Variable"
     fontSize: 36px
-    fontWeight: 600
+    fontWeight: "600"
     lineHeight: 1.1
     letterSpacing: -0.02em
   heading:
-    fontFamily: Inter Variable
+    fontFamily: "Inter Variable"
     fontSize: 20px
-    fontWeight: 600
+    fontWeight: "600"
     lineHeight: 1.3
   body:
-    fontFamily: Inter Variable
+    fontFamily: "Inter Variable"
     fontSize: 16px
-    fontWeight: 400
+    fontWeight: "400"
     lineHeight: 1.6
   balinese:
-    fontFamily: Noto Sans Balinese
+    fontFamily: "Noto Sans Balinese"
     fontSize: 24px
-    fontWeight: 400
+    fontWeight: "400"
     lineHeight: 1.4
 spacing:
-  base: 8px
+  unit: 8px
   xs: 4px
   sm: 8px
   md: 16px
   lg: 24px
   xl: 32px
   2xl: 48px
+  container-padding: 24px
+  card-gap: 16px
 rounded:
   sm: 6px
-  md: 8px
-  lg: 12px
-  xl: 16px
+  DEFAULT: 8px
+  md: 12px
+  lg: 16px
+  xl: 24px
   full: 9999px
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.background}"
+    typography: "{typography.body}"
+    rounded: "{rounded.lg}"
+  card-modul:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.xl}"
+    padding: "{spacing.card-gap}"
+  wresastra-grid:
+    backgroundColor: "{colors.neutral}"
+    textColor: "{colors.foreground}"
+    rounded: "{rounded.lg}"
 ---
 
 # Caksara DESIGN.md
