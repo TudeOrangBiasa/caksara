@@ -1,6 +1,6 @@
 # ADR 0010 — Design Tokens & Taste (Bali-inspired M3)
 
-Konteks: `to-spec` tertahan karena UI taste belum terkunci. `packages/ui/src/styles/globals.css` masih shadcn default neutral (`oklch` abu), `apps/web/src/styles/aksara.css` hanya `@font-face` tanpa `unicode-range`, belum ada token semantic untuk Hati/XP/Streak/Mastery, dan belum ada mapping Material 3 → Tailwind v4 `@theme inline`. Tanpa ini ticket #5-#8 akan diverge.
+Konteks: `to-spec` tertahan karena UI taste belum terkunci. `packages/ui/src/styles/globals.css` masih shadcn default neutral (`oklch` abu), `apps/web/src/styles/aksara.css` hanya `@font-face` tanpa `unicode-range`, belum ada token semantic untuk Hati/XP/Streak/Mastery, dan belum ada mapping Material 3 → Tailwind v4 `@theme inline`. Tanpa ini ticket #5-#8 akan diverge. Referensi taste: `docs/design/taste-skill.md` (anti-slop, dials 8/6/4) dan `docs/design/duolingo.md` (lime `#a5ed6e` playful) — grill lock pilih sakral terracotta, Duolingo hanya untuk bulk/cache ala Duolingo (ADR 0006), bukan visual.
 
 Keputusan:
 
