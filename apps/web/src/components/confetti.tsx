@@ -9,7 +9,15 @@ interface ConfettiParticle {
   scale: number;
 }
 
-const COLORS = ["#f59e0b", "#fbbf24", "#fcd34d", "#fde68a", "#d97706", "#b45309"];
+// Emas konfeti dari token global (ADR-0011): var(--confetti-*), bukan hex.
+const COLORS = [
+  "var(--confetti-1)",
+  "var(--confetti-2)",
+  "var(--confetti-3)",
+  "var(--confetti-4)",
+  "var(--confetti-5)",
+  "var(--confetti-6)",
+];
 
 export function Confetti({ active }: { active: boolean }) {
   const [particles, setParticles] = useState<ConfettiParticle[]>([]);

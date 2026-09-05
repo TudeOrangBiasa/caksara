@@ -2,14 +2,18 @@ import { cn } from "@caksara/ui/lib/utils";
 
 export type BedawangMood = "senang" | "semangat" | "sedih";
 
-const SHELL = "#b85c32";
-const SHELL_EDGE = "#d98a52";
-const SHELL_DARK = "#8f4526";
-const HEAD = "#e59a6b";
-const HEAD_DARK = "#b76a3d";
-const LEG = "#d9824f";
-const BELLY = "#f6e7c9";
-const INK = "#3a2417";
+// Warna maskot dari token global (ADR-0011): var(--bedawang-*), bukan hex.
+const SHELL = "var(--bedawang-shell)";
+const SHELL_EDGE = "var(--bedawang-shell-edge)";
+const SHELL_DARK = "var(--bedawang-shell-dark)";
+const HEAD = "var(--bedawang-head)";
+const HEAD_DARK = "var(--bedawang-head-dark)";
+const LEG = "var(--bedawang-leg)";
+const BELLY = "var(--bedawang-belly)";
+const INK = "var(--bedawang-ink)";
+const HIGHLIGHT = "var(--bedawang-highlight)";
+const BLUSH = "var(--bedawang-blush)";
+const GEM = "var(--bedawang-gem)";
 
 interface BedawangProps {
   mood?: BedawangMood;
@@ -84,13 +88,13 @@ export function Bedawang({ mood = "senang", className, animate = true }: Bedawan
               strokeLinecap="round"
               fill="none"
             />
-            <circle cx="27.4" cy="32.4" r="1.3" fill="#fff" />
-            <circle cx="40.4" cy="32.4" r="1.3" fill="#fff" />
+            <circle cx="27.4" cy="32.4" r="1.3" fill={HIGHLIGHT} />
+            <circle cx="40.4" cy="32.4" r="1.3" fill={HIGHLIGHT} />
           </>
         ) : mood === "senang" ? (
           <>
-            <circle cx="27.4" cy="32.4" r="1.3" fill="#fff" />
-            <circle cx="40.4" cy="32.4" r="1.3" fill="#fff" />
+            <circle cx="27.4" cy="32.4" r="1.3" fill={HIGHLIGHT} />
+            <circle cx="40.4" cy="32.4" r="1.3" fill={HIGHLIGHT} />
           </>
         ) : (
           <>
@@ -103,12 +107,12 @@ export function Bedawang({ mood = "senang", className, animate = true }: Bedawan
             />
           </>
         )}
-        <circle cx="26.6" cy="38" r="2" fill="#e58a74" opacity="0.85" />
-        <circle cx="44.4" cy="38" r="2" fill="#e58a74" opacity="0.85" />
+        <circle cx="26.6" cy="38" r="2" fill={BLUSH} opacity="0.85" />
+        <circle cx="44.4" cy="38" r="2" fill={BLUSH} opacity="0.85" />
         {mood === "sedih" ? (
           <>
-            <circle cx="20.5" cy="40" r="1.2" fill="#8ecae6" opacity="0.9" />
-            <circle cx="53.5" cy="40" r="1.2" fill="#8ecae6" opacity="0.9" />
+            <circle cx="20.5" cy="40" r="1.2" fill={GEM} opacity="0.9" />
+            <circle cx="53.5" cy="40" r="1.2" fill={GEM} opacity="0.9" />
             <path
               d="M33 36.5 q3 -1.7 6 0"
               stroke={INK}

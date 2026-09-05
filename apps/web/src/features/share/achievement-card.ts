@@ -14,26 +14,38 @@ export interface AchievementCardData {
 export const CARD_W = 1080;
 export const CARD_H = 1350;
 
+/**
+ * Palet kartu dari token global (ADR-0011). Canvas tidak bisa memakai
+ * `var()` langsung di fillStyle, jadi resolve sekali dari CSSOM dengan
+ * fallback HEX (kartu PNG selalu desain terang; SSR pakai fallback).
+ */
+function cssVar(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  return (
+    window.getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
+  );
+}
+
 const PALETTE = {
-  bg: "#faf1e2",
-  bgDeep: "#f1dfc2",
-  ink: "#3a2a1c",
-  muted: "#7a6350",
-  line: "#e3cdab",
-  primary: "#b05a30",
-  primaryDark: "#873f1e",
-  gold: "#d9a441",
-  cream: "#fff8ec",
-  white: "#ffffff",
+  bg: cssVar("--card-bg", "#faf1e2"),
+  bgDeep: cssVar("--card-bg-deep", "#f1dfc2"),
+  ink: cssVar("--card-ink", "#3a2a1c"),
+  muted: cssVar("--card-muted", "#7a6350"),
+  line: cssVar("--card-line", "#e3cdab"),
+  primary: cssVar("--card-primary", "#b05a30"),
+  primaryDark: cssVar("--card-primary-dark", "#873f1e"),
+  gold: cssVar("--card-gold", "#d9a441"),
+  cream: cssVar("--card-cream", "#fff8ec"),
+  white: cssVar("--card-white", "#ffffff"),
   mastery: {
-    belum: "#d6c8b6",
-    dipahami: "#e0b24f",
-    ahli: "#b05a30",
+    belum: cssVar("--card-mastery-belum", "#d6c8b6"),
+    dipahami: cssVar("--card-mastery-dipahami", "#e0b24f"),
+    ahli: cssVar("--card-mastery-ahli", "#b05a30"),
   },
   statusText: {
-    belum: "#7a6350",
-    dipahami: "#6b4b12",
-    ahli: "#fff8ec",
+    belum: cssVar("--card-status-belum", "#7a6350"),
+    dipahami: cssVar("--card-status-dipahami", "#6b4b12"),
+    ahli: cssVar("--card-status-ahli", "#fff8ec"),
   },
 };
 
