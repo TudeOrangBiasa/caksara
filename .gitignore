@@ -66,3 +66,6 @@ temp
 *.local.md
 plan.md
 spec.md
+
+# Secrets
+key.md

@@ -7,8 +7,4 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   plugins: [tailwindcss(), reactRouter()],
-  ssr: {
-    // The deployment artifact has no node_modules; bundle all server dependencies.
-    noExternal: true,
-  },
 });

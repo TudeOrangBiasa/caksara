@@ -5,11 +5,28 @@ export const choiceSchema = z.object({
   isCorrect: z.boolean(),
 });
 
+export const questionTypeSchema = z.enum([
+  "dengar_pilih",
+  "susun_aksara",
+  "kenali_visual",
+  "checkpoint_budaya",
+  "cocokkan",
+]);
+export type QuestionType = z.infer<typeof questionTypeSchema>;
+
+const matchPairSchema = z.object({
+  left: z.string().min(1),
+  right: z.string().min(1),
+});
+
 export const questionSchema = z.object({
-  type: z.enum(["dengar_pilih", "susun_aksara", "kenali_visual", "checkpoint", "cocokkan"]),
+  type: questionTypeSchema,
   prompt: z.string().min(1),
   audioUrl: z.string().optional(),
-  choices: z.array(choiceSchema).length(4),
+  audioType: z.enum(["original", "latin"]).optional(),
+  choices: z.array(choiceSchema).length(4).optional(),
+  tiles: z.array(z.string().min(1)).optional(),
+  pairs: z.array(matchPairSchema).optional(),
   explanation: z.string().optional(),
   sourceRef: z.string().optional(),
   aksaraId: z.string().optional(),
@@ -22,4 +39,5 @@ export const quizSchema = z.object({
 });
 
 export type Question = z.infer<typeof questionSchema>;
+export type MatchPair = z.infer<typeof matchPairSchema>;
 export type Quiz = z.infer<typeof quizSchema>;
