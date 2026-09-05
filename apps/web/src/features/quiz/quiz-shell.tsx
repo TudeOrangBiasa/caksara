@@ -6,6 +6,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { notifyHeartsRefilled } from "../../lib/notify";
+import { playCue } from "../../lib/sound";
 import type { Question, Quiz } from "../../lib/zod/question";
 import { Cocokkan } from "./quiz-cocokkan";
 import { SusunAksara } from "./quiz-susun";
@@ -126,11 +127,13 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
     const question = quiz.questions[questionIndex];
     if (isAnswerCorrect(question, answer)) {
       addXp(XP_PER_CORRECT);
+      playCue("success");
     } else if (hearts > 0) {
       const next = hearts - 1;
       setHeartsState(next);
       setHearts(next);
       if (next === 0) setGameOver(true);
+      playCue("error");
     }
   };
 

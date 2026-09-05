@@ -14,6 +14,7 @@
     "@react-router/fs-routes": "^8.3.0",
     "@react-router/node": "^8.3.0",
     "@react-router/serve": "^8.3.0",
+    "cuelume": "^0.2.2",
     "dotenv": "catalog:",
     "isbot": "^5.2.1",
     "lucide-react": "catalog:",

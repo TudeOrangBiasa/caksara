@@ -17,6 +17,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { useTheme } from "../../components/theme-provider";
 import { Bedawang } from "../../components/bedawang";
+import { playCue } from "../../lib/sound";
 import { clearSelesai } from "../module/module-store";
 import { resetProfile } from "../../lib/profile-store";
 import {
@@ -298,7 +299,16 @@ function SoundSection({ enabled }: { enabled: boolean }) {
           <p className="text-xs text-muted-foreground">Bunyi saat jawab benar / salah</p>
         </div>
       </div>
-      <Swing checked={enabled} onChecked={setSoundEnabled} />
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => playCue("success")}
+          className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground"
+        >
+          Coba
+        </button>
+        <Swing checked={enabled} onChecked={setSoundEnabled} />
+      </div>
     </section>
   );
 }

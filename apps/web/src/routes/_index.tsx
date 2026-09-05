@@ -28,6 +28,7 @@ import type { Quiz } from "../lib/zod/question";
 import { applyOvernightReset, createAnonProfile, loadProfile } from "../lib/profile-store";
 import { notifyStreakReset } from "../lib/notify";
 import { ensureAnonSession } from "../lib/supabase";
+import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
 
@@ -93,6 +94,7 @@ export default function Home() {
 
   useEffect(() => {
     void ensureAnonSession();
+    initSoundboard();
   }, []);
 
   if (!profileLoaded) {
