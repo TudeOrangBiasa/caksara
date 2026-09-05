@@ -1,0 +1,104 @@
+import { describe, test } from "node:test";
+import assert from "node:assert/strict";
+import {
+  applyCorrectAnswer,
+  applyWrongAnswer,
+  deriveMastery,
+  refillHeartsForNewDay,
+  resetStreakForMissedDay,
+  touchStreakOnActivity,
+  witaDateString,
+} from "./game-rules";
+import type { GameState } from "./game-rules";
+
+describe("witaDateString", () => {
+  test("16:00 UTC is already the next day in WITA", () => {
+    assert.equal(witaDateString(new Date("2026-09-04T15:59:00Z")), "2026-09-04");
+    assert.equal(witaDateString(new Date("2026-09-04T16:00:00Z")), "2026-09-05");
+  });
+});
+
+const fresh = (): GameState => ({
+  xp: 0,
+  hearts: 5,
+  streak: 0,
+  lastActiveDate: "2026-09-04",
+  heartsRefilledAt: "2026-09-04",
+});
+
+describe("jawaban Sesi Kuis", () => {
+  test("jawaban benar memberi +10 XP tanpa menyentuh Hati", () => {
+    const next = applyCorrectAnswer({ ...fresh(), xp: 20, hearts: 3 });
+    assert.equal(next.xp, 30);
+    assert.equal(next.hearts, 3);
+  });
+
+  test("jawaban salah mengurangi 1 Hati tanpa game over", () => {
+    const { state, gameOver } = applyWrongAnswer(fresh());
+    assert.equal(state.hearts, 4);
+    assert.equal(gameOver, false);
+  });
+
+  test("Hati terakhir memicu game over dan Hati tidak pernah negatif", () => {
+    const last = applyWrongAnswer({ ...fresh(), hearts: 1 });
+    assert.equal(last.state.hearts, 0);
+    assert.equal(last.gameOver, true);
+    const again = applyWrongAnswer(last.state);
+    assert.equal(again.state.hearts, 0);
+    assert.equal(again.gameOver, true);
+  });
+});
+
+describe("refill Hati harian (00:00 WITA)", () => {
+  test("refill ke 5 sekali per hari WITA", () => {
+    const empty = { ...fresh(), hearts: 0 };
+    const refilled = refillHeartsForNewDay(empty, new Date("2026-09-05T01:00:00Z"));
+    assert.equal(refilled.hearts, 5);
+    assert.equal(refilled.heartsRefilledAt, "2026-09-05");
+    assert.equal(refillHeartsForNewDay(refilled, new Date("2026-09-05T10:00:00Z")), refilled);
+  });
+
+  test("hari UTC yang sama bisa menjadi hari WITA yang baru", () => {
+    const next = refillHeartsForNewDay({ ...fresh(), hearts: 2 }, new Date("2026-09-04T16:30:00Z"));
+    assert.equal(next.hearts, 5);
+  });
+});
+
+describe("Streak", () => {
+  test("hari WITA berurutan menambah, hari yang sama idempoten", () => {
+    const day2 = touchStreakOnActivity({ ...fresh(), streak: 3 }, "2026-09-05");
+    assert.equal(day2.streak, 4);
+    assert.equal(day2.lastActiveDate, "2026-09-05");
+    assert.equal(touchStreakOnActivity(day2, "2026-09-05").streak, 4);
+  });
+
+  test("hari yang terlewat memulai lagi dari 1 saat berikutnya aktif", () => {
+    const back = touchStreakOnActivity({ ...fresh(), streak: 6 }, "2026-09-10");
+    assert.equal(back.streak, 1);
+  });
+
+  test("cron menolkan Streak yang terputus tapi menjaga yang hidup", () => {
+    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 6 }, "2026-09-10").streak, 0);
+    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 6 }, "2026-09-05").streak, 6);
+    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 2 }, "2026-09-04").streak, 2);
+  });
+});
+
+describe("Mastery", () => {
+  test("tanpa percobaan berarti belum", () => {
+    assert.equal(deriveMastery({ correctCount: 0, totalCount: 0 }), "belum");
+  });
+
+  test("sedikit percobaan tetap belum walau sempurna", () => {
+    assert.equal(deriveMastery({ correctCount: 2, totalCount: 2 }), "belum");
+  });
+
+  test("akurasi stabil meraih dipahami, akurasi terjaga meraih ahli", () => {
+    assert.equal(deriveMastery({ correctCount: 2, totalCount: 4 }), "dipahami");
+    assert.equal(deriveMastery({ correctCount: 8, totalCount: 10 }), "ahli");
+  });
+
+  test("volume tinggi dengan akurasi rendah tetap belum", () => {
+    assert.equal(deriveMastery({ correctCount: 3, totalCount: 10 }), "belum");
+  });
+});
