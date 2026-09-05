@@ -5,6 +5,7 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
+import { notifyHeartsRefilled } from "../../lib/notify";
 import type { Question, Quiz } from "../../lib/zod/question";
 import { Cocokkan } from "./quiz-cocokkan";
 import { SusunAksara } from "./quiz-susun";
@@ -115,7 +116,7 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
 
   useEffect(() => {
     updateStreak();
-    refillHearts();
+    if (refillHearts()) notifyHeartsRefilled();
   }, []);
 
   const submitAnswer = (questionIndex: number, answer: QuizAnswer) => {

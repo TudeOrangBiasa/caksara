@@ -1,5 +1,6 @@
 import { profileNameSchema, userProfileSchema } from "./zod/profile";
 import type { ProfileAvatar, UserProfile } from "./zod/profile";
+import { scheduleProfileSync } from "./profile-sync";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const STORAGE_KEY = "caksara.profile.v1";
@@ -32,27 +33,73 @@ function readStored(): UserProfile | null {
   }
 }
 
-function persist(profile: UserProfile | null): void {
-  cache = profile;
+const WITA_OFFSET_MS = 8 * 3600 * 1000;
+const DAY_MS = 24 * 3600 * 1000;
+/** V9: tulis XP/Hati didebounce agar tidak membanjiri storage saat kuis. */
+const DISK_WRITE_DEBOUNCE_MS = 500;
+
+let diskTimer: ReturnType<typeof setTimeout> | null = null;
+let pagehideWired = false;
+
+function writeDisk(profile: UserProfile | null): void {
+  const storage = safeStorage();
+  if (!storage) return;
   if (profile) {
-    safeStorage()?.setItem(STORAGE_KEY, JSON.stringify(profile));
+    storage.setItem(STORAGE_KEY, JSON.stringify(profile));
   } else {
-    safeStorage()?.removeItem(STORAGE_KEY);
+    storage.removeItem(STORAGE_KEY);
   }
-  emit();
 }
 
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+function scheduleDiskWrite(): void {
+  if (typeof window === "undefined") return;
+  if (!pagehideWired) {
+    pagehideWired = true;
+    window.addEventListener("pagehide", () => flushProfileWrites());
+  }
+  if (diskTimer) window.clearTimeout(diskTimer);
+  diskTimer = window.setTimeout(() => {
+    diskTimer = null;
+    writeDisk(cache);
+  }, DISK_WRITE_DEBOUNCE_MS);
+}
+
+function persist(profile: UserProfile | null, immediate = false): void {
+  cache = profile;
+  if (immediate || typeof window === "undefined") {
+    if (diskTimer) {
+      clearTimeout(diskTimer);
+      diskTimer = null;
+    }
+    writeDisk(profile);
+  } else {
+    scheduleDiskWrite();
+  }
+  emit();
+  if (profile) scheduleProfileSync(profile);
+}
+
+/** Paksa tulis cache ke localStorage sekarang (otomatis dipanggil saat pagehide). */
+export function flushProfileWrites(): void {
+  if (diskTimer) {
+    clearTimeout(diskTimer);
+    diskTimer = null;
+  }
+  writeDisk(cache);
+}
+
+/** Tanggal kalender WITA (UTC+8 tetap, tanpa DST) format YYYY-MM-DD. */
+export function witaTodayStr(now = Date.now()): string {
+  return new Date(now + WITA_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+function witaYesterdayStr(now = Date.now()): string {
+  return new Date(now + WITA_OFFSET_MS - DAY_MS).toISOString().slice(0, 10);
 }
 
 function isYesterday(dateStr: string | undefined): boolean {
   if (!dateStr) return false;
-  const d = new Date(dateStr + "T00:00:00");
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
-  return d.getTime() >= yesterday.getTime() && d.getTime() < new Date().setHours(0, 0, 0, 0);
+  return dateStr === witaYesterdayStr();
 }
 
 export function loadProfile(): UserProfile | null {
@@ -67,7 +114,7 @@ export function subscribeProfile(listener: () => void): () => void {
 }
 
 export function createAnonProfile(name: string): UserProfile {
-  const today = todayStr();
+  const today = witaTodayStr();
   const mastery: Record<string, "belum" | "dipahami" | "ahli"> = {};
   for (const id of WRESASTRA_IDS) {
     mastery[id] = "belum";
@@ -107,19 +154,43 @@ export function setHearts(hearts: number): void {
   });
 }
 
-export function refillHearts(): void {
+/**
+ * Isi hati penuh 5 bila sudah lewat 00:00 WITA sejak refill terakhir.
+ * Kembalikan true bila refill terjadi (pemanggil wajib toast).
+ */
+export function refillHearts(): boolean {
+  const today = witaTodayStr();
+  let didRefill = false;
   update((profile) => {
-    const today = todayStr();
-    if (profile.hearts < 5 && profile.heartsRefilledAt && profile.heartsRefilledAt < today) {
+    if (profile.hearts < 5 && (!profile.heartsRefilledAt || profile.heartsRefilledAt < today)) {
       profile.hearts = 5;
       profile.heartsRefilledAt = today;
+      didRefill = true;
     }
   });
+  return didRefill;
+}
+
+/**
+ * Cermin lokal cron harian V9: bila terakhir aktif lebih tua dari kemarin
+ * (WITA), streak dinolkan. Dijalankan sekali saat aplikasi dimuat.
+ * Kembalikan true bila streak direset (pemanggil wajib toast).
+ */
+export function applyOvernightReset(): boolean {
+  const yesterday = witaYesterdayStr();
+  let didReset = false;
+  update((profile) => {
+    if (profile.lastActiveDate && profile.lastActiveDate < yesterday && profile.streak !== 0) {
+      profile.streak = 0;
+      didReset = true;
+    }
+  });
+  return didReset;
 }
 
 export function updateStreak(): void {
   update((profile) => {
-    const today = todayStr();
+    const today = witaTodayStr();
     if (profile.lastActiveDate === today) return;
     if (isYesterday(profile.lastActiveDate)) {
       profile.streak += 1;
@@ -150,7 +221,7 @@ export function markModuleMastered(moduleAksaraIds: string[]): void {
 }
 
 export function resetProfile(): void {
-  persist(null);
+  persist(null, true);
 }
 
 /** Ganti nama panggilan. Kembalikan pesan error bila tidak valid, null bila sukses. */

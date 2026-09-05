@@ -1,8 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Route } from "./+types/_index";
 import { BottomNav } from "../components/bottom-nav";
 import type { NavTab } from "../components/bottom-nav";
+import { OfflineBanner } from "../components/offline-banner";
 import { TopNav } from "../components/top-nav";
 import Header from "../components/header";
 import { Dashboard } from "../features/dashboard/dashboard";
@@ -24,7 +25,9 @@ import { QuizShell } from "../features/quiz/quiz-shell";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { buildMixedQuiz, buildQuiz } from "../features/quiz/quiz-data";
 import type { Quiz } from "../lib/zod/question";
-import { createAnonProfile, loadProfile } from "../lib/profile-store";
+import { applyOvernightReset, createAnonProfile, loadProfile } from "../lib/profile-store";
+import { notifyStreakReset } from "../lib/notify";
+import { ensureAnonSession } from "../lib/supabase";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
 
@@ -86,6 +89,10 @@ export default function Home() {
   const handleComplete = useCallback((name: string) => {
     if (name) createAnonProfile(name);
     setProfileLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    void ensureAnonSession();
   }, []);
 
   if (!profileLoaded) {
@@ -230,11 +237,16 @@ function HomeShell({
 }) {
   const isDesktop = useIsDesktop();
 
+  useEffect(() => {
+    if (applyOvernightReset()) notifyStreakReset();
+  }, []);
+
   return (
     <div className="flex h-full flex-col">
       {!overlay && isDesktop && <TopNav active={navTab} onSelect={onSelect} />}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {!isDesktop && <Header />}
+        <OfflineBanner />
         <main className="flex-1 overflow-y-auto">{content}</main>
         {!overlay && !isDesktop && <BottomNav active={navTab} onSelect={onSelect} />}
       </div>

@@ -40,6 +40,7 @@
     "code-review": "echo \"code-review: run /code-review (Standards + Spec) — see docs/CODING_STANDARDS.md + CONTEXT.md\" && oxlint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
+    "db:seed": "bun --env-file=apps/web/.env scripts/seed-kb.ts",
     "db:studio": "drizzle-kit studio",
     "prepare": "husky"
   },

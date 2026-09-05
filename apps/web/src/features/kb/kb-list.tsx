@@ -5,6 +5,7 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
+import { EmptyState } from "../../components/empty-state";
 import { KB_CATEGORY_META, KB_ENTRIES, kbLevelSchema } from "./kb-data";
 import type { KbCategory, KbEntry, KbLevel } from "./kb-data";
 
@@ -69,29 +70,38 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
 
   if (simulateError) {
     return (
-      <StatePanel
-        icon={<WifiOff className="size-10 text-destructive" />}
+      <EmptyState
+        illustration={<WifiOff className="size-7" />}
         title="Gagal memuat daftar"
         body="Ada masalah saat mengambil data KB. Cek koneksimu lalu coba sekali lagi."
-      >
-        <Button className="h-11" onClick={() => window.location.reload()}>
-          Coba Lagi
-        </Button>
-      </StatePanel>
+        tone="danger"
+        action={
+          <Button
+            className="h-11 w-full rounded-full font-semibold"
+            onClick={() => window.location.reload()}
+          >
+            Coba Lagi
+          </Button>
+        }
+      />
     );
   }
 
   if (simulateEmpty) {
     return (
-      <StatePanel
-        icon={<Library className="size-10 text-muted-foreground" />}
+      <EmptyState
+        illustration={<Library className="size-7" />}
         title="Belum ada isi KB"
         body="Kamus aksara & budaya masih kosong. Sumbernya sedang disusun pelan-pelan."
-      >
-        <Button className="h-11" onClick={() => setCategory("semua")}>
-          Buka Semua
-        </Button>
-      </StatePanel>
+        action={
+          <Button
+            className="h-11 w-full rounded-full font-semibold"
+            onClick={() => setCategory("semua")}
+          >
+            Buka Semua
+          </Button>
+        }
+      />
     );
   }
 
@@ -158,36 +168,37 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
       </div>
 
       {showNoResults ? (
-        <div className="mt-10 flex flex-col items-center rounded-3xl bg-card px-6 py-10 text-center">
-          <span className="flex size-14 items-center justify-center rounded-full bg-muted">
-            <FilterX className="size-6 text-muted-foreground" />
-          </span>
-          <h2 className="mt-4 text-base font-semibold">Tidak ketemu</h2>
-          <p className="mt-1 max-w-[34ch] text-sm text-muted-foreground">
-            Coba kata lain atau bersihkan filter biar hasilnya keluar semua.
-          </p>
-          <Button
-            className="mt-5 h-11"
-            onClick={() => {
-              setQuery("");
-              setCategory("semua");
-              setLevel("semua");
-            }}
-          >
-            Reset Filter
-          </Button>
-        </div>
+        <EmptyState
+          illustration={<FilterX className="size-7" />}
+          title="Tidak ketemu"
+          body="Coba kata lain atau bersihkan filter biar hasilnya keluar semua."
+          action={
+            <Button
+              className="h-11 w-full rounded-full font-semibold"
+              onClick={() => {
+                setQuery("");
+                setCategory("semua");
+                setLevel("semua");
+              }}
+            >
+              Reset Filter
+            </Button>
+          }
+        />
       ) : showEmpty ? (
-        <div className="mt-10 flex flex-col items-center rounded-3xl bg-card px-6 py-10 text-center">
-          <Bedawang className="size-24" mood="sedih" />
-          <h2 className="mt-3 text-base font-semibold">KB masih kosong</h2>
-          <p className="mt-1 max-w-[34ch] text-sm text-muted-foreground">
-            Belum ada entri untuk filter ini. Coba buka semua kategori.
-          </p>
-          <Button className="mt-5 h-11" onClick={() => setCategory("semua")}>
-            Buka Semua
-          </Button>
-        </div>
+        <EmptyState
+          illustration={<Bedawang className="size-12" mood="sedih" />}
+          title="KB masih kosong"
+          body="Belum ada entri untuk filter ini. Coba buka semua kategori."
+          action={
+            <Button
+              className="h-11 w-full rounded-full font-semibold"
+              onClick={() => setCategory("semua")}
+            >
+              Buka Semua
+            </Button>
+          }
+        />
       ) : (
         <div className="mt-5 space-y-8">
           {(Object.keys(KB_CATEGORY_META) as KbCategory[]).map((cat) => {
@@ -320,26 +331,5 @@ function LevelChipFilter({
       {level && <span className={cn("size-1.5 rounded-full", LEVEL_CHIP[level].dot)} />}
       {children}
     </button>
-  );
-}
-
-function StatePanel({
-  icon,
-  title,
-  body,
-  children,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="mx-auto flex w-full max-w-lg flex-col items-center md:max-w-2xl px-6 py-24 text-center">
-      {icon}
-      <h1 className="mt-4 text-lg font-semibold">{title}</h1>
-      <p className="mt-1 max-w-[34ch] text-sm text-muted-foreground">{body}</p>
-      {children && <div className="mt-5">{children}</div>}
-    </div>
   );
 }
