@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { RotateCcw, Sparkles } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
@@ -5,6 +6,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { Confetti } from "../../components/confetti";
+import { playCue } from "../../lib/sound";
 import type { CourseModule } from "../module/module-data";
 
 const XP_PER_CORRECT = 10;
@@ -24,9 +26,13 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
   const R = 54;
   const C = 2 * Math.PI * R;
 
+  useEffect(() => {
+    playCue(passed ? "success" : "error");
+  }, [passed]);
+
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center px-4 md:max-w-xl py-8">
-      <Confetti active={passed && !isLatihan} />
+      <Confetti active={passed} />
       <Bedawang
         mood={passed ? "semangat" : "sedih"}
         className={cn("size-20", !passed && "grayscale-[35%]")}
