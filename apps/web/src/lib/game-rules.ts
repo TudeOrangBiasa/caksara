@@ -1,13 +1,10 @@
+import { witaDateSchema } from "./zod/game-state";
+import type { GameState } from "./zod/game-state";
+
+export type { GameState };
+
 export const MAX_HEARTS = 5;
 export const XP_PER_CORRECT = 10;
-
-export interface GameState {
-  xp: number;
-  hearts: number;
-  streak: number;
-  lastActiveDate?: string;
-  heartsRefilledAt?: string;
-}
 
 const WITA_OFFSET_MS = 8 * 3_600_000;
 
@@ -49,8 +46,9 @@ export function refillHeartsForNewDay(state: GameState, now: Date): GameState {
 }
 
 export function resetStreakForMissedDay(state: GameState, today: string): GameState {
-  if (state.lastActiveDate === today) return state;
-  if (state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === today) {
+  const validToday = witaDateSchema.parse(today);
+  if (state.lastActiveDate === validToday) return state;
+  if (state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === validToday) {
     return state;
   }
   if (state.streak === 0) return state;
@@ -58,16 +56,16 @@ export function resetStreakForMissedDay(state: GameState, today: string): GameSt
 }
 
 export function touchStreakOnActivity(state: GameState, today: string): GameState {
-  if (state.lastActiveDate === today) return state;
+  const validToday = witaDateSchema.parse(today);
+  if (state.lastActiveDate === validToday) return state;
   const continued =
-    state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === today;
+    state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === validToday;
   return {
     ...state,
     streak: continued ? state.streak + 1 : 1,
-    lastActiveDate: today,
+    lastActiveDate: validToday,
   };
 }
-
 export type Mastery = "belum" | "dipahami" | "ahli";
 
 export interface MasteryInput {

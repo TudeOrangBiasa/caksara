@@ -54,8 +54,8 @@ describe("refill Hati harian (00:00 WITA)", () => {
     const empty = { ...fresh(), hearts: 0 };
     const refilled = refillHeartsForNewDay(empty, new Date("2026-09-05T01:00:00Z"));
     assert.equal(refilled.hearts, 5);
+    assert.deepEqual(refillHeartsForNewDay(refilled, new Date("2026-09-05T10:00:00Z")), refilled);
     assert.equal(refilled.heartsRefilledAt, "2026-09-05");
-    assert.equal(refillHeartsForNewDay(refilled, new Date("2026-09-05T10:00:00Z")), refilled);
   });
 
   test("hari UTC yang sama bisa menjadi hari WITA yang baru", () => {
