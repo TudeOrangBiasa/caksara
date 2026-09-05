@@ -6,7 +6,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { Confetti } from "../../components/confetti";
-import { playCue } from "../../lib/sound";
+import { playCue, playFanfare } from "../../lib/sound";
 import type { CourseModule } from "../module/module-data";
 
 const XP_PER_CORRECT = 10;
@@ -27,7 +27,8 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
   const C = 2 * Math.PI * R;
 
   useEffect(() => {
-    playCue(passed ? "success" : "error");
+    if (passed) playFanfare();
+    else playCue("error");
   }, [passed]);
 
   return (
@@ -79,7 +80,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
       </div>
 
       {passed && (
-        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent animate-[confetti-fall_1.4s_ease-out_forwards]">
+        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent animate-card-pop">
           <Sparkles className="size-4" /> +{xpGained} XP
         </div>
       )}

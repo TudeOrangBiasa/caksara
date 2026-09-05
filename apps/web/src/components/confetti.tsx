@@ -7,6 +7,9 @@ interface ConfettiParticle {
   color: string;
   rotation: number;
   scale: number;
+  duration: number;
+  sway: number;
+  round: boolean;
 }
 
 // Emas konfeti dari token global (ADR-0011): var(--confetti-*), bukan hex.
@@ -19,22 +22,43 @@ const COLORS = [
   "var(--confetti-6)",
 ];
 
+/** Perayaan 3 gelombang: 45 partikel tiap 450ms, hidup total ~4,5 detik. */
+const WAVES = 3;
+const PER_WAVE = 45;
+const WAVE_GAP_MS = 450;
+const CLEAR_MS = 4500;
+
+function makeWave(wave: number): ConfettiParticle[] {
+  return Array.from({ length: PER_WAVE }, (_, i) => ({
+    id: wave * PER_WAVE + i,
+    x: Math.random() * 100,
+    y: -6 - Math.random() * 8,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    rotation: Math.random() * 360,
+    scale: 0.6 + Math.random() * 1.1,
+    duration: 2.2 + Math.random() * 1.2,
+    sway: (Math.random() - 0.5) * 90,
+    round: Math.random() < 0.35,
+  }));
+}
+
 export function Confetti({ active }: { active: boolean }) {
   const [particles, setParticles] = useState<ConfettiParticle[]>([]);
 
   useEffect(() => {
     if (!active) return;
-    const newParticles: ConfettiParticle[] = Array.from({ length: 30 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: -10 - Math.random() * 20,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      rotation: Math.random() * 360,
-      scale: 0.6 + Math.random() * 0.8,
-    }));
-    setParticles(newParticles);
-    const timer = setTimeout(() => setParticles([]), 1500);
-    return () => clearTimeout(timer);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    for (let w = 0; w < WAVES; w += 1) {
+      timers.push(
+        window.setTimeout(() => {
+          setParticles((prev) => [...prev, ...makeWave(w)]);
+        }, w * WAVE_GAP_MS),
+      );
+    }
+    timers.push(window.setTimeout(() => setParticles([]), CLEAR_MS));
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+    };
   }, [active]);
 
   if (particles.length === 0) return null;
@@ -44,16 +68,17 @@ export function Confetti({ active }: { active: boolean }) {
       {particles.map((p) => (
         <div
           key={p.id}
-          className="absolute top-0 animate-[confetti-fall_1.4s_ease-out_forwards]"
+          className="absolute top-0 animate-[confetti-fall_ease-out_forwards]"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
-            width: `${8 * p.scale}px`,
-            height: `${8 * p.scale}px`,
+            width: `${9 * p.scale}px`,
+            height: `${9 * p.scale}px`,
             backgroundColor: p.color,
-            borderRadius: "2px",
+            borderRadius: p.round ? "50%" : "2px",
+            ["--sway" as string]: `${p.sway}px`,
             transform: `rotate(${p.rotation}deg)`,
-            opacity: 0.9,
+            animationDuration: `${p.duration}s`,
           }}
         />
       ))}

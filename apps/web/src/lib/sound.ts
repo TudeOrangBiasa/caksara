@@ -15,7 +15,7 @@ export function initSoundboard(): void {
   bind();
 }
 
-export type SoundCue = "success" | "error" | "press" | "toggle";
+export type SoundCue = "success" | "error" | "press" | "toggle" | "sparkle" | "chime";
 
 /** Mainkan cue bila suara aktif. Aman dipanggil dari event handler. */
 export function playCue(cue: SoundCue): void {
@@ -26,4 +26,12 @@ export function playCue(cue: SoundCue): void {
   } catch {
     // Audio tidak tersedia/diblokir: diam, jangan ganggu belajar.
   }
+}
+
+/** Fanfare lulus kuis: 3 lapis nada (tiap lapis cek toggle lagi). */
+export function playFanfare(): void {
+  if (typeof window === "undefined") return;
+  playCue("success");
+  window.setTimeout(() => playCue("sparkle"), 250);
+  window.setTimeout(() => playCue("chime"), 550);
 }
