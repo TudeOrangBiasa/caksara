@@ -3,6 +3,7 @@ import type { GameState, WitaDate } from "./zod/game-state";
 
 export type { GameState, WitaDate };
 
+/** Spec constants (#24). Read these; do not restate 5 or 10 in UI code. */
 export const MAX_HEARTS = 5;
 export const XP_PER_CORRECT = 10;
 
@@ -12,6 +13,7 @@ function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
+/** Day producer. 00:00 WITA starts at 16:00 UTC the day before, so compare WITA days, never UTC days. */
 export function witaDateString(now: Date): WitaDate {
   const wita = new Date(now.getTime() + WITA_OFFSET_MS);
   return parseWitaDate(
@@ -19,6 +21,7 @@ export function witaDateString(now: Date): WitaDate {
   );
 }
 
+/** Correct Sesi Kuis answer. Drives the XP Pop in; Hati untouched. */
 export function applyCorrectAnswer(state: GameState): GameState {
   return { ...state, xp: state.xp + XP_PER_CORRECT };
 }
@@ -28,6 +31,7 @@ export interface WrongAnswerResult {
   gameOver: boolean;
 }
 
+/** Wrong Sesi Kuis answer. gameOver drives the Hati 0 overlay with Coba Lagi (#24). */
 export function applyWrongAnswer(state: GameState): WrongAnswerResult {
   const hearts = Math.max(0, state.hearts - 1);
   return { state: { ...state, hearts }, gameOver: hearts === 0 };
@@ -43,12 +47,14 @@ function shiftWitaDate(dateStr: WitaDate, days: number): WitaDate {
   );
 }
 
+/** Call once per launch. Idempotent within a day; stamps heartsRefilledAt even when Hati already full. */
 export function refillHeartsForNewDay(state: GameState, now: Date): GameState {
   const today = witaDateString(now);
   if (state.heartsRefilledAt === today) return state;
   return { ...state, hearts: MAX_HEARTS, heartsRefilledAt: today };
 }
 
+/** Cron half of Streak (see touchStreakOnActivity). Zeroes lapsed streaks; live ones pass through untouched. */
 export function resetStreakForMissedDay(state: GameState, today: WitaDate): GameState {
   if (state.lastActiveDate === today) return state;
   if (state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === today) {
@@ -58,6 +64,7 @@ export function resetStreakForMissedDay(state: GameState, today: WitaDate): Game
   return { ...state, streak: 0 };
 }
 
+/** Activity half of Streak. Do not merge with reset: cron zeroes, activity increments, and the two run in different processes. */
 export function touchStreakOnActivity(state: GameState, today: WitaDate): GameState {
   if (state.lastActiveDate === today) return state;
   const continued =
@@ -75,8 +82,7 @@ export interface MasteryInput {
   totalCount: number;
 }
 
-// Thresholds stay in code (not KB) so the quiz Edge and the client share one
-// interpretation; changing them is a product decision, hence explicit numbers.
+/** Derived from answers history per aksaraId (#24). Thresholds are a product decision; change here, not in callers. */
 export function deriveMastery(input: MasteryInput): Mastery {
   const { correctCount, totalCount } = input;
   if (totalCount <= 0) return "belum";
