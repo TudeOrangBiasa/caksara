@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const witaDateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/u, "Tanggal harus format YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/u, "Tanggal harus format YYYY-MM-DD.")
+  .brand<"WitaDate">();
+
+export type WitaDate = z.infer<typeof witaDateSchema>;
+
+export function parseWitaDate(input: unknown): WitaDate {
+  return witaDateSchema.parse(input);
+}
 
 export const gameStateSchema = z.object({
   xp: z.number().int().nonnegative(),

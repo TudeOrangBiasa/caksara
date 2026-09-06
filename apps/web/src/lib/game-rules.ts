@@ -1,7 +1,7 @@
-import { witaDateSchema } from "./zod/game-state";
-import type { GameState } from "./zod/game-state";
+import { parseWitaDate } from "./zod/game-state";
+import type { GameState, WitaDate } from "./zod/game-state";
 
-export type { GameState };
+export type { GameState, WitaDate };
 
 export const MAX_HEARTS = 5;
 export const XP_PER_CORRECT = 10;
@@ -12,9 +12,11 @@ function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
-export function witaDateString(now: Date): string {
+export function witaDateString(now: Date): WitaDate {
   const wita = new Date(now.getTime() + WITA_OFFSET_MS);
-  return `${wita.getUTCFullYear()}-${pad(wita.getUTCMonth() + 1)}-${pad(wita.getUTCDate())}`;
+  return parseWitaDate(
+    `${wita.getUTCFullYear()}-${pad(wita.getUTCMonth() + 1)}-${pad(wita.getUTCDate())}`,
+  );
 }
 
 export function applyCorrectAnswer(state: GameState): GameState {
@@ -33,10 +35,12 @@ export function applyWrongAnswer(state: GameState): WrongAnswerResult {
 
 const MS_PER_DAY = 86_400_000;
 
-function shiftWitaDate(dateStr: string, days: number): string {
+function shiftWitaDate(dateStr: WitaDate, days: number): WitaDate {
   const [y, m, d] = dateStr.split("-").map(Number);
   const shifted = new Date(Date.UTC(y, m - 1, d) + days * MS_PER_DAY);
-  return `${shifted.getUTCFullYear()}-${pad(shifted.getUTCMonth() + 1)}-${pad(shifted.getUTCDate())}`;
+  return parseWitaDate(
+    `${shifted.getUTCFullYear()}-${pad(shifted.getUTCMonth() + 1)}-${pad(shifted.getUTCDate())}`,
+  );
 }
 
 export function refillHeartsForNewDay(state: GameState, now: Date): GameState {
@@ -45,25 +49,23 @@ export function refillHeartsForNewDay(state: GameState, now: Date): GameState {
   return { ...state, hearts: MAX_HEARTS, heartsRefilledAt: today };
 }
 
-export function resetStreakForMissedDay(state: GameState, today: string): GameState {
-  const validToday = witaDateSchema.parse(today);
-  if (state.lastActiveDate === validToday) return state;
-  if (state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === validToday) {
+export function resetStreakForMissedDay(state: GameState, today: WitaDate): GameState {
+  if (state.lastActiveDate === today) return state;
+  if (state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === today) {
     return state;
   }
   if (state.streak === 0) return state;
   return { ...state, streak: 0 };
 }
 
-export function touchStreakOnActivity(state: GameState, today: string): GameState {
-  const validToday = witaDateSchema.parse(today);
-  if (state.lastActiveDate === validToday) return state;
+export function touchStreakOnActivity(state: GameState, today: WitaDate): GameState {
+  if (state.lastActiveDate === today) return state;
   const continued =
-    state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === validToday;
+    state.lastActiveDate !== undefined && shiftWitaDate(state.lastActiveDate, 1) === today;
   return {
     ...state,
     streak: continued ? state.streak + 1 : 1,
-    lastActiveDate: validToday,
+    lastActiveDate: today,
   };
 }
 export type Mastery = "belum" | "dipahami" | "ahli";

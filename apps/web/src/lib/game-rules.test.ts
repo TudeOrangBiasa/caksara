@@ -9,6 +9,7 @@ import {
   touchStreakOnActivity,
   witaDateString,
 } from "./game-rules";
+import { parseWitaDate } from "./zod/game-state";
 import type { GameState } from "./game-rules";
 
 describe("witaDateString", () => {
@@ -22,8 +23,8 @@ const fresh = (): GameState => ({
   xp: 0,
   hearts: 5,
   streak: 0,
-  lastActiveDate: "2026-09-04",
-  heartsRefilledAt: "2026-09-04",
+  lastActiveDate: parseWitaDate("2026-09-04"),
+  heartsRefilledAt: parseWitaDate("2026-09-04"),
 });
 
 describe("jawaban Sesi Kuis", () => {
@@ -66,21 +67,24 @@ describe("refill Hati harian (00:00 WITA)", () => {
 
 describe("Streak", () => {
   test("hari WITA berurutan menambah, hari yang sama idempoten", () => {
-    const day2 = touchStreakOnActivity({ ...fresh(), streak: 3 }, "2026-09-05");
+    const day2 = touchStreakOnActivity({ ...fresh(), streak: 3 }, parseWitaDate("2026-09-05"));
     assert.equal(day2.streak, 4);
     assert.equal(day2.lastActiveDate, "2026-09-05");
-    assert.equal(touchStreakOnActivity(day2, "2026-09-05").streak, 4);
+    assert.equal(touchStreakOnActivity(day2, parseWitaDate("2026-09-05")).streak, 4);
   });
 
   test("hari yang terlewat memulai lagi dari 1 saat berikutnya aktif", () => {
-    const back = touchStreakOnActivity({ ...fresh(), streak: 6 }, "2026-09-10");
+    const back = touchStreakOnActivity({ ...fresh(), streak: 6 }, parseWitaDate("2026-09-10"));
     assert.equal(back.streak, 1);
   });
 
   test("cron menolkan Streak yang terputus tapi menjaga yang hidup", () => {
-    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 6 }, "2026-09-10").streak, 0);
-    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 6 }, "2026-09-05").streak, 6);
-    assert.equal(resetStreakForMissedDay({ ...fresh(), streak: 2 }, "2026-09-04").streak, 2);
+    const lapsed = resetStreakForMissedDay({ ...fresh(), streak: 6 }, parseWitaDate("2026-09-10"));
+    const live = resetStreakForMissedDay({ ...fresh(), streak: 6 }, parseWitaDate("2026-09-05"));
+    const today = resetStreakForMissedDay({ ...fresh(), streak: 2 }, parseWitaDate("2026-09-04"));
+    assert.equal(lapsed.streak, 0);
+    assert.equal(live.streak, 6);
+    assert.equal(today.streak, 2);
   });
 });
 
