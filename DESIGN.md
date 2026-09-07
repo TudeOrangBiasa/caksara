@@ -3,28 +3,28 @@ version: alpha.1
 name: Caksara — Aksara Bali
 description: Web edutainment sakral-terracotta for Profil Anon learning Wresastra via Sesi Kuis
 colors:
-  primary: "oklch(0.58 0.17 40)"
+  primary: "oklch(0.55 0.13 38)"
   primary-foreground: "oklch(0.985 0 0)"
-  primary-dark: "oklch(0.65 0.19 40)"
-  primary-dark-foreground: "oklch(0.99 0 0)"
-  secondary: "oklch(0.955 0 0)"
-  secondary-foreground: "oklch(0.35 0.05 38)"
-  muted: "oklch(0.955 0 0)"
-  muted-foreground: "oklch(0.5 0.02 45)"
+  primary-dark: "oklch(0.7 0.12 38)"
+  primary-dark-foreground: "oklch(0.145 0 0)"
+  secondary: "oklch(0.92 0.03 85)"
+  secondary-foreground: "oklch(0.35 0.08 38)"
+  muted: "oklch(0.97 0.01 85)"
+  muted-foreground: "oklch(0.56 0.02 45)"
   accent: "oklch(0.72 0.14 75)"
   accent-foreground: "oklch(0.2 0.05 38)"
   destructive: "oklch(0.58 0.22 27)"
   success: "oklch(0.62 0.15 145)"
   warning: "oklch(0.75 0.14 65)"
-  mastery-belum: "oklch(0.955 0 0)"
+  mastery-belum: "oklch(0.97 0.01 85)"
   mastery-dipahami: "oklch(0.72 0.14 75)"
   mastery-ahli: "oklch(0.55 0.13 38)"
-  border: "oklch(0.91 0 0)"
-  input: "oklch(0.91 0 0)"
-  ring: "oklch(0.58 0.17 40)"
-  background: "oklch(0.977 0 0)"
+  border: "oklch(0.92 0.01 85)"
+  input: "oklch(0.92 0.01 85)"
+  ring: "oklch(0.55 0.13 38)"
+  background: "oklch(1 0 0)"
   foreground: "oklch(0.145 0 0)"
-  radius: "1rem"
+  radius: "0.75rem"
 typography:
   display:
     fontFamily: "Inter Variable"
@@ -93,10 +93,10 @@ Design read: "Reading this as: web edutainment for pelajar Bali, with a sakral-t
 
 Palette is burnt-orange + neutral + gold. Single accent lock.
 
-- **Primary (terracotta light `oklch(0.58 0.17 40)`, dark `oklch(0.65 0.19 40)`):** CTA, Modul aktif, pill aktif. Pair with `primary-foreground`.
-- **Secondary/Muted (neutral light `oklch(0.955 0 0)`, dark obsidian `oklch(0.24 0.012 260)`):** card surface, track progress, chip.
+- **Primary (terracotta light `oklch(0.55 0.13 38)`, dark `oklch(0.7 0.12 38)`):** CTA, Modul aktif, pill aktif. Pair with `primary-foreground`.
+- **Secondary/Muted (warm limestone light `oklch(0.92 0.03 85)`, dark `oklch(0.27 0.02 45)`):** card surface, track progress, chip.
 - **Accent (emas `oklch(0.72 0.14 75)`):** highlight, Mastery dipahami, XP.
-- **Semantic:** Destructive Hati `0.58 0.22 27`, Success `0.62 0.15 145`, Warning Streak `0.75 0.14 65`. Dark mode: obsidian background, graphite cards, white text.
+- **Semantic:** Destructive Hati `0.58 0.22 27`, Success `0.62 0.15 145`, Warning Streak `0.75 0.14 65`. Dark mode: warm deep background, white text.
 - **Mastery:** Belum neutral, Dipahami emas, Ahli terracotta (`0.55 0.13 38` light).
 
 Tokens are normative (`packages/ui/src/lib/tokens.ts` mirrors `globals.css` 36/36); prose describes use. No hex hardcode in components — use `bg-primary` etc.
@@ -117,7 +117,7 @@ Tonal layers, not heavy shadows. Background off-white, cards pure white. Shadow 
 
 ## Shapes
 
-Shape lock: base `--radius 1rem`, cards `rounded-3xl`, inputs `rounded-2xl`, `full` for Hati/XP pills, search, and CTA. One scale, consistent.
+Shape lock: base `--radius 0.75rem` M3 medium, cards `rounded-3xl`, inputs `rounded-2xl`, `full` for Hati/XP pills, search, and CTA. One scale, consistent.
 
 ## Components
 
@@ -132,5 +132,5 @@ Use shadcn/ui components via `npx shadcn@latest add` — Button, Card, Badge, Pr
 
 ## Changelog
 
-- **alpha.1** — V0 tokens SSOT: `tokens.ts` mirrors `globals.css` 36/36 (burnt-orange `0.58/0.65`, obsidian dark, radius `1rem`); frontmatter hex replaced with oklch; per-token docs + governance header.
+- **alpha.1** — V0 tokens SSOT: `tokens.ts` mirrors `globals.css` warm SSOT (terracotta `0.55/0.70` hue 38, limestone neutrals, radius `0.75rem`); frontmatter oklch; per-token docs + governance header.
 - **alpha** — Initial palette (warm limestone scale, radius `0.75rem`).
