@@ -21,13 +21,21 @@ import {
   quizReducer,
 } from "./quiz-store";
 import type { QuizAnswer, QuizSession } from "./quiz-store";
+import type { QuizResume } from "./quiz-resume";
+import { clearResume, loadResume, saveResume } from "./quiz-resume";
 
 const XP_PER_CORRECT = 10;
 
+export interface QuizFinishDetail {
+  questionIndex: number;
+  correct: boolean;
+}
+
 interface QuizShellProps {
   quiz: Quiz;
+  moduleId: string;
   initialHearts: number;
-  onFinish: (score: { correct: number; total: number }) => void;
+  onFinish: (score: { correct: number; total: number }, detail: QuizFinishDetail[]) => void;
   onBack: () => void;
 }
 
@@ -86,6 +94,47 @@ function QuestionBody({
   );
 }
 
+function ResumeDialog({
+  resume,
+  total,
+  onResume,
+  onRestart,
+}: {
+  resume: QuizResume;
+  total: number;
+  onResume: () => void;
+  onRestart: () => void;
+}) {
+  const tanggal = new Date(resume.updatedAt).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+  });
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Lanjutkan kuis"
+      className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center"
+    >
+      <span className="flex size-20 items-center justify-center rounded-full bg-accent/20">
+        <RotateCcw className="size-10 text-accent" />
+      </span>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Lanjutkan kuis?</h1>
+      <p className="mt-2 max-w-[32ch] text-sm text-muted-foreground">
+        Terakhir sampai soal ke-{resume.currentIndex + 1} dari {total} ({tanggal}).
+      </p>
+      <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
+        <Button className="h-12 w-full text-base font-semibold" onClick={onResume}>
+          Lanjut dari soal ke-{resume.currentIndex + 1}
+        </Button>
+        <Button variant="outline" className="h-12 w-full" onClick={onRestart}>
+          Mulai ulang
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void }) {
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center">
@@ -108,10 +157,12 @@ function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void
   );
 }
 
-export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellProps) {
+export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: QuizShellProps) {
   const [session, dispatch] = useReducer(quizReducer, quiz, createSession);
   const [hearts, setHeartsState] = useState(initialHearts);
   const [gameOver, setGameOver] = useState(false);
+  const [resumeOffer, setResumeOffer] = useState<QuizResume | null>(() => loadResume(moduleId));
+  const [resumed, setResumed] = useState(false);
   const current = quiz.questions[session.currentIndex];
   if (!current) return null;
 
@@ -119,6 +170,34 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
     updateStreak();
     if (refillHearts()) notifyHeartsRefilled();
   }, []);
+
+  // Buffer lokal: simpan progres tiap jawaban (kecuali dialog resume masih terbuka).
+  useEffect(() => {
+    if (resumeOffer && !resumed) return;
+    if (isSessionComplete(session)) return;
+    saveResume({
+      moduleId,
+      currentIndex: session.currentIndex,
+      answers: [...session.answers.entries()],
+      hearts,
+      updatedAt: Date.now(),
+    });
+  }, [session, hearts, moduleId, resumeOffer, resumed]);
+
+  const handleResume = () => {
+    const offer = resumeOffer;
+    if (offer) {
+      dispatch({ type: "HYDRATE", currentIndex: offer.currentIndex, answers: offer.answers });
+      setHeartsState(offer.hearts);
+    }
+    setResumed(true);
+  };
+
+  const handleRestart = () => {
+    clearResume(moduleId);
+    setResumeOffer(null);
+    setResumed(true);
+  };
 
   const submitAnswer = (questionIndex: number, answer: QuizAnswer) => {
     if (session.answers.has(questionIndex)) return;
@@ -138,6 +217,7 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
   };
 
   const handleRetry = () => {
+    clearResume(moduleId);
     setHeartsState(5);
     setHearts(5);
     setGameOver(false);
@@ -146,7 +226,14 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
 
   const handleNext = () => {
     if (isSessionComplete(session)) {
-      onFinish(getScore(session));
+      clearResume(moduleId);
+      const detail: QuizFinishDetail[] = [...session.answers.entries()].map(
+        ([questionIndex, answer]) => {
+          const q = quiz.questions[questionIndex];
+          return { questionIndex, correct: q ? isAnswerCorrect(q, answer) : false };
+        },
+      );
+      onFinish(getScore(session), detail);
     } else {
       dispatch({ type: "NEXT" });
     }
@@ -154,6 +241,17 @@ export function QuizShell({ quiz, initialHearts, onFinish, onBack }: QuizShellPr
 
   if (gameOver) {
     return <GameOver onRetry={handleRetry} onBack={onBack} />;
+  }
+
+  if (resumeOffer && !resumed) {
+    return (
+      <ResumeDialog
+        resume={resumeOffer}
+        total={quiz.questions.length}
+        onResume={handleResume}
+        onRestart={handleRestart}
+      />
+    );
   }
 
   return (

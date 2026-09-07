@@ -22,6 +22,7 @@ import { ShareSheet } from "../features/share/share-sheet";
 import type { CourseModule } from "../features/module/module-data";
 import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
+import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { buildMixedQuiz, buildQuiz } from "../features/quiz/quiz-data";
 import type { Quiz } from "../lib/zod/question";
@@ -125,11 +126,13 @@ export default function Home() {
     content = (
       <QuizShell
         quiz={view.quiz}
+        moduleId={view.mod.id}
         initialHearts={loadProfile()?.hearts ?? 5}
-        onFinish={(score) => {
+        onFinish={(score, detail) => {
           if (!view.isLatihan && score.correct >= score.total * 0.7) {
             markSelesai(view.mod.id);
           }
+          void saveQuizSession(view.mod.id, detail, score);
           setView({ kind: "result", mod: view.mod, score, isLatihan: view.isLatihan });
         }}
         onBack={() =>

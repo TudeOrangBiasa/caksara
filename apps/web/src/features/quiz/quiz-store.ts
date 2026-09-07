@@ -16,7 +16,8 @@ export interface QuizSession {
 export type QuizAction =
   | { type: "ANSWER"; questionIndex: number; answer: QuizAnswer }
   | { type: "NEXT" }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "HYDRATE"; currentIndex: number; answers: [number, QuizAnswer][] };
 
 export function quizReducer(state: QuizSession, action: QuizAction): QuizSession {
   switch (action.type) {
@@ -34,6 +35,14 @@ export function quizReducer(state: QuizSession, action: QuizAction): QuizSession
     }
     case "RESET": {
       return createSession(state.quiz);
+    }
+    case "HYDRATE": {
+      return {
+        ...state,
+        currentIndex: Math.min(action.currentIndex, state.quiz.questions.length - 1),
+        answers: new Map(action.answers),
+        showFeedback: false,
+      };
     }
     default:
       return state;
