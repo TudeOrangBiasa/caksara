@@ -1,5 +1,6 @@
 import { profileNameSchema, userProfileSchema } from "./zod/profile";
 import type { ProfileAvatar, UserProfile } from "./zod/profile";
+import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
@@ -38,7 +39,7 @@ const DAY_MS = 24 * 3600 * 1000;
 /** V9: tulis XP/Hati didebounce agar tidak membanjiri storage saat kuis. */
 const DISK_WRITE_DEBOUNCE_MS = 500;
 
-let diskTimer: ReturnType<typeof setTimeout> | null = null;
+let diskTimer: number | null = null;
 let pagehideWired = false;
 
 function writeDisk(profile: UserProfile | null): void {
@@ -111,6 +112,22 @@ export function loadProfile(): UserProfile | null {
 export function subscribeProfile(listener: () => void): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
+}
+
+/**
+ * Satukan identitas ganda: baris server dikunci ke auth.uid() sementara UI
+ * memakai anon_uuid lokal. Setelah sesi anon ada, adopsi uid sebagai id
+ * profil agar tulis lokal dan server merujuk baris yang sama. No-op saat
+ * backend mati (offline-first tetap jalan dengan id lokal).
+ */
+export async function reconcileProfileId(): Promise<string | null> {
+  const uid = await ensureAnonSession();
+  if (!uid) return null;
+  const current = loadProfile();
+  if (current && current.id !== uid) {
+    persist({ ...current, id: uid }, true);
+  }
+  return uid;
 }
 
 export function createAnonProfile(name: string): UserProfile {

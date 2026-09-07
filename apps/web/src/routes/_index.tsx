@@ -26,9 +26,13 @@ import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { buildMixedQuiz, buildQuiz } from "../features/quiz/quiz-data";
 import type { Quiz } from "../lib/zod/question";
-import { applyOvernightReset, createAnonProfile, loadProfile } from "../lib/profile-store";
+import {
+  applyOvernightReset,
+  createAnonProfile,
+  loadProfile,
+  reconcileProfileId,
+} from "../lib/profile-store";
 import { notifyStreakReset } from "../lib/notify";
-import { ensureAnonSession } from "../lib/supabase";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
@@ -94,7 +98,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    void ensureAnonSession();
+    void reconcileProfileId();
     initSoundboard();
   }, []);
 

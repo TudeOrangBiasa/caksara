@@ -3,6 +3,7 @@ import * as React from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
+import { userProfileSchema } from "../../lib/zod/profile";
 import type { UserProfile } from "../../lib/zod/profile";
 import { renderAchievementCard, pickTidbit } from "./achievement-card";
 import type { AchievementCardData } from "./achievement-card";
@@ -23,8 +24,15 @@ export function ShareSheet({ modulSelesai, modulTotal, onClose }: ShareSheetProp
   React.useEffect(() => {
     async function build() {
       try {
-        const profile =
-          loadProfile() ?? ({ name: "Teman Belajar", xp: 0, streak: 0, hearts: 5 } as UserProfile);
+        const fallbackProfile: UserProfile = userProfileSchema.parse({
+          id: "tamu",
+          isAnon: true,
+          name: "Teman Belajar",
+          xp: 0,
+          streak: 0,
+          hearts: 5,
+        });
+        const profile = loadProfile() ?? fallbackProfile;
         await document.fonts.load('48px "Noto Sans Balinese"');
         await document.fonts.ready;
         const canvas = canvasRef.current;

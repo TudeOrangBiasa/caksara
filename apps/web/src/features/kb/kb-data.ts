@@ -34,7 +34,7 @@ export const KB_CATEGORY_META: Record<KbCategory, { label: string; desc: string 
 
 const kategoriWresastra: KbEntry[] = WRESASTRA_AKSARA.map((a) => {
   const index = Number(a.id.replace("wre_", ""));
-  const level: KbLevel = (index <= 5 ? "1" : index <= 12 ? "2" : "3") as KbLevel;
+  const level = kbLevelSchema.parse(index <= 5 ? "1" : index <= 12 ? "2" : "3");
   return {
     id: `kb_wre_${a.id.replace("wre_", "")}`,
     category: "wresastra",

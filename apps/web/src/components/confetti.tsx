@@ -47,7 +47,7 @@ export function Confetti({ active }: { active: boolean }) {
 
   useEffect(() => {
     if (!active) return;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    const timers: number[] = [];
     for (let w = 0; w < WAVES; w += 1) {
       timers.push(
         window.setTimeout(() => {

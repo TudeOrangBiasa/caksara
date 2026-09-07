@@ -4,7 +4,7 @@ import type { UserProfile } from "./zod/profile";
 /** V9+: jeda sinkron profil agar tulis beruntun saat kuis tidak membanjiri API. */
 const SYNC_DEBOUNCE_MS = 1000;
 
-let timer: ReturnType<typeof setTimeout> | null = null;
+let timer: number | null = null;
 let cachedUid: string | null = null;
 
 async function pushNow(profile: UserProfile): Promise<void> {
