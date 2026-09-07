@@ -14,5 +14,6 @@ jobs:
         with:
           bun-version: "1.3.13"
       - run: bun install --frozen-lockfile
-      - run: bun run check
+      - run: bunx oxlint
+      - run: bunx oxfmt --check
       - run: bun run build
