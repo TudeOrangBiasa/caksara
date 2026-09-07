@@ -7,6 +7,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { AVATAR_PRESETS, ProfileAvatar } from "../../components/profile-avatar";
 import { loadProfile, setAvatar, setProfileName, subscribeProfile } from "../../lib/profile-store";
+import { BedawangStudio } from "./bedawang-studio";
 
 const PHOTO_SIZE = 128;
 
@@ -168,6 +169,8 @@ export function ProfileSection() {
             {photoError}
           </p>
         )}
+
+        <BedawangStudio current={activeAvatar?.kind === "bedawang" ? activeAvatar.value : null} />
 
         <div className="mt-4 space-y-1.5">
           <Label htmlFor="settings-name">Nama panggilan</Label>

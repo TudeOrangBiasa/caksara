@@ -22,7 +22,7 @@ function Splash() {
   return (
     <div className="relative flex h-full flex-col items-center justify-center gap-6 overflow-hidden bg-secondary px-6">
       <div className="animate-fade flex flex-col items-center gap-1">
-        <Bedawang className="size-24 drop-shadow-sm" />
+        <Bedawang className="size-24 drop-shadow-sm" interactive blink />
         <div className="animate-fade font-balinese text-6xl leading-none text-primary">ᬳᬓ᭄ᬱᬭ</div>
       </div>
       <div className="animate-fade text-center" style={{ animationDelay: "120ms" }}>

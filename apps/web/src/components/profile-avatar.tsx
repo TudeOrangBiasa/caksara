@@ -1,6 +1,7 @@
 import { cn } from "@caksara/ui/lib/utils";
 
 import type { ProfileAvatar } from "../lib/zod/profile";
+import { Bedawang } from "./bedawang";
 
 export const AVATAR_PRESETS = [
   { id: "terakota", label: "Terakota", cls: "bg-primary text-primary-foreground" },
@@ -30,6 +31,26 @@ export function ProfileAvatar({
   textClassName?: string;
 }) {
   const initial = name.trim().charAt(0).toUpperCase() || "C";
+  if (avatar?.kind === "bedawang") {
+    const cfg = avatar.value;
+    return (
+      <span
+        className={cn(
+          "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-card",
+          className,
+        )}
+      >
+        <Bedawang
+          shell={cfg.shell}
+          head={cfg.head}
+          accessory={cfg.accessory}
+          mood={cfg.mood}
+          animate={false}
+          className="size-[88%]"
+        />
+      </span>
+    );
+  }
   if (avatar?.kind === "photo" && avatar.value.startsWith("data:image")) {
     return (
       <img
