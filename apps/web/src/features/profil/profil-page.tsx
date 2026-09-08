@@ -13,6 +13,7 @@ import {
 import { cn } from "@caksara/ui/lib/utils";
 
 import { ProfileAvatar } from "../../components/profile-avatar";
+import { AnimatedNumber } from "../../components/animated-number";
 import { loadProfile } from "../../lib/profile-store";
 import { courseModules } from "../module/module-data";
 
@@ -214,7 +215,9 @@ export function ProfilPage({
 function StatMini({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl bg-white/15 px-2 py-2.5 text-center">
-      <p className="text-lg leading-none font-bold tabular-nums">{value}</p>
+      <p className="text-lg leading-none font-bold">
+        <AnimatedNumber value={value} />
+      </p>
       <p className="mt-1 text-[11px] text-white/80">{label}</p>
     </div>
   );

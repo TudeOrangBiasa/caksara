@@ -15,6 +15,7 @@ import {
 
 import { courseModules, deriveStatus } from "../module/module-data";
 import type { CourseModule, ModuleStatus } from "../module/module-data";
+import { AnimatedNumber } from "../../components/animated-number";
 import type { UserProfile } from "../../lib/zod/profile";
 
 const CULTURAL_TIDBITS = [
@@ -77,7 +78,7 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
       <span className="flex size-8 items-center justify-center rounded-full bg-muted text-primary">
         {icon}
       </span>
-      <span className="mt-1.5 text-2xl font-bold tabular-nums">{value}</span>
+      <AnimatedNumber value={value} className="mt-1.5 text-2xl font-bold" />
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   );

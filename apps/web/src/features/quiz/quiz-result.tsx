@@ -5,6 +5,7 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
+import { AnimatedNumber } from "../../components/animated-number";
 import { Confetti } from "../../components/confetti";
 import { playCue, playFanfare } from "../../lib/sound";
 import type { CourseModule } from "../module/module-data";
@@ -75,8 +76,8 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-2xl font-bold tabular-nums">
-            {score.correct}/{score.total}
+          <p className="text-2xl font-bold">
+            <AnimatedNumber value={score.correct} />/{score.total}
           </p>
           <p className="text-[11px] text-muted-foreground">{percentage}% benar</p>
         </div>
@@ -84,7 +85,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
 
       {passed && (
         <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent animate-card-pop">
-          <Sparkles className="size-4" /> +{xpGained} XP
+          <Sparkles className="size-4" /> +<AnimatedNumber value={xpGained} /> XP
         </div>
       )}
 
