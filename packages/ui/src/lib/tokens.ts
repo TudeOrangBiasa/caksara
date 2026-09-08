@@ -195,3 +195,36 @@ export const tokens = {
     radius: "0.75rem",
   },
 } satisfies Record<string, Tokens>;
+
+/**
+ * Token depth minimal premium (bukan oklch murni, multi-shadow + inset).
+ * Terpisah dari `tokenSchema` 19 field. Mirror normatif dari
+ * `packages/ui/src/styles/globals.css` (`:root` = light, `.dark` = dark).
+ */
+export const depthTokenSchema = z.object({
+  /** Bayangan halus kartu standar. */
+  shadowSm: z.string().describe("Subtle card shadow"),
+  /** Bayangan sedang hero dan nav mengambang. */
+  shadowMd: z.string().describe("Hero and floating nav shadow"),
+  /** Bayangan besar hero dan nav mengambang. */
+  shadowLg: z.string().describe("Large hero shadow"),
+  /** Kilau atas hero dan nav mengambang. */
+  highlight: z.string().describe("Top highlight for hero and nav"),
+});
+
+export type DepthTokens = z.infer<typeof depthTokenSchema>;
+
+export const depthTokens = {
+  light: {
+    shadowSm: "0 1px 2px oklch(0.35 0.05 38 / 8%), 0 1px 3px oklch(0.35 0.05 38 / 6%)",
+    shadowMd: "0 4px 12px oklch(0.35 0.05 38 / 12%), 0 2px 4px oklch(0.35 0.05 38 / 8%)",
+    shadowLg: "0 12px 32px oklch(0.35 0.05 38 / 18%), 0 4px 8px oklch(0.35 0.05 38 / 10%)",
+    highlight: "inset 0 1px 0 oklch(1 0 0 / 55%)",
+  },
+  dark: {
+    shadowSm: "0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 24%)",
+    shadowMd: "0 4px 12px oklch(0 0 0 / 40%), 0 2px 4px oklch(0 0 0 / 30%)",
+    shadowLg: "0 12px 32px oklch(0 0 0 / 55%), 0 4px 8px oklch(0 0 0 / 40%)",
+    highlight: "inset 0 1px 0 oklch(1 0 0 / 8%)",
+  },
+} satisfies Record<string, DepthTokens>;
