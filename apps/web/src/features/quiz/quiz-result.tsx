@@ -38,7 +38,10 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
         mood={passed ? "semangat" : "sedih"}
         className={cn("size-20", !passed && "grayscale-[35%]")}
       />
-      <h1 className="mt-3 text-center text-2xl font-bold tracking-tight">
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        Hasil Kuis
+      </p>
+      <h1 className="mt-1 text-center text-[28px] leading-tight font-extrabold tracking-tight md:text-[32px]">
         {isLatihan
           ? passed
             ? "Mantap, latihan beres!"
@@ -86,7 +89,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
       )}
 
       {passed && !isLatihan && (
-        <div className="mt-5 w-full rounded-3xl bg-card p-5 text-left">
+        <div className="mt-5 w-full rounded-3xl bg-card p-5 text-left shadow-sm">
           <span className="font-balinese text-xl leading-none text-primary">ᬲᬧᬢ</span>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Seru! Kamu berhasil menuntaskan {mod.title}. Pelan-pelan aja, tanpa terasa aksara &amp;
@@ -95,7 +98,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
         </div>
       )}
 
-      <div className="mt-auto flex w-full gap-2 pt-6">
+      <div className="mt-auto flex w-full gap-2 border-t border-border/60 pt-6">
         <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onBack}>
           Kembali
         </Button>

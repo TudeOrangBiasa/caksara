@@ -91,7 +91,7 @@ function MenuList({
             key={key}
             type="button"
             onClick={() => onSelect(key)}
-            className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left transition-transform active:scale-[0.99]"
+            className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left shadow-sm transition-transform active:scale-[0.99]"
           >
             <span
               className={cn(
@@ -150,11 +150,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
           type="button"
           onClick={section ? () => setSection(null) : onBack}
           aria-label={section ? "Kembali ke daftar pengaturan" : "Kembali ke profil"}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card shadow-sm"
         >
           <ArrowLeft className="size-4" />
         </button>
-        <h1 className="text-xl font-bold tracking-tight">
+        <h1 className="text-[28px] leading-tight font-extrabold tracking-tight md:text-[32px]">
           {section ? SECTION_META[section].title : "Pengaturan"}
         </h1>
       </header>
@@ -179,14 +179,20 @@ function ThemeSection({
   pickTheme: (next: ThemeMode) => void;
 }) {
   return (
-    <section aria-labelledby="theme-heading">
-      <h2
-        id="theme-heading"
-        className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+    <section aria-labelledby="theme-heading" className="space-y-6">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Tampilan
+        </p>
+        <h2 id="theme-heading" className="text-base font-bold tracking-tight">
+          Tema
+        </h2>
+      </div>
+      <div
+        role="radiogroup"
+        aria-label="Pilih tema"
+        className="flex rounded-full bg-card p-1.5 shadow-sm"
       >
-        Tema
-      </h2>
-      <div role="radiogroup" aria-label="Pilih tema" className="flex rounded-full bg-card p-1.5">
         {THEME_OPTIONS.map((opt) => {
           const Icon = opt.icon;
           const active = theme === opt.value;
@@ -210,7 +216,7 @@ function ThemeSection({
           );
         })}
       </div>
-      <p className="mt-3 rounded-3xl bg-card p-4 text-xs leading-relaxed text-muted-foreground">
+      <p className="rounded-3xl bg-card p-4 text-xs leading-relaxed text-muted-foreground shadow-sm">
         Ikuti sistem artinya tampilan menyesuaikan pengaturan terang/gelap di perangkatmu secara
         otomatis.
       </p>
@@ -220,19 +226,21 @@ function ThemeSection({
 
 function AksaraSection({ fontSize }: { fontSize: number }) {
   return (
-    <section aria-labelledby="font-heading">
-      <div className="mb-2 flex items-center justify-between">
-        <h2
-          id="font-heading"
-          className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-        >
-          Ukuran Aksara Wresastra
-        </h2>
+    <section aria-labelledby="font-heading" className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Aksara
+          </p>
+          <h2 id="font-heading" className="text-base font-bold tracking-tight">
+            Ukuran Aksara Wresastra
+          </h2>
+        </div>
         <Type className="size-4 text-muted-foreground" />
       </div>
 
       <div
-        className="flex items-center justify-center rounded-3xl bg-card py-6"
+        className="flex items-center justify-center rounded-3xl bg-card py-6 shadow-sm"
         style={{ fontSize }}
         data-fontsize={fontSize}
       >
@@ -282,7 +290,7 @@ function SoundSection({ enabled }: { enabled: boolean }) {
   return (
     <section
       aria-labelledby="sound-heading"
-      className="flex items-center justify-between rounded-3xl bg-card px-4 py-3"
+      className="flex items-center justify-between rounded-3xl bg-card px-4 py-3 shadow-sm"
     >
       <div className="flex items-center gap-3">
         <span className="inline-flex size-9 items-center justify-center rounded-full bg-muted">
@@ -317,7 +325,7 @@ function DataSection() {
   return (
     <section
       aria-labelledby="reset-heading"
-      className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4"
+      className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 shadow-sm"
     >
       <div className="flex items-center gap-3">
         <span className="inline-flex size-9 items-center justify-center rounded-full bg-destructive/10">

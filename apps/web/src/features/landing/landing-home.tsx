@@ -153,7 +153,7 @@ function FaqItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="rounded-2xl bg-card">
+    <div className="rounded-2xl bg-card shadow-sm">
       <button
         type="button"
         onClick={onToggle}
@@ -260,8 +260,13 @@ export function LandingHome({
       </section>
 
       {/* FITUR */}
-      <section className="mt-14">
-        <h2 className="text-center text-2xl font-bold tracking-tight">Kenapa Belajar di Sini?</h2>
+      <section className="mt-14 border-t border-border/60 pt-10">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Fitur
+        </p>
+        <h2 className="mt-1 text-center text-2xl font-bold tracking-tight">
+          Kenapa Belajar di Sini?
+        </h2>
         <p className="mt-2 text-center text-sm text-muted-foreground">
           Semua yang kamu butuhkan untuk menguasai aksara & budaya Bali.
         </p>
@@ -271,7 +276,7 @@ export function LandingHome({
               key={f.title}
               type="button"
               onClick={() => onOpenTab(f.tab)}
-              className="rounded-3xl bg-card p-5 text-left transition-transform active:scale-[0.99]"
+              className="rounded-3xl bg-card p-5 text-left shadow-sm transition-transform active:scale-[0.99]"
             >
               <span className="flex items-center justify-center rounded-2xl bg-primary/10 py-8">
                 {f.visual}
@@ -287,11 +292,14 @@ export function LandingHome({
       </section>
 
       {/* WHY US */}
-      <section className="mt-14">
-        <h2 className="text-center text-2xl font-bold tracking-tight">Kenapa CAKSARA?</h2>
+      <section className="mt-14 border-t border-border/60 pt-10">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Keunggulan
+        </p>
+        <h2 className="mt-1 text-center text-2xl font-bold tracking-tight">Kenapa CAKSARA?</h2>
         <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {WHY_US.map((w) => (
-            <div key={w.title} className="rounded-3xl bg-card p-5">
+            <div key={w.title} className="rounded-3xl bg-card p-5 shadow-sm">
               <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
                 {w.icon}
               </span>
@@ -303,8 +311,11 @@ export function LandingHome({
       </section>
 
       {/* REVIEW */}
-      <section className="mt-14">
-        <h2 className="text-2xl font-bold tracking-tight">Kata Mereka</h2>
+      <section className="mt-14 border-t border-border/60 pt-10">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Testimoni
+        </p>
+        <h2 className="mt-1 text-2xl font-bold tracking-tight">Kata Mereka</h2>
         <div className="mt-6 grid gap-3 lg:grid-cols-2">
           <figure className="flex flex-col rounded-3xl bg-primary p-6 text-primary-foreground lg:p-8">
             <Quote className="size-7 text-white/60" />
@@ -326,7 +337,7 @@ export function LandingHome({
           </figure>
           <div className="grid gap-3">
             {REVIEWS.items.map((r) => (
-              <figure key={r.name} className="rounded-3xl bg-card p-5">
+              <figure key={r.name} className="rounded-3xl bg-card p-5 shadow-sm">
                 <Stars />
                 <blockquote className="mt-2 text-sm leading-relaxed">“{r.text}”</blockquote>
                 <figcaption className="mt-3 flex items-center gap-2.5">
@@ -355,9 +366,12 @@ export function LandingHome({
       </section>
 
       {/* FAQ */}
-      <section className="mt-14 grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <section className="mt-14 grid gap-6 border-t border-border/60 pt-10 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Sering Ditanyakan</h2>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Bantuan
+          </p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight">Sering Ditanyakan</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Masih ragu? Jawaban singkat untuk hal yang paling sering ditanyakan.
           </p>

@@ -87,7 +87,7 @@ export function ProfilPage({
   const unlockedCount = badges.filter((b) => b.unlocked).length;
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-6 md:max-w-2xl lg:max-w-5xl">
+    <div className="mx-auto max-w-lg space-y-6 px-4 py-6 md:max-w-2xl lg:max-w-5xl">
       <header className="hero-texture surface-raised rounded-3xl bg-primary p-5 text-primary-foreground">
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-white/20 p-1">
@@ -115,8 +115,11 @@ export function ProfilPage({
         </div>
       </header>
 
-      <div className="mt-4 rounded-3xl bg-card p-5">
-        <div className="flex items-center justify-between">
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Progres
+        </p>
+        <div className="mt-1 flex items-center justify-between">
           <p className="text-sm font-bold">Level {level}</p>
           <p className="text-xs text-muted-foreground tabular-nums">
             {intoLevel}/50 XP ke Level {level + 1}
@@ -133,8 +136,11 @@ export function ProfilPage({
         </p>
       </div>
 
-      <div className="mt-4 rounded-3xl bg-card p-5">
-        <div className="mb-3 flex items-center justify-between">
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Pencapaian
+        </p>
+        <div className="mt-1 mb-3 flex items-center justify-between">
           <h2 className="text-sm font-bold tracking-tight">Lencana</h2>
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary tabular-nums">
             {unlockedCount}/{badges.length}
@@ -166,11 +172,11 @@ export function ProfilPage({
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3 border-t border-border/60 pt-6 lg:grid-cols-2">
         <button
           type="button"
           onClick={onOpenShare}
-          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left transition-transform active:scale-[0.99]"
+          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left shadow-sm transition-transform active:scale-[0.99]"
         >
           <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Share2 className="size-5" />
@@ -187,7 +193,7 @@ export function ProfilPage({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left hover:bg-muted"
+          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left shadow-sm hover:bg-muted"
         >
           <span className="inline-flex size-10 items-center justify-center rounded-full bg-muted">
             <Settings className="size-5 text-muted-foreground" />

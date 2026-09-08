@@ -100,14 +100,16 @@ export function ProfileSection() {
   }
 
   return (
-    <section aria-labelledby="profil-heading">
-      <h2
-        id="profil-heading"
-        className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
-      >
-        Profil
-      </h2>
-      <div className="rounded-3xl bg-card p-5">
+    <section aria-labelledby="profil-heading" className="space-y-6">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Akun
+        </p>
+        <h2 id="profil-heading" className="text-base font-bold tracking-tight">
+          Profil
+        </h2>
+      </div>
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
         <div className="flex items-center gap-4">
           <ProfileAvatar name={profile.name} avatar={activeAvatar} className="size-16 text-xl" />
           <div className="min-w-0 flex-1">
