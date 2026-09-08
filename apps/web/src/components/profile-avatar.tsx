@@ -1,6 +1,7 @@
 import { cn } from "@caksara/ui/lib/utils";
 
 import type { ProfileAvatar } from "../lib/zod/profile";
+import { defaultAvatarUri } from "../lib/default-avatar";
 import { Bedawang } from "./bedawang";
 
 export const AVATAR_PRESETS = [
@@ -31,7 +32,16 @@ export function ProfileAvatar({
   textClassName?: string;
 }) {
   const initial = name.trim().charAt(0).toUpperCase() || "C";
-  if (avatar?.kind === "bedawang") {
+  if (!avatar) {
+    return (
+      <img
+        src={defaultAvatarUri(name)}
+        alt={`Avatar ${name}`}
+        className={cn("rounded-full object-cover", className)}
+      />
+    );
+  }
+  if (avatar.kind === "bedawang") {
     const cfg = avatar.value;
     return (
       <span
