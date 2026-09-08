@@ -105,7 +105,7 @@ function FeaturedModul({
 }) {
   const done = status === "selesai";
   return (
-    <article className="rounded-3xl bg-primary p-5 text-primary-foreground">
+    <article className="hero-texture surface-raised rounded-3xl bg-primary p-5 text-primary-foreground">
       <div className="flex items-start justify-between gap-3">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
           Modul {mod.order}

@@ -88,7 +88,7 @@ export function ProfilPage({
 
   return (
     <div className="mx-auto max-w-lg px-4 py-6 md:max-w-2xl lg:max-w-5xl">
-      <header className="rounded-3xl bg-primary p-5 text-primary-foreground">
+      <header className="hero-texture surface-raised rounded-3xl bg-primary p-5 text-primary-foreground">
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-white/20 p-1">
             <ProfileAvatar

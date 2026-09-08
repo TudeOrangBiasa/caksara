@@ -22,7 +22,7 @@ export function ModuleDetail({
         <ArrowLeft className="size-4" />
       </button>
 
-      <div className="rounded-3xl bg-primary p-5 text-primary-foreground">
+      <div className="hero-texture surface-raised rounded-3xl bg-primary p-5 text-primary-foreground">
         <div className="flex items-start justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-white/80">
             Modul {mod.order} · {mod.theme}
