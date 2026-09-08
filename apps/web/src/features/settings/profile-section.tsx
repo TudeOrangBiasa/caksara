@@ -6,6 +6,7 @@ import { Label } from "@caksara/ui/components/label";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { AVATAR_PRESETS, ProfileAvatar } from "../../components/profile-avatar";
+import { defaultAvatarUri } from "../../lib/default-avatar";
 import { loadProfile, setAvatar, setProfileName, subscribeProfile } from "../../lib/profile-store";
 import { BedawangStudio } from "./bedawang-studio";
 
@@ -154,12 +155,17 @@ export function ProfileSection() {
                   setAvatar({ kind: "color", value: p.id });
                 }}
                 className={cn(
-                  "flex aspect-square items-center justify-center rounded-2xl text-sm font-bold transition-transform active:scale-95",
+                  "flex aspect-square items-center justify-center overflow-hidden rounded-2xl transition-transform active:scale-95",
                   p.cls,
                   active && "ring-2 ring-foreground ring-offset-2 ring-offset-card",
                 )}
               >
-                {profile.name.trim().charAt(0).toUpperCase() || "C"}
+                <img
+                  src={defaultAvatarUri(profile.name)}
+                  alt=""
+                  aria-hidden
+                  className="size-[92%] rounded-full object-cover"
+                />
               </button>
             );
           })}

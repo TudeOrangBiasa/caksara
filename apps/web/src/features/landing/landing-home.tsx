@@ -18,6 +18,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { avatarClass } from "../../components/profile-avatar";
+import { defaultAvatarUri } from "../../lib/default-avatar";
 import type { NavTab } from "../../components/nav-tabs";
 
 const SOURCES = ["Parasali", "Balai Bahasa Provinsi Bali", "Unicode U+1B00–U+1B7F"];
@@ -332,11 +333,15 @@ export function LandingHome({
                   <span
                     aria-hidden
                     className={cn(
-                      "flex size-9 items-center justify-center rounded-full text-sm font-bold",
+                      "flex size-9 items-center justify-center overflow-hidden rounded-full",
                       avatarClass({ kind: "color", value: r.color }),
                     )}
                   >
-                    {r.name.charAt(0)}
+                    <img
+                      src={defaultAvatarUri(r.name)}
+                      alt=""
+                      className="size-[92%] rounded-full object-cover"
+                    />
                   </span>
                   <span>
                     <span className="block text-xs font-bold">{r.name}</span>

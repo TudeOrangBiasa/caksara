@@ -11,8 +11,6 @@
   "dependencies": {
     "@caksara/env": "workspace:*",
     "@caksara/ui": "workspace:*",
-    "@dicebear/collection": "^9.4.2",
-    "@dicebear/core": "9.4.2",
     "@react-router/fs-routes": "^8.3.0",
     "@react-router/node": "^8.3.0",
     "@react-router/serve": "^8.3.0",

@@ -31,7 +31,6 @@ export function ProfileAvatar({
   className?: string;
   textClassName?: string;
 }) {
-  const initial = name.trim().charAt(0).toUpperCase() || "C";
   if (!avatar) {
     return (
       <img
@@ -74,12 +73,16 @@ export function ProfileAvatar({
     <span
       aria-hidden
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full font-bold",
+        "flex shrink-0 items-center justify-center overflow-hidden rounded-full",
         avatarClass(avatar),
         className,
       )}
     >
-      <span className={textClassName}>{initial}</span>
+      <img
+        src={defaultAvatarUri(name)}
+        alt=""
+        className={cn("size-[92%] rounded-full object-cover", textClassName)}
+      />
     </span>
   );
 }
