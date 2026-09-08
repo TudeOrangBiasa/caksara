@@ -5,8 +5,8 @@ import { Input } from "@caksara/ui/components/input";
 import { Label } from "@caksara/ui/components/label";
 import { cn } from "@caksara/ui/lib/utils";
 
-import { AVATAR_PRESETS, ProfileAvatar } from "../../components/profile-avatar";
-import { defaultAvatarUri } from "../../lib/default-avatar";
+import { ProfileAvatar } from "../../components/profile-avatar";
+import { SATWA_NAMES, satwaAvatarUri } from "../../lib/default-avatar";
 import { loadProfile, setAvatar, setProfileName, subscribeProfile } from "../../lib/profile-store";
 import { BedawangStudio } from "./bedawang-studio";
 
@@ -137,35 +137,29 @@ export function ProfileSection() {
         <div
           className="mt-4 grid grid-cols-6 gap-2"
           role="radiogroup"
-          aria-label="Pilih warna avatar"
+          aria-label="Pilih avatar satwa"
         >
-          {AVATAR_PRESETS.map((p) => {
-            const active =
-              activeAvatar?.kind !== "photo" && (activeAvatar?.value ?? "terakota") === p.id;
+          {SATWA_NAMES.map((label, i) => {
+            const uri = satwaAvatarUri(i);
+            const active = activeAvatar?.kind === "photo" && activeAvatar.value === uri;
             return (
               <button
-                key={p.id}
+                key={label}
                 type="button"
                 role="radio"
                 aria-checked={active}
-                aria-label={p.label}
-                title={p.label}
+                aria-label={label}
+                title={label}
                 onClick={() => {
                   setPhotoError(null);
-                  setAvatar({ kind: "color", value: p.id });
+                  setAvatar({ kind: "photo", value: uri });
                 }}
                 className={cn(
                   "flex aspect-square items-center justify-center overflow-hidden rounded-2xl transition-transform active:scale-95",
-                  p.cls,
                   active && "ring-2 ring-foreground ring-offset-2 ring-offset-card",
                 )}
               >
-                <img
-                  src={defaultAvatarUri(profile.name)}
-                  alt=""
-                  aria-hidden
-                  className="size-[92%] rounded-full object-cover"
-                />
+                <img src={uri} alt="" aria-hidden className="size-full object-cover" />
               </button>
             );
           })}

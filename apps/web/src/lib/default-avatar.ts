@@ -98,6 +98,13 @@ const SATWA: { bg: string; draw: string }[] = [
   },
 ];
 
+export const SATWA_NAMES = ["Penyu", "Kucing", "Hantu", "Beruang", "Kelinci", "Jalak"] as const;
+
+export function satwaAvatarUri(index: number): string {
+  const satwa = SATWA[((index % SATWA.length) + SATWA.length) % SATWA.length];
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg(satwa.draw, satwa.bg))}`;
+}
+
 function hashSeed(seed: string): number {
   let h = 5381;
   for (let i = 0; i < seed.length; i += 1) {
@@ -114,8 +121,7 @@ export function defaultAvatarUri(seed: string): string {
   const key = seed.trim() || "C";
   const hit = cache.get(key);
   if (hit) return hit;
-  const satwa = SATWA[hashSeed(key) % SATWA.length];
-  const uri = `data:image/svg+xml;utf8,${encodeURIComponent(svg(satwa.draw, satwa.bg))}`;
+  const uri = satwaAvatarUri(hashSeed(key));
   cache.set(key, uri);
   return uri;
 }
