@@ -1,5 +1,6 @@
 import { profileNameSchema, userProfileSchema } from "./zod/profile";
 import type { ProfileAvatar, UserProfile } from "./zod/profile";
+import { defaultAvatarUri } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
@@ -146,6 +147,11 @@ export function createAnonProfile(name: string): UserProfile {
     lastActiveDate: today,
     heartsRefilledAt: today,
     mastery,
+    // Avatar acak dari lib (DiceBear, seed unik per profil); user bisa ganti nanti.
+    avatar: {
+      kind: "photo",
+      value: defaultAvatarUri(`${name.trim()}-${crypto.randomUUID().slice(0, 8)}`),
+    },
   };
   persist(profile);
   return profile;
