@@ -61,7 +61,7 @@ function AksaraCard({
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className={`flex flex-col items-center gap-1 rounded-3xl bg-card p-3 transition-colors ${
+      className={`flex flex-col items-center gap-1 rounded-3xl bg-card p-3 shadow-sm transition-colors ${
         selected ? "bg-primary/10 ring-1 ring-primary" : "hover:bg-muted/60"
       }`}
     >
@@ -73,7 +73,7 @@ function AksaraCard({
 
 function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1 rounded-3xl bg-card p-4">
+    <div className="flex flex-col gap-1 rounded-3xl bg-card p-4 shadow-sm">
       <span className="flex size-8 items-center justify-center rounded-full bg-muted text-primary">
         {icon}
       </span>
@@ -164,7 +164,7 @@ function ModulRow({
       type="button"
       onClick={locked ? undefined : onOpen}
       disabled={locked}
-      className={`flex w-full items-center gap-3 rounded-3xl bg-card p-3.5 text-left transition-transform ${
+      className={`flex w-full items-center gap-3 rounded-3xl bg-card p-3.5 text-left shadow-sm transition-transform ${
         locked ? "opacity-60" : "active:scale-[0.99]"
       }`}
     >
@@ -242,9 +242,17 @@ function ModulBerjalan({
     activeIdx >= 0 ? "aktif" : (statuses[statuses.length - 1] ?? "terkunci");
 
   return (
-    <section aria-label="Modul berjalan" className="mt-6 lg:col-start-1">
+    <section
+      aria-label="Modul berjalan"
+      className="mt-6 space-y-6 border-t border-border/60 pt-6 lg:col-start-1"
+    >
       <div className="mb-3 flex items-end justify-between">
-        <h2 className="text-base font-bold tracking-tight">Modul Berjalan</h2>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Modul
+          </p>
+          <h2 className="text-base font-bold tracking-tight">Modul Berjalan</h2>
+        </div>
         <button
           type="button"
           onClick={onStart}
@@ -327,7 +335,7 @@ export function Dashboard({
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 pt-6 pb-10 md:max-w-2xl lg:max-w-4xl lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-x-8">
-      <h1 className="text-[28px] leading-tight font-bold tracking-tight lg:col-start-1">
+      <h1 className="text-[28px] leading-tight font-extrabold tracking-tight md:text-[32px] lg:col-start-1">
         Mau Belajar
         <br />
         Apa Hari Ini?
@@ -340,7 +348,7 @@ export function Dashboard({
           onOpenKb(search.trim());
         }}
       >
-        <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full bg-card px-4">
+        <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full bg-card px-4 shadow-sm">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             value={search}
@@ -362,7 +370,7 @@ export function Dashboard({
 
       <ModulBerjalan selesai={selesai} onStart={onStart} onOpenDetail={onOpenDetail} />
 
-      <div className="mt-6 rounded-3xl bg-card p-5 lg:col-start-2 lg:mt-0">
+      <div className="mt-6 space-y-6 rounded-3xl bg-card p-5 shadow-sm lg:col-start-2 lg:mt-0">
         <div className="flex items-center gap-3">
           <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Target className="size-5" />
@@ -389,9 +397,12 @@ export function Dashboard({
         <StatCard label="Hati" value={profile?.hearts ?? 0} icon={<Heart className="size-4" />} />
       </div>
 
-      <div className="mt-6 lg:col-start-1">
+      <div className="mt-6 space-y-6 border-t border-border/60 pt-6 lg:col-start-1">
         <div className="mb-3 flex items-end justify-between">
           <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Wresastra
+            </p>
             <h2 className="text-base font-semibold tracking-tight">Aksara Wresastra</h2>
             <p className="text-xs text-muted-foreground">Kenalan lewat bentuk &amp; bunyinya.</p>
           </div>
@@ -437,10 +448,15 @@ export function Dashboard({
         )}
       </div>
 
-      <div className="mt-6 space-y-3 lg:col-start-1">
-        <h2 className="text-base font-semibold tracking-tight">Tahukah kamu?</h2>{" "}
+      <div className="mt-6 space-y-6 border-t border-border/60 pt-6 lg:col-start-1">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Budaya
+          </p>
+          <h2 className="text-base font-semibold tracking-tight">Tahukah kamu?</h2>
+        </div>{" "}
         {CULTURAL_TIDBITS.map((t) => (
-          <div key={t.title} className="rounded-3xl bg-card p-5">
+          <div key={t.title} className="rounded-3xl bg-card p-5 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="font-balinese text-2xl leading-none text-primary">{t.glyph}</span>
               <span className="text-sm font-semibold">{t.title}</span>

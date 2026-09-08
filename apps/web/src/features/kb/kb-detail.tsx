@@ -23,7 +23,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         >
           <ArrowLeft className="size-4" />
         </button>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           {KB_CATEGORY_META[entry.category].label}
         </p>
         <span className="ml-auto">
@@ -37,16 +37,21 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         ) : (
           <p className="text-5xl font-bold leading-none">{entry.title.slice(0, 1)}</p>
         )}
-        <h1 className="mt-4 text-2xl font-bold tracking-tight">{entry.title}</h1>
+        <h1 className="mt-4 text-[28px] font-extrabold tracking-tight md:text-[32px]">
+          {entry.title}
+        </h1>
         {entry.latin && <p className="mt-1 text-sm text-white/80">{entry.latin}</p>}
       </div>
 
-      <div className="lg:max-w-3xl">
-        <div className="mt-4 rounded-3xl bg-card p-5">
-          <p className="text-sm leading-relaxed">{entry.body}</p>
+      <div className="space-y-6 lg:max-w-3xl">
+        <div className="mt-4 rounded-3xl bg-card p-5 shadow-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Isi entri
+          </p>
+          <p className="mt-2 text-sm leading-relaxed">{entry.body}</p>
         </div>
 
-        <div className="mt-4 rounded-3xl bg-card p-5">
+        <div className="mt-4 space-y-6 rounded-3xl bg-card p-5 shadow-sm border-t border-border/60">
           <p className="flex items-center gap-2 text-sm font-semibold">
             <BookMarked className="size-4 text-primary" />
             Sumber rujukan

@@ -36,7 +36,7 @@ function StatusBadge({ status, onHero }: { status: ModuleStatus; onHero?: boolea
 
 function ProgresCard({ totalSelesai, progress }: { totalSelesai: number; progress: number }) {
   return (
-    <section className="rounded-3xl bg-card p-5">
+    <section className="rounded-3xl bg-card p-5 shadow-sm">
       <div className="flex items-center justify-between text-sm">
         <span className="font-semibold">Progres kurikulum</span>
         <span className="tabular-nums text-muted-foreground">
@@ -70,7 +70,7 @@ function NodeButton({
       onClick={() => onOpenDetail(mod)}
       disabled={disabled}
       className={cn(
-        "relative z-10 flex w-full items-center gap-3 rounded-3xl p-4 text-left",
+        "relative z-10 flex w-full items-center gap-3 rounded-3xl p-4 text-left shadow-sm",
         isHero
           ? "bg-primary text-primary-foreground"
           : status === "selesai"
@@ -183,12 +183,14 @@ export function ModuleTree({
   return (
     <div className="mx-auto w-full max-w-lg px-4 md:max-w-2xl lg:max-w-5xl pt-7 pb-12">
       <header className="mb-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">Kurikulum</p>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Kurikulum
+        </p>
         <span className="flex items-center gap-2">
           <span aria-hidden className="font-balinese text-3xl leading-none text-primary">
             ᬳᬓ᭄ᬱᬭ
           </span>
-          <h1 className="text-3xl font-bold tracking-tight">Belajar</h1>
+          <h1 className="text-[28px] font-extrabold tracking-tight md:text-[32px]">Belajar</h1>
         </span>
         <p className="mt-1.5 max-w-[44ch] text-sm text-muted-foreground">
           Digali dari materi dulu, baru diuji lewat kuis seru.
@@ -201,9 +203,14 @@ export function ModuleTree({
         <ProgresCard totalSelesai={totalSelesai} progress={progress} />
       </div>
 
-      <div className="mt-7">
+      <div className="mt-7 space-y-6 border-t border-border/60 pt-6">
         <div className="mb-3 flex items-end justify-between">
-          <h2 className="text-base font-semibold tracking-tight">Modul</h2>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Daftar modul
+            </p>
+            <h2 className="text-base font-semibold tracking-tight">Modul</h2>
+          </div>
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
             {totalSelesai}/{courseModules.length} selesai
           </span>
@@ -227,19 +234,22 @@ export function ModuleTree({
         </ol>
       </div>
 
-      <div className="mt-8 rounded-3xl bg-card p-5">
+      <div className="mt-8 space-y-6 rounded-3xl bg-card p-5 shadow-sm">
         <MasteryGrid mastery={mastery} />
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
           Selesaikan kuis tiap modul untuk menaikkan status tiap aksara dari Belum menjadi Ahli.
         </p>
       </div>
 
-      <div className="mt-8 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/20">
+      <div className="mt-8 space-y-6 rounded-3xl bg-primary/10 p-5 shadow-sm ring-1 ring-primary/20">
         <div className="mb-3 flex items-center gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Repeat className="size-4.5" />
           </span>
           <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Latihan mandiri
+            </p>
             <h2 className="text-base font-bold tracking-tight">Latihan</h2>
             <p className="text-xs text-muted-foreground">
               Ulangi materi yang sudah dihafal, tanpa mengulang dari awal.
@@ -253,7 +263,7 @@ export function ModuleTree({
             onClick={onLatihan}
             disabled={!canLatihan}
             className={cn(
-              "flex w-full items-center gap-3 rounded-3xl p-4 text-left transition-colors",
+              "flex w-full items-center gap-3 rounded-3xl p-4 text-left shadow-sm transition-colors",
               canLatihan ? "bg-card hover:bg-muted/60" : "bg-card opacity-60",
             )}
           >
@@ -296,7 +306,7 @@ export function ModuleTree({
         </div>
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 space-y-6 border-t border-border/60 pt-6">
         <SumberList />
         <TipsBelajar />
       </div>

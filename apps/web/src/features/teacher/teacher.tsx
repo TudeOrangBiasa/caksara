@@ -23,7 +23,7 @@ let msgId = 0;
 const nextId = () => ++msgId;
 
 const GREETING =
-  "Rahajeng! Aku Bedawang Nala, guru virtual CAKSARA. Tanya apa aja seputar aksara, bahasa, atau budaya Bali — jawabanmu selalu kutunjukkan sumbernya biar nggak asal.";
+  "Rahajeng! Aku Bedawang Nala, guru virtual CAKSARA. Tanya apa aja seputar aksara, bahasa, atau budaya Bali, jawabanmu selalu kutunjukkan sumbernya biar tidak asal.";
 
 export function TeacherChat() {
   const [messages, setMessages] = useState<Message[]>([
@@ -89,18 +89,21 @@ export function TeacherChat() {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col md:max-w-2xl lg:max-w-5xl">
-      <header className="mx-auto flex w-full items-center gap-3 px-4 py-4 lg:max-w-3xl">
+      <header className="mx-auto flex w-full items-center gap-3 border-b border-border/60 px-4 py-4 lg:max-w-3xl">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15">
           <Bedawang className="size-8" />
         </span>
         <div className="flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Guru virtual
+          </p>
           <p className="text-base font-bold tracking-tight">Bedawang Nala</p>
           <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
             <span className="size-1.5 rounded-full bg-success" />
             Online · jawab pakai sumber
           </p>
         </div>
-        <span className="flex size-10 items-center justify-center rounded-full bg-card">
+        <span className="flex size-10 items-center justify-center rounded-full bg-card shadow-sm">
           <Sparkles className="size-4 text-primary" />
         </span>
       </header>
@@ -125,7 +128,7 @@ export function TeacherChat() {
           send(input);
         }}
       >
-        <div className="flex items-end gap-2 rounded-full bg-card py-2 pl-4 pr-2">
+        <div className="flex items-end gap-2 rounded-full bg-card py-2 pl-4 pr-2 shadow-sm">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -182,7 +185,7 @@ function Bubble({
           "max-w-[82%] px-4 py-2.5",
           isUser
             ? "rounded-full rounded-br-md bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-md bg-card",
+            : "rounded-3xl rounded-bl-md bg-card shadow-sm",
         )}
       >
         {msg.title && (
@@ -236,7 +239,7 @@ function ThinkingBubble() {
   return (
     <div className="flex justify-start">
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
-      <div className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3">
+      <div className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm">
         <span
           className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
           style={{ animationDelay: "0ms" }}
@@ -257,6 +260,9 @@ function ThinkingBubble() {
 function QuickReplies({ onPick }: { onPick: (s: string) => void }) {
   return (
     <div>
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        Mulai cepat
+      </p>
       <p className="mb-2 px-1 text-xs font-semibold text-muted-foreground">
         Ketuk untuk langsung tanya:
       </p>
@@ -266,7 +272,7 @@ function QuickReplies({ onPick }: { onPick: (s: string) => void }) {
             key={q.text}
             type="button"
             onClick={() => onPick(q.text)}
-            className="rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-transform active:scale-95"
+            className="rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-transform active:scale-95"
           >
             {q.label}
           </button>

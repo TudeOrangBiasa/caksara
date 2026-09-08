@@ -112,18 +112,20 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
     <div className="mx-auto max-w-lg px-4 py-5 md:max-w-2xl lg:max-w-5xl">
       <header className="mb-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Kamus</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Kamus
+          </p>
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
             {KB_ENTRIES.length} Entri
           </span>
         </div>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">KB Entri</h1>
+        <h1 className="mt-1 text-[28px] font-extrabold tracking-tight md:text-[32px]">KB Entri</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Semua materi yang jadi dasar soal & Guru Virtual, bisa ditelusuri sumbernya.
         </p>
       </header>
 
-      <label className="flex items-center gap-2 rounded-full bg-card px-4 py-3 lg:max-w-3xl">
+      <label className="flex items-center gap-2 rounded-full bg-card px-4 py-3 shadow-sm lg:max-w-3xl">
         <Search className="size-4 shrink-0 text-muted-foreground" />
         <input
           value={query}
@@ -200,14 +202,21 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
           }
         />
       ) : (
-        <div className="mt-5 space-y-8">
+        <div className="mt-5 space-y-6">
           {(Object.keys(KB_CATEGORY_META) as KbCategory[]).map((cat) => {
             const items = filtered.filter((e) => e.category === cat);
             if (items.length === 0) return null;
             const meta = KB_CATEGORY_META[cat];
             return (
-              <section key={cat} aria-labelledby={`kb-sec-${cat}`}>
+              <section
+                key={cat}
+                aria-labelledby={`kb-sec-${cat}`}
+                className="border-t border-border/60 pt-6 first:border-t-0 first:pt-0"
+              >
                 <header className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="w-full text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    Kategori
+                  </p>
                   <h2 id={`kb-sec-${cat}`} className="text-sm font-semibold tracking-tight">
                     {meta.label}
                   </h2>
@@ -237,7 +246,7 @@ function KbCard({ entry, onOpen }: { entry: KbEntry; onOpen: (e: KbEntry) => voi
     <button
       type="button"
       onClick={() => onOpen(entry)}
-      className="flex flex-col items-center gap-1.5 rounded-3xl bg-card px-2 py-3.5 text-center transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring"
+      className="flex flex-col items-center gap-1.5 rounded-3xl bg-card px-2 py-3.5 text-center shadow-sm transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring"
     >
       {entry.glyph ? (
         entry.category === "wresastra" ? (
