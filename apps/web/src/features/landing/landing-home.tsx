@@ -4,7 +4,18 @@ import { useState } from "react";
 import { cn } from "@caksara/ui/lib/utils";
 
 import type { NavTab } from "../../components/nav-tabs";
-import { ArtGuru, ArtLontar, ArtPath, ArtQuiz } from "./approach-art";
+import {
+  ArtGlyphTile,
+  ArtGuru,
+  ArtLontar,
+  ArtMeru,
+  ArtModul,
+  ArtPapan,
+  ArtPath,
+  ArtPenjor,
+  ArtQuiz,
+} from "./approach-art";
+import { defaultAvatarUri } from "../../lib/default-avatar";
 
 /* Nama & kutipan di bawah ini placeholder untuk demo, ganti dengan testimoni asli. */
 
@@ -117,29 +128,17 @@ export function LandingHome({
           </div>
         </div>
 
-        {/* Hero Masonry Right Side */}
+        {/* Hero Masonry Right Side: ilustrasi prosedural */}
         <div className="relative hidden h-[600px] w-full grid-cols-[1fr_0.8fr] gap-4 lg:grid">
-          <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80"
-              alt="Balinese Temple Gate"
-              className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-            />
+          <div className="h-full w-full overflow-hidden rounded-[2.5rem] shadow-sm">
+            <ArtMeru />
           </div>
           <div className="grid h-full grid-rows-2 gap-4">
-            <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
-              <img
-                src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=600&q=80"
-                alt="Bali Rice Terraces"
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-              />
+            <div className="h-full w-full overflow-hidden rounded-[2.5rem] shadow-sm">
+              <ArtGlyphTile />
             </div>
-            <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
-              <img
-                src="https://images.unsplash.com/photo-1557939403-1760a0e47505?auto=format&fit=crop&w=600&q=80"
-                alt="Balinese Dancer"
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-              />
+            <div className="h-full w-full overflow-hidden rounded-[2.5rem] shadow-sm">
+              <ArtPenjor />
             </div>
           </div>
         </div>
@@ -205,11 +204,9 @@ export function LandingHome({
 
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="group relative flex flex-col justify-end overflow-hidden rounded-[2.5rem] bg-muted shadow-sm lg:col-span-7 lg:min-h-[500px]">
-            <img
-              src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1000&q=80"
-              alt="Modul Interaktif"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105">
+              <ArtModul />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="relative z-10 p-8 text-white">
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-primary/80">
@@ -226,17 +223,17 @@ export function LandingHome({
           <div className="flex flex-col gap-6 lg:col-span-5">
             {[
               {
-                img: "https://images.unsplash.com/photo-1516972810927-80185027ca84?auto=format&fit=crop&w=300&q=80",
+                art: <ArtQuiz />,
                 title: "Kuis Seru & Menantang",
                 desc: "Uji kemampuan membaca dan menyusun aksara dengan gamifikasi.",
               },
               {
-                img: "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=300&q=80",
+                art: <ArtGuru />,
                 title: "Guru Virtual Cerdas",
                 desc: "Tanya apa saja seputar aksara dan budaya, kapan saja.",
               },
               {
-                img: "https://images.unsplash.com/photo-1604999335501-1e96a2d9c10f?auto=format&fit=crop&w=300&q=80",
+                art: <ArtLontar />,
                 title: "Kamus Budaya",
                 desc: "Eksplorasi entri kebudayaan dan filosofi Bali terdalam.",
               },
@@ -245,12 +242,8 @@ export function LandingHome({
                 key={i}
                 className="group flex flex-1 items-center gap-6 rounded-[2rem] bg-card p-4 pr-6 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50"
               >
-                <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[1.5rem] bg-muted">
-                  <img
-                    src={f.img}
-                    alt={f.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[1.5rem] transition-transform duration-700 group-hover:scale-105">
+                  {f.art}
                 </div>
                 <div>
                   <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -271,9 +264,11 @@ export function LandingHome({
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="flex flex-col">
             <div className="mb-6 flex items-center gap-4">
-              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-secondary text-base font-bold text-muted-foreground">
-                BA
-              </div>
+              <img
+                src={defaultAvatarUri("Bli Agung")}
+                alt="Avatar Bli Agung"
+                className="size-14 shrink-0 rounded-full object-cover"
+              />
               <div>
                 <p className="font-bold text-lg">Bli Agung</p>
                 <p className="text-sm text-muted-foreground">Siswa SMA</p>
@@ -288,12 +283,8 @@ export function LandingHome({
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="h-64 w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
-              <img
-                src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=80"
-                alt="Bali Review Visual"
-                className="h-full w-full object-cover"
-              />
+            <div className="h-64 w-full overflow-hidden rounded-[2.5rem] shadow-sm">
+              <ArtPapan />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
