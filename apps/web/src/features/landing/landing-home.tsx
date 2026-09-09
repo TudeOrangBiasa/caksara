@@ -1,122 +1,12 @@
-import {
-  ArrowRight,
-  ChevronDown,
-  Gift,
-  HeartHandshake,
-  Layers,
-  Play,
-  Quote,
-  Send,
-  Sparkles,
-  Star,
-  Swords,
-  Zap,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
-import { Bedawang } from "../../components/bedawang";
-import { avatarClass } from "../../components/profile-avatar";
-import { defaultAvatarUri } from "../../lib/default-avatar";
 import type { NavTab } from "../../components/nav-tabs";
-
-const SOURCES = ["Parasali", "Balai Bahasa Provinsi Bali", "Unicode U+1B00–U+1B7F"];
-
-const FEATURES: {
-  tab: NavTab;
-  visual: React.ReactNode;
-  title: string;
-  desc: string;
-}[] = [
-  {
-    tab: "belajar",
-    visual: <span className="font-balinese text-6xl leading-none text-primary">ᬳ</span>,
-    title: "Modul Interaktif",
-    desc: "4 modul berurutan: sapaan, wresastra, bahasa, dan tradisi.",
-  },
-  {
-    tab: "belajar",
-    visual: <Swords className="size-14 text-primary" />,
-    title: "Kuis & Hati",
-    desc: "Uji pemahaman lewat kuis. Salah mengurangi hati, benar menambah XP.",
-  },
-  {
-    tab: "guru",
-    visual: <Bedawang mood="senang" className="size-16" />,
-    title: "Guru Virtual",
-    desc: "Tanya apa saja soal aksara & budaya, selalu dengan sumber rujukan.",
-  },
-  {
-    tab: "kb",
-    visual: <span className="font-balinese text-6xl leading-none text-primary">ᬓ</span>,
-    title: "KB Entri",
-    desc: "Kamus 27 entri aksara, kosakata, dan budaya yang bisa ditelusuri.",
-  },
-];
-
-const WHY_US: { icon: React.ReactNode; title: string; desc: string }[] = [
-  {
-    icon: <Gift className="size-5" />,
-    title: "100% Gratis",
-    desc: "Semua materi terbuka, tanpa paywall.",
-  },
-  {
-    icon: <Zap className="size-5" />,
-    title: "Tanpa Daftar",
-    desc: "Profil anonim langsung jadi, privasi aman.",
-  },
-  {
-    icon: <Layers className="size-5" />,
-    title: "Terstruktur",
-    desc: "Alur 4 modul dari nol sampai tradisi.",
-  },
-  {
-    icon: <HeartHandshake className="size-5" />,
-    title: "Ada Pendamping",
-    desc: "Bedawang Nala menemani tiap langkah.",
-  },
-];
+import { ArtGuru, ArtLontar, ArtPath, ArtQuiz } from "./approach-art";
 
 /* Nama & kutipan di bawah ini placeholder untuk demo, ganti dengan testimoni asli. */
-const REVIEWS = {
-  featured: {
-    name: "Made Wirawan",
-    role: "Guru Bahasa Bali · Denpasar",
-    color: "terakota" as const,
-    text: "Akhirnya ada cara mengajar aksara yang bikin murid betah. Modulnya runtut, kuisnya bikin nagih, dan Guru Virtual selalu bisa jawab pertanyaan anak-anak lengkap dengan sumbernya. Nilai harian kelas saya naik sejak pakai CAKSARA.",
-  },
-  items: [
-    {
-      name: "Ni Luh Sari",
-      role: "Mahasiswa",
-      color: "emas" as const,
-      text: "Belajar wresastra otodidak selalu gagal, di sini 10 menit sehari langsung nempel.",
-    },
-    {
-      name: "Putu Eka",
-      role: "Pelajar SMA",
-      color: "daun" as const,
-      text: "Kuis hatinya bikin deg-degan tapi seru. Streak saya sudah 12 hari!",
-    },
-    {
-      name: "Wayan Kerta",
-      role: "Pekerja",
-      color: "laut" as const,
-      text: "Pulang kerja sempatkan buka satu materi. Bedawang Nala lucu, Betul-betul menemani.",
-    },
-  ],
-};
-
-function Stars() {
-  return (
-    <p className="flex gap-0.5" aria-label="Rating 5 dari 5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className="size-3.5 fill-accent text-accent" />
-      ))}
-    </p>
-  );
-}
 
 const FAQS = [
   {
@@ -198,185 +88,278 @@ export function LandingHome({
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pt-10 pb-10 md:max-w-2xl lg:max-w-5xl">
+    <div className="mx-auto w-full max-w-lg px-4 pt-12 pb-16 md:max-w-3xl lg:max-w-[1400px] lg:px-12">
       {/* HERO */}
-      <section className="grid items-center gap-8 lg:grid-cols-2">
-        <div>
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="size-3.5" /> Web Edukasi Aksara Bali
-          </p>
-          <h1 className="mt-4 text-4xl leading-tight font-bold tracking-tight lg:text-5xl">
+      <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="text-center lg:text-left">
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl lg:text-[4rem] lg:leading-[1.1]">
             Pelajari Aksara Bali, Pelan tapi Pasti.
           </h1>
-          <p className="mt-3 max-w-[46ch] text-sm leading-relaxed text-muted-foreground lg:text-base">
-            Dari sapaan sehari-hari sampai filosofi wresastra. Modul interaktif, kuis seru, dan guru
-            virtual yang selalu siap membantu.
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground lg:text-lg">
+            Temukan kekayaan warisan budaya Bali melalui modul interaktif dan kuis seru. Dari sapaan
+            sehari-hari hingga wresastra yang bermakna.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
             <button
               type="button"
               onClick={onStart}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
+              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
             >
-              <Play className="size-4 fill-current" /> Mulai Belajar
+              Mulai Belajar
             </button>
             <button
               type="button"
               onClick={onOpenKb}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-card px-6 text-sm font-semibold transition-transform active:scale-95"
+              className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-card ring-1 ring-border px-8 text-base font-bold text-foreground transition-all hover:bg-muted active:scale-95"
             >
-              Jelajahi KB <ArrowRight className="size-4" />
+              Jelajahi KB
             </button>
           </div>
         </div>
-        <div className="rounded-3xl bg-primary p-8 text-center text-primary-foreground">
-          <p className="font-balinese text-7xl leading-none">ᬳᬓ᭄ᬱᬭ</p>
-          <p className="mt-4 text-sm font-semibold text-white/85">aksara · tulisan · warisan</p>
-          <div className="mt-6 grid grid-cols-3 gap-2">
+
+        {/* Hero Masonry Right Side */}
+        <div className="relative hidden h-[600px] w-full grid-cols-[1fr_0.8fr] gap-4 lg:grid">
+          <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
+            <img
+              src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80"
+              alt="Balinese Temple Gate"
+              className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </div>
+          <div className="grid h-full grid-rows-2 gap-4">
+            <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
+              <img
+                src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=600&q=80"
+                alt="Bali Rice Terraces"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+            <div className="h-full w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
+              <img
+                src="https://images.unsplash.com/photo-1557939403-1760a0e47505?auto=format&fit=crop&w=600&q=80"
+                alt="Balinese Dancer"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY US */}
+      <section className="mt-32 border-t border-border/60 pt-20">
+        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">Pendekatan Kami</h2>
+          <button
+            onClick={onStart}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
+          >
+            Jelajahi modul
+          </button>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              art: <ArtPath />,
+              title: "Terstruktur",
+              desc: "Alur 4 modul dari nol sampai tradisi.",
+            },
+            {
+              art: <ArtQuiz />,
+              title: "Menyenangkan",
+              desc: "Belajar lewat kuis seru dan interaktif.",
+            },
+            { art: <ArtLontar />, title: "Kamus Lengkap", desc: "Lebih dari 27+ entri budaya." },
+            {
+              art: <ArtGuru />,
+              title: "Pendamping",
+              desc: "Guru virtual siap membantu kapan saja.",
+            },
+          ].map((w, i) => (
+            <div
+              key={i}
+              className="group flex flex-col overflow-hidden rounded-[2rem] bg-transparent"
+            >
+              <div className="mb-4 h-64 w-full overflow-hidden rounded-[2rem] shadow-sm ring-1 ring-border/50 transition-transform duration-700 group-hover:scale-[1.02]">
+                {w.art}
+              </div>
+              <h3 className="text-lg font-bold">{w.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="mt-32 border-t border-border/60 pt-20">
+        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">
+            Kenapa Belajar di Sini?
+          </h2>
+          <button
+            onClick={onOpenKb}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
+          >
+            Lihat semua fitur
+          </button>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="group relative flex flex-col justify-end overflow-hidden rounded-[2.5rem] bg-muted shadow-sm lg:col-span-7 lg:min-h-[500px]">
+            <img
+              src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1000&q=80"
+              alt="Modul Interaktif"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="relative z-10 p-8 text-white">
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-primary/80">
+                Edukasi & Budaya
+              </p>
+              <h3 className="text-2xl font-bold">Modul Interaktif yang Runtut</h3>
+              <p className="mt-2 max-w-lg text-base text-white/80">
+                Belajar tidak melompat-lompat. Mulai dari pengenalan wresastra hingga mahir,
+                dirancang khusus agar mudah dipahami.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6 lg:col-span-5">
             {[
-              ["18", "Aksara"],
-              ["4", "Modul"],
-              ["27", "Entri KB"],
-            ].map(([num, label]) => (
-              <div key={label} className="rounded-2xl bg-white/15 px-2 py-3">
-                <p className="text-2xl font-bold">{num}</p>
-                <p className="text-[11px] text-white/80">{label}</p>
+              {
+                img: "https://images.unsplash.com/photo-1516972810927-80185027ca84?auto=format&fit=crop&w=300&q=80",
+                title: "Kuis Seru & Menantang",
+                desc: "Uji kemampuan membaca dan menyusun aksara dengan gamifikasi.",
+              },
+              {
+                img: "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=300&q=80",
+                title: "Guru Virtual Cerdas",
+                desc: "Tanya apa saja seputar aksara dan budaya, kapan saja.",
+              },
+              {
+                img: "https://images.unsplash.com/photo-1604999335501-1e96a2d9c10f?auto=format&fit=crop&w=300&q=80",
+                title: "Kamus Budaya",
+                desc: "Eksplorasi entri kebudayaan dan filosofi Bali terdalam.",
+              },
+            ].map((f, i) => (
+              <div
+                key={i}
+                className="group flex flex-1 items-center gap-6 rounded-[2rem] bg-card p-4 pr-6 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50"
+              >
+                <div className="h-28 w-28 shrink-0 overflow-hidden rounded-[1.5rem] bg-muted">
+                  <img
+                    src={f.img}
+                    alt={f.title}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Fitur {i + 2}
+                  </p>
+                  <h3 className="text-base font-bold">{f.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SUMBER */}
-      <section className="mt-12 text-center">
-        <p className="text-xs text-muted-foreground">Disusun dari sumber resmi</p>
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-          {SOURCES.map((s) => (
-            <span key={s} className="text-sm font-bold text-muted-foreground">
-              {s}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* FITUR */}
-      <section className="mt-14 border-t border-border/60 pt-10">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Fitur
-        </p>
-        <h2 className="mt-1 text-center text-2xl font-bold tracking-tight">
-          Kenapa Belajar di Sini?
-        </h2>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          Semua yang kamu butuhkan untuk menguasai aksara & budaya Bali.
-        </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((f) => (
-            <button
-              key={f.title}
-              type="button"
-              onClick={() => onOpenTab(f.tab)}
-              className="rounded-3xl bg-card p-5 text-left shadow-sm transition-transform active:scale-[0.99]"
-            >
-              <span className="flex items-center justify-center rounded-2xl bg-primary/10 py-8">
-                {f.visual}
-              </span>
-              <p className="mt-4 text-base font-bold">{f.title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-                Buka <ArrowRight className="size-3.5" />
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* WHY US */}
-      <section className="mt-14 border-t border-border/60 pt-10">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Keunggulan
-        </p>
-        <h2 className="mt-1 text-center text-2xl font-bold tracking-tight">Kenapa CAKSARA?</h2>
-        <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {WHY_US.map((w) => (
-            <div key={w.title} className="rounded-3xl bg-card p-5 shadow-sm">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-                {w.icon}
-              </span>
-              <p className="mt-3 text-sm font-bold">{w.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{w.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* REVIEW */}
-      <section className="mt-14 border-t border-border/60 pt-10">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Testimoni
-        </p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight">Kata Mereka</h2>
-        <div className="mt-6 grid gap-3 lg:grid-cols-2">
-          <figure className="flex flex-col rounded-3xl bg-primary p-6 text-primary-foreground lg:p-8">
-            <Quote className="size-7 text-white/60" />
-            <blockquote className="mt-3 flex-1 text-base leading-relaxed lg:text-lg">
-              “{REVIEWS.featured.text}”
-            </blockquote>
-            <figcaption className="mt-6 flex items-center gap-3">
-              <span
-                aria-hidden
-                className="flex size-11 items-center justify-center rounded-full bg-white/20 text-base font-bold"
-              >
-                {REVIEWS.featured.name.charAt(0)}
-              </span>
-              <span>
-                <span className="block text-sm font-bold">{REVIEWS.featured.name}</span>
-                <span className="block text-xs text-white/75">{REVIEWS.featured.role}</span>
-              </span>
-            </figcaption>
-          </figure>
-          <div className="grid gap-3">
-            {REVIEWS.items.map((r) => (
-              <figure key={r.name} className="rounded-3xl bg-card p-5 shadow-sm">
-                <Stars />
-                <blockquote className="mt-2 text-sm leading-relaxed">“{r.text}”</blockquote>
-                <figcaption className="mt-3 flex items-center gap-2.5">
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "flex size-9 items-center justify-center overflow-hidden rounded-full",
-                      avatarClass({ kind: "color", value: r.color }),
-                    )}
-                  >
-                    <img
-                      src={defaultAvatarUri(r.name)}
-                      alt=""
-                      className="size-[92%] rounded-full object-cover"
-                    />
-                  </span>
-                  <span>
-                    <span className="block text-xs font-bold">{r.name}</span>
-                    <span className="block text-[11px] text-muted-foreground">{r.role}</span>
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
+      <section className="mt-32 border-t border-border/60 pt-20">
+        <h2 className="mb-12 text-3xl font-bold tracking-tight lg:text-[2.5rem]">Kisah Pengguna</h2>
+        <div className="grid gap-12 lg:grid-cols-2">
+          <div className="flex flex-col">
+            <div className="mb-6 flex items-center gap-4">
+              <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-secondary text-base font-bold text-muted-foreground">
+                BA
+              </div>
+              <div>
+                <p className="font-bold text-lg">Bli Agung</p>
+                <p className="text-sm text-muted-foreground">Siswa SMA</p>
+              </div>
+            </div>
+            <h3 className="mb-4 text-2xl font-bold">Cara Baru Menikmati Budaya</h3>
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              "Akhirnya ada cara mengajar aksara yang bikin murid betah. Modulnya runtut, kuisnya
+              bikin nagih, dan Guru Virtual selalu bisa jawab pertanyaan anak-anak lengkap dengan
+              sumbernya."
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="h-64 w-full overflow-hidden rounded-[2.5rem] bg-muted shadow-sm">
+              <img
+                src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=80"
+                alt="Bali Review Visual"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                  "Awalnya mikir aksara itu susah, tapi kuisnya bikin berasa main game..."
+                </p>
+                <p className="font-bold text-sm">Ayu Saraswati</p>
+                <p className="text-xs text-muted-foreground">Mahasiswa</p>
+              </div>
+              <div className="flex flex-col rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                  "Pulang kerja sempatkan buka satu materi. Sangat membantu."
+                </p>
+                <p className="font-bold text-sm">Bapak Wayan</p>
+                <p className="text-xs text-muted-foreground">Pekerja</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* CTA */}
+      <section className="mt-32 flex flex-col items-center justify-center rounded-[3rem] bg-secondary/30 px-6 py-24 text-center shadow-inner lg:px-12 lg:py-32">
+        <h2 className="text-3xl font-bold tracking-tight lg:text-[3rem]">Terus Terinspirasi</h2>
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground lg:text-lg">
+          Dapatkan tips belajar aksara, cerita budaya, dan update modul baru langsung ke kotak
+          masukmu.
+        </p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            subscribeNews();
+          }}
+          className="mt-10 flex w-full max-w-md flex-col gap-3 sm:flex-row"
+        >
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailMsg) setEmailMsg(null);
+            }}
+            placeholder="Masukkan email..."
+            aria-label="Email"
+            className="h-14 w-full flex-1 rounded-full bg-card px-6 text-foreground placeholder:text-muted-foreground outline-none ring-1 ring-border transition-all focus:ring-2 focus:ring-primary"
+          />
+          <button
+            type="submit"
+            className="inline-flex h-14 shrink-0 items-center justify-center rounded-full bg-primary px-8 font-bold text-primary-foreground transition-transform active:scale-95"
+          >
+            Berlangganan
+          </button>
+        </form>
+        {emailMsg && <p className="mt-6 text-sm font-medium text-primary">{emailMsg}</p>}
+      </section>
+
       {/* FAQ */}
-      <section className="mt-14 grid gap-6 border-t border-border/60 pt-10 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <section className="mt-24 grid gap-8 border-t border-border/60 pt-16 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-12">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Bantuan
-          </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight">Sering Ditanyakan</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Masih ragu? Jawaban singkat untuk hal yang paling sering ditanyakan.
+          <h2 className="text-3xl font-bold tracking-tight">Sering Ditanyakan</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Masih ragu? Jawaban singkat untuk hal yang paling sering ditanyakan saat memulai
+            belajar.
           </p>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {FAQS.map((f, i) => (
             <FaqItem
               key={f.q}
@@ -389,82 +372,23 @@ export function LandingHome({
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mt-14 grid items-center gap-6 rounded-3xl bg-primary p-8 text-primary-foreground lg:grid-cols-2 lg:p-12">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight lg:text-3xl">
-            Siap Memulai Petualangan Aksara?
-          </h2>
-          <p className="mt-2 max-w-[44ch] text-sm text-white/85">
-            Lima menit sehari cukup. Bedawang Nala akan menemanimu dari aksara pertama.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onStart}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-primary transition-transform active:scale-95"
-            >
-              <Play className="size-4 fill-current" /> Mulai Sekarang
-            </button>
-            <button
-              type="button"
-              onClick={onOpenGuru}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-white/20 px-6 text-sm font-semibold text-white transition-transform active:scale-95"
-            >
-              Tanya Guru Dulu
-            </button>
-          </div>
-        </div>
-        <div aria-hidden className="relative hidden items-center justify-center lg:flex">
-          <div className="rounded-3xl bg-white/15 px-12 py-10">
-            <p className="font-balinese text-8xl leading-none">ᬳ</p>
-          </div>
-          <div className="absolute -right-2 -bottom-4 rounded-2xl bg-card px-4 py-3 text-card-foreground shadow-lg">
-            <p className="text-xs font-bold">+10 XP</p>
-            <p className="text-[11px] text-muted-foreground">tiap jawaban benar</p>
-          </div>
-        </div>
-      </section>
-
       {/* FOOTER */}
-      <footer className="mt-14 border-t border-border/60 pt-8 pb-4">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
-          <div>
-            <p className="flex items-center gap-2 text-base font-bold tracking-tight">
-              <span aria-hidden className="font-balinese text-2xl leading-none text-primary">
+      <footer className="mt-24 border-t border-border/60 pt-12 pb-8">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-24">
+          <div className="max-w-sm">
+            <p className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+              <span
+                aria-hidden
+                className="flex size-10 items-center justify-center rounded-xl bg-primary/10 font-balinese text-2xl leading-none text-primary"
+              >
                 ᬳ
               </span>
               CAKSARA
             </p>
-            <p className="mt-2 max-w-[36ch] text-xs leading-relaxed text-muted-foreground">
-              Web edukasi aksara & budaya Bali. Belajar pelan-pelan, sedikit demi sedikit.
+            <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+              Web edukasi aksara & budaya Bali. Dirancang untuk membuat belajar aksara kuno menjadi
+              modern, pelan-pelan, sedikit demi sedikit.
             </p>
-            <form
-              className="mt-4 flex max-w-sm items-center gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                subscribeNews();
-              }}
-            >
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (emailMsg) setEmailMsg(null);
-                }}
-                placeholder="Email untuk kabar aksara"
-                aria-label="Email untuk kabar aksara"
-                className="h-11 w-full rounded-full bg-card px-4 text-sm outline-none placeholder:text-muted-foreground"
-              />
-              <button
-                type="submit"
-                className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
-              >
-                <Send className="size-4" /> Kirim
-              </button>
-            </form>
-            {emailMsg && <p className="mt-2 text-xs text-muted-foreground">{emailMsg}</p>}
           </div>
           <nav aria-label="Tautan" className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <div className="flex flex-col gap-2">
