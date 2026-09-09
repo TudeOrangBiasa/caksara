@@ -194,7 +194,7 @@ export function ArtMeru({ className }: { className?: string }) {
       <ellipse cx="110" cy="118" rx="30" ry="11" fill="var(--card-white)" opacity="0.7" />
       <path d="M0 330 L70 250 L140 330 Z" fill="var(--card-muted)" opacity="0.6" />
       <path d="M160 330 L240 240 L300 330 Z" fill="var(--card-muted)" opacity="0.45" />
-      <rect x="60" y="356" width="180" height="44" rx="6" fill="var(--card-ink)" />
+      <rect x="60" y="356" width="180" height="44" rx="6" fill="var(--card-primary)" />
       {tiers}
       <rect x="147" y="118" width="6" height="22" fill="var(--card-ink)" />
       <path d="M153 118 l22 7 -22 7 z" fill="var(--card-gold)" />
@@ -205,8 +205,8 @@ export function ArtMeru({ className }: { className?: string }) {
         fill="none"
         strokeLinecap="round"
       />
-      <rect y="400" width="300" height="200" fill="var(--primary)" opacity="0.22" />
-      <rect x="120" y="410" width="60" height="150" fill="var(--card-white)" opacity="0.28" />
+      <rect y="400" width="300" height="200" fill="var(--bedawang-gem)" opacity="0.4" />
+      <rect x="128" y="410" width="44" height="150" fill="var(--card-white)" opacity="0.35" />
       {[430, 460, 495, 530].map((ry, i) => (
         <rect
           key={ry}
@@ -237,17 +237,17 @@ export function ArtGlyphTile({ className }: { className?: string }) {
       <rect width="300" height="292" fill="var(--primary)" />
       <text
         x="150"
-        y="150"
+        y="138"
         textAnchor="middle"
         fontFamily="'Noto Sans Balinese', sans-serif"
-        fontSize="120"
+        fontSize="82"
         fill="var(--primary-foreground)"
       >
         ᬳᬓ᭄ᬱᬭ
       </text>
       <text
         x="150"
-        y="192"
+        y="180"
         textAnchor="middle"
         fontFamily="Inter, sans-serif"
         fontSize="15"
@@ -297,38 +297,50 @@ export function ArtPenjor({ className }: { className?: string }) {
       className={cn("h-full w-full", className)}
     >
       <rect width="300" height="292" fill="var(--card-bg-deep)" />
-      <circle cx="248" cy="52" r="26" fill="var(--accent)" opacity="0.8" />
+      <circle cx="248" cy="52" r="26" fill="var(--accent)" opacity="0.85" />
+      <rect y="252" width="300" height="40" fill="var(--success)" opacity="0.3" />
       <path
-        d="M70 270 C70 170 130 140 210 105"
-        stroke="var(--success)"
-        strokeWidth="9"
+        d="M80 268 C80 180 130 140 215 100"
+        stroke="var(--card-ink)"
+        strokeWidth="13"
         fill="none"
         strokeLinecap="round"
       />
-      {[0.25, 0.45, 0.65, 0.85].map((t, i) => {
-        const x = 70 + (210 - 70) * t;
-        const yy = 270 - (270 - 105) * (t * t * 0.9 + t * 0.1);
-        return (
-          <g key={i}>
-            <path
-              d={`M${x} ${yy} l-13 22 l26 0 z`}
-              fill={i % 2 ? "var(--card-gold)" : "var(--card-cream)"}
-              stroke="var(--card-ink)"
-              strokeOpacity="0.2"
-            />
-            <rect
-              x={x - 16}
-              y={yy + 20}
-              width="32"
-              height="7"
-              rx="3.5"
-              fill="var(--primary)"
-              opacity="0.85"
-            />
-          </g>
-        );
-      })}
-      <rect x="42" y="238" width="56" height="34" rx="8" fill="var(--success)" opacity="0.3" />
+      <path
+        d="M80 268 C80 180 130 140 215 100"
+        stroke="var(--card-gold)"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="2 14"
+      />
+      <path
+        d="M215 100 l34 10 -34 10 z"
+        fill="var(--card-white)"
+        stroke="var(--card-ink)"
+        strokeOpacity="0.25"
+      />
+      <path d="M215 100 l20 6 -20 6 z" fill="var(--destructive)" opacity="0.85" />
+      {[
+        [92, 218, 1],
+        [112, 192, 0],
+        [138, 168, 1],
+        [168, 146, 0],
+        [196, 126, 1],
+      ].map(([x, yy, gold], i) => (
+        <g key={i}>
+          <line x1={x} y1={yy - 4} x2={x} y2={yy + 8} stroke="var(--card-ink)" strokeWidth="2.5" />
+          <path
+            d={`M${x} ${yy + 8} l-12 20 l24 0 z`}
+            fill={gold ? "var(--card-gold)" : "var(--card-cream)"}
+            stroke="var(--card-ink)"
+            strokeOpacity="0.25"
+            strokeWidth="1.5"
+          />
+          <rect x={x - 15} y={yy + 26} width="30" height="7" rx="3.5" fill="var(--primary)" />
+        </g>
+      ))}
+      <rect x="42" y="238" width="56" height="34" rx="8" fill="var(--success)" opacity="0.45" />
       <rect
         x="48"
         y="232"
@@ -339,9 +351,16 @@ export function ArtPenjor({ className }: { className?: string }) {
         stroke="var(--card-ink)"
         strokeOpacity="0.25"
       />
-      <circle cx="60" cy="238" r="4" fill="var(--bedawang-blush)" />
-      <circle cx="70" cy="238" r="4" fill="var(--card-white)" />
-      <circle cx="80" cy="238" r="4" fill="var(--card-gold)" />
+      <circle cx="68" cy="243" r="5" fill="var(--bedawang-blush)" />
+      <circle
+        cx="80"
+        cy="243"
+        r="5"
+        fill="var(--card-white)"
+        stroke="var(--card-ink)"
+        strokeOpacity="0.2"
+      />
+      <circle cx="92" cy="243" r="5" fill="var(--card-gold)" />
     </svg>
   );
 }
