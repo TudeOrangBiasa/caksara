@@ -16,7 +16,12 @@ interface QuizFeedbackProps {
 
 export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFeedbackProps) {
   return (
-    <div className={cn("mt-4 rounded-3xl p-4", isCorrect ? "bg-success/15" : "bg-destructive/10")}>
+    <div
+      className={cn(
+        "mt-4 animate-card-pop rounded-3xl p-4",
+        isCorrect ? "bg-success/15" : "bg-destructive/10",
+      )}
+    >
       <div className="flex items-start gap-3">
         <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-12 shrink-0" />
         <div className="flex-1">

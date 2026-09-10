@@ -20,20 +20,31 @@ const TOTAL_STEPS = 4;
 
 function Splash() {
   return (
-    <div className="relative flex h-full flex-col items-center justify-center gap-6 overflow-hidden bg-secondary px-6">
-      <div className="animate-fade flex flex-col items-center gap-1">
-        <Bedawang className="size-24 drop-shadow-sm" interactive blink />
-        <div className="animate-fade font-balinese text-6xl leading-none text-primary">ᬳᬓ᭄ᬱᬭ</div>
+    <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-background px-6">
+      <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02]"></div>
+      <div className="absolute -left-32 -top-32 size-72 rounded-full bg-primary/20 blur-[100px]"></div>
+      <div className="absolute -bottom-32 -right-32 size-72 rounded-full bg-warning/20 blur-[100px]"></div>
+
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="mb-8 flex size-32 animate-[bounce_3s_infinite] items-center justify-center rounded-[3rem] bg-card shadow-2xl ring-1 ring-border/50">
+          <Bedawang className="size-full rounded-[3rem]" />
+        </div>
+
+        <div className="flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="mb-2 font-balinese text-5xl text-primary/40">ᬳᬓ᭄ᬱᬭ</div>
+          <h1 className="text-4xl font-extrabold tracking-tight">CAKSARA</h1>
+          <p className="mt-3 max-w-[250px] text-sm text-muted-foreground">
+            Aksara dan budaya Bali, dipelajari pelan-pelan.
+          </p>
+        </div>
+
+        <div className="mt-12 animate-in fade-in duration-1000 delay-500 fill-mode-both">
+          <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2 ring-1 ring-border">
+            <Loader2 className="size-4 animate-spin text-primary" />
+            <span className="text-xs font-medium text-muted-foreground">Memuat data...</span>
+          </div>
+        </div>
       </div>
-      <div className="animate-fade text-center" style={{ animationDelay: "120ms" }}>
-        <p className="text-3xl font-bold tracking-tight">CAKSARA</p>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Aksara dan budaya Bali, dipelajari pelan-pelan.
-        </p>
-      </div>
-      <span className="animate-fade" style={{ animationDelay: "240ms" }}>
-        <Loader2 className="size-5 animate-spin text-primary" />
-      </span>
     </div>
   );
 }

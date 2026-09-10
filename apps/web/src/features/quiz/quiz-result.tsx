@@ -26,6 +26,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
   const xpGained = score.correct * XP_PER_CORRECT;
   const R = 54;
   const C = 2 * Math.PI * R;
+  const dashOffset = C * (1 - percentage / 100);
 
   useEffect(() => {
     if (passed) playFanfare();
@@ -70,14 +71,19 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
             strokeWidth="12"
             strokeLinecap="round"
             strokeDasharray={C}
-            strokeDashoffset={C * (1 - percentage / 100)}
+            strokeDashoffset={dashOffset}
             transform="rotate(-90 70 70)"
-            className={passed ? "stroke-primary" : "stroke-muted-foreground"}
+            className={cn(
+              "transition-[stroke-dashoffset] duration-[1200ms] ease-out",
+              passed ? "stroke-primary" : "stroke-muted-foreground",
+            )}
+            style={{ "--tw-stroke-dashoffset-from": String(C) } as React.CSSProperties}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <p className="text-2xl font-bold">
-            <AnimatedNumber value={score.correct} />/{score.total}
+            <AnimatedNumber value={score.correct} />
+            {score.total > 0 ? `/${score.total}` : ""}
           </p>
           <p className="text-[11px] text-muted-foreground">{percentage}% benar</p>
         </div>
@@ -100,16 +106,33 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
       )}
 
       <div className="mt-auto flex w-full gap-2 border-t border-border/60 pt-6">
-        <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onBack}>
-          Kembali
-        </Button>
-        <Button
-          className="h-12 flex-1 gap-2 rounded-full text-base font-semibold"
-          onClick={onRetry}
-        >
-          <RotateCcw className="size-4" />
-          Ulangi
-        </Button>
+        {passed ? (
+          <>
+            <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onRetry}>
+              <RotateCcw className="size-4 mr-1.5" />
+              Ulangi
+            </Button>
+            <Button
+              className="h-12 flex-1 gap-2 rounded-full text-base font-semibold"
+              onClick={onBack}
+            >
+              Kembali
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onBack}>
+              Kembali
+            </Button>
+            <Button
+              className="h-12 flex-1 gap-2 rounded-full text-base font-semibold"
+              onClick={onRetry}
+            >
+              <RotateCcw className="size-4" />
+              Coba Lagi
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

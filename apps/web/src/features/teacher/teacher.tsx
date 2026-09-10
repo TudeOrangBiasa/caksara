@@ -88,74 +88,135 @@ export function TeacherChat() {
   }
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-lg flex-col md:max-w-2xl lg:max-w-5xl">
-      <header className="mx-auto flex w-full items-center gap-3 border-b border-border/60 px-4 py-4 lg:max-w-3xl">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15">
-          <Bedawang className="size-8" />
-        </span>
-        <div className="flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Guru virtual
-          </p>
-          <p className="text-base font-bold tracking-tight">Bedawang Nala</p>
-          <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
-            <span className="size-1.5 rounded-full bg-success" />
-            Online · jawab pakai sumber
-          </p>
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col md:max-w-2xl lg:max-w-6xl lg:grid lg:grid-cols-[340px_1fr] lg:gap-8 lg:p-6 lg:overflow-hidden">
+      
+      {/* Desktop Sidebar (hidden on mobile) */}
+      <div className="hidden lg:flex lg:flex-col lg:gap-6 overflow-y-auto pr-2 pb-6">
+        <div className="relative overflow-hidden rounded-[1.75rem] shadow-sm min-h-[220px] flex flex-col justify-end p-6">
+          <img 
+            src="/assets/feature_teacher_2d_1788968442321.jpg" 
+            alt="Ilustrasi Guru" 
+            className="absolute inset-0 h-full w-full object-cover" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+          
+          <div className="relative z-10 flex flex-col items-start justify-end">
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-white/20 text-white backdrop-blur-md mb-3 shadow-inner">
+              <Sparkles className="size-5" />
+            </span>
+            <h3 className="text-[22px] font-extrabold tracking-tight text-white leading-tight">
+              Tanya Bedawang
+            </h3>
+            <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[280px]">
+              Tanyakan apa saja seputar Aksara Bali. Saya mencarikan jawaban akurat.
+            </p>
+          </div>
         </div>
-        <span className="flex size-10 items-center justify-center rounded-full bg-card shadow-sm">
-          <Sparkles className="size-4 text-primary" />
-        </span>
-      </header>
 
-      <div
-        ref={scrollRef}
-        className="mx-auto w-full flex-1 space-y-3 overflow-y-auto px-4 py-4 lg:max-w-3xl"
-      >
-        {messages.map((msg, idx) => (
-          <Bubble key={msg.id} msg={msg} index={idx} onSuggest={(s) => send(s)} />
-        ))}
-
-        {thinking && <ThinkingBubble />}
-
-        {messages.length <= 1 && <QuickReplies onPick={send} />}
+        <div className="bg-card rounded-[1.75rem] p-6 shadow-sm border border-border/50">
+          <QuickReplies onPick={send} />
+        </div>
       </div>
 
-      <form
-        className="mx-auto w-full bg-transparent p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:max-w-3xl"
-        onSubmit={(e) => {
-          e.preventDefault();
-          send(input);
-        }}
-      >
-        <div className="flex items-end gap-2 rounded-full bg-card py-2 pl-4 pr-2 shadow-sm">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-            rows={1}
-            placeholder="Tanya seputar aksara Bali…"
-            aria-label="Tulis pertanyaan untuk Guru Virtual"
-            className="max-h-32 min-h-8 w-full resize-none bg-transparent py-1 text-sm outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            aria-label="Kirim"
-            disabled={!input.trim() || thinking}
-            className={cn(
-              "mb-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-colors",
-              input.trim() && !thinking
-                ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                : "bg-muted text-muted-foreground disabled:opacity-60",
-            )}
-          >
-            <SendHorizontal className="size-4" />
-          </button>
+      {/* Main Chat Area (Mobile wrapper + Desktop styling) */}
+      <div className="flex h-full flex-col lg:bg-card lg:rounded-[2rem] lg:shadow-md lg:border lg:border-border/60 lg:overflow-hidden">
+        {/* Header */}
+        <header className="mx-auto flex w-full items-center gap-3 border-b border-border/60 px-4 py-4 lg:px-6 lg:bg-card lg:border-border/40">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15">
+            <Bedawang className="size-8" />
+          </span>
+          <div className="flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Guru virtual
+            </p>
+            <p className="text-base font-bold tracking-tight">Bedawang Nala</p>
+            <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
+              <span className="size-1.5 rounded-full bg-success" />
+              Online · jawab pakai sumber
+            </p>
+          </div>
+          <span className="hidden lg:flex size-10 items-center justify-center rounded-full bg-primary/10">
+            <Sparkles className="size-4 text-primary" />
+          </span>
+        </header>
+
+        {/* Chat Window */}
+        <div
+          ref={scrollRef}
+          className="mx-auto w-full flex-1 space-y-3 overflow-y-auto px-4 py-4 lg:px-6"
+        >
+          {messages.map((msg, idx) => (
+            <Bubble key={msg.id} msg={msg} index={idx} onSuggest={(s) => send(s)} />
+          ))}
+
+          {thinking && <ThinkingBubble />}
+
+          {/* Mobile-only welcome & quick replies */}
+          {messages.length <= 1 && (
+            <div className="animate-in fade-in zoom-in-95 duration-700 delay-100 flex flex-col gap-6 py-2 lg:hidden">
+              <div className="relative overflow-hidden rounded-[1.75rem] shadow-sm min-h-[220px] flex flex-col justify-end p-6">
+                <img 
+                  src="/assets/feature_teacher_2d_1788968442321.jpg" 
+                  alt="Ilustrasi Guru" 
+                  className="absolute inset-0 h-full w-full object-cover" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+                
+                <div className="relative z-10 flex flex-col items-start justify-end">
+                  <span className="flex size-10 items-center justify-center rounded-2xl bg-white/20 text-white backdrop-blur-md mb-3 shadow-inner">
+                    <Sparkles className="size-5" />
+                  </span>
+                  <h3 className="text-[22px] font-extrabold tracking-tight text-white leading-tight">
+                    Tanya Bedawang Nala
+                  </h3>
+                  <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[280px]">
+                    Tanyakan apa saja seputar Aksara Bali. Saya akan mencarikan jawabannya dari berbagai sumber!
+                  </p>
+                </div>
+              </div>
+              
+              <QuickReplies onPick={send} />
+            </div>
+          )}
         </div>
-        <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
-          Enter kirim · Shift+Enter buat baris baru
-        </p>
-      </form>
+
+        {/* Input Form */}
+        <form
+          className="mx-auto w-full bg-transparent p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:px-6 lg:pb-6 lg:pt-0"
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(input);
+          }}
+        >
+          <div className="flex items-end gap-2 rounded-[1.5rem] bg-card lg:bg-background lg:border lg:border-border/50 py-2 pl-4 pr-2 shadow-sm">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              rows={1}
+              placeholder="Tanya seputar aksara Bali…"
+              aria-label="Tulis pertanyaan untuk Guru Virtual"
+              className="max-h-32 min-h-8 w-full resize-none bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              aria-label="Kirim"
+              disabled={!input.trim() || thinking}
+              className={cn(
+                "mb-1 inline-flex size-9 shrink-0 items-center justify-center rounded-full transition-colors",
+                input.trim() && !thinking
+                  ? "bg-primary text-primary-foreground hover:bg-primary/80"
+                  : "bg-muted text-muted-foreground disabled:opacity-60",
+              )}
+            >
+              <SendHorizontal className="size-4" />
+            </button>
+          </div>
+          <p className="mt-2 text-center text-[10px] text-muted-foreground">
+            Enter untuk kirim · Shift+Enter buat baris baru
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
@@ -184,8 +245,8 @@ function Bubble({
         className={cn(
           "max-w-[82%] px-4 py-2.5",
           isUser
-            ? "rounded-full rounded-br-md bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-md bg-card shadow-sm",
+            ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
+            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
         )}
       >
         {msg.title && (

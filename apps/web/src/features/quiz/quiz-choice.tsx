@@ -33,7 +33,7 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             disabled={showFeedback}
             onClick={() => onSelect(i)}
             className={cn(
-              "flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors",
+              "flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",
               stateClass,
               showFeedback && "cursor-default",
             )}

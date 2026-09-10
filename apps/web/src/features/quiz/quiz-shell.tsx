@@ -138,8 +138,9 @@ function ResumeDialog({
 function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void }) {
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center">
-      <span className="flex size-20 items-center justify-center rounded-full bg-destructive/10">
-        <HeartCrack className="size-10 text-destructive" />
+      <Bedawang mood="sedih" className="size-24 drop-shadow-md" />
+      <span className="mt-4 flex size-14 items-center justify-center rounded-full bg-destructive/10">
+        <HeartCrack className="size-7 text-destructive" />
       </span>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight">Hati kamu habis</h1>
       <p className="mt-2 max-w-[30ch] text-sm text-muted-foreground">

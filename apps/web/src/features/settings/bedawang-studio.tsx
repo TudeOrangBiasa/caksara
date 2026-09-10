@@ -105,7 +105,7 @@ export function BedawangStudio({ current }: { current: BedawangConfig | null }) 
         <Bedawang
           shell={draft.shell}
           head={draft.head}
-          accessory={draft.accessory}
+          acc={draft.accessory}
           mood={draft.mood}
           interactive
           blink

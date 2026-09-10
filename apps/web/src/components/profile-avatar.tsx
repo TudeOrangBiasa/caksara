@@ -52,7 +52,7 @@ export function ProfileAvatar({
         <Bedawang
           shell={cfg.shell}
           head={cfg.head}
-          accessory={cfg.accessory}
+          acc={cfg.accessory}
           mood={cfg.mood}
           animate={false}
           className="size-[88%]"
