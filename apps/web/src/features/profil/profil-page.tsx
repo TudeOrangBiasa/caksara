@@ -91,16 +91,16 @@ export function ProfilPage({
     <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-6xl lg:grid lg:grid-cols-[340px_1fr] lg:gap-8 lg:items-start animate-in fade-in duration-500">
       {/* Left Column (Sticky Sidebar on Desktop) */}
       <div className="lg:sticky lg:top-24 flex flex-col gap-6">
-        <header className="relative overflow-hidden rounded-[1.75rem] bg-primary min-h-[220px] p-6 text-primary-foreground shadow-xl shadow-primary/20 flex flex-col justify-between group">
+        <header className="relative overflow-hidden rounded-[1.75rem] min-h-[220px] p-6 shadow-md flex flex-col justify-between group">
           <img 
             src="/assets/review_family_2d_1788968477297.jpg" 
             alt="Profil background" 
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-40 mix-blend-overlay" 
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
           
           <div className="relative z-10 flex items-center gap-4">
-            <span className="relative flex shrink-0 items-center justify-center rounded-full bg-white/20 p-1.5 shadow-sm">
+            <span className="relative flex shrink-0 items-center justify-center rounded-full bg-white/20 p-1.5 shadow-sm backdrop-blur-md">
               <ProfileAvatar
                 name={profile?.name ?? "Teman Baru"}
                 avatar={profile?.avatar}
@@ -108,10 +108,10 @@ export function ProfilPage({
               />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-2xl font-extrabold tracking-tight">
+              <p className="truncate text-2xl font-extrabold tracking-tight text-white">
                 {profile?.name ?? "Teman Baru"}
               </p>
-              <p className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold shadow-sm backdrop-blur-md">
+              <p className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-md">
                 {profile?.id?.startsWith("anon_") || profile?.isAnon
                   ? "Profil anonim"
                   : "Petualang Caksara"}
@@ -120,9 +120,9 @@ export function ProfilPage({
           </div>
           
           <div className="relative z-10 mt-8 grid grid-cols-3 gap-3">
-            <StatMini label="XP" value={profile?.xp ?? 0} color="bg-warning/90 text-warning-foreground" />
-            <StatMini label="Hati" value={profile?.hearts ?? 5} color="bg-destructive/90 text-destructive-foreground" />
-            <StatMini label="Streak" value={profile?.streak ?? 0} color="bg-orange-500/90 text-orange-50" />
+            <StatMini label="XP" value={profile?.xp ?? 0} color="bg-white/10 text-white border border-white/20" />
+            <StatMini label="Hati" value={profile?.hearts ?? 5} color="bg-white/10 text-white border border-white/20" />
+            <StatMini label="Streak" value={profile?.streak ?? 0} color="bg-white/10 text-white border border-white/20" />
           </div>
         </header>
 
