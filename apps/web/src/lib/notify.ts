@@ -43,3 +43,11 @@ export function notifyStreakReset() {
     duration: 4000,
   });
 }
+
+/** #21: modul terkunci diklik → peringatan + ajakan bereskan modul sebelumnya. */
+export function notifyModuleLocked() {
+  toast.warning("Beresin modul sebelumnya dulu ya", {
+    description: "Modul ini kebuka setelah modul sebelumnya selesai.",
+    duration: 3500,
+  });
+}

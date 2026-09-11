@@ -28,13 +28,13 @@ export function ModuleDetail({
       {/* Left Column */}
       <div className="flex flex-col gap-6">
         <div className="relative overflow-hidden rounded-[1.75rem] shadow-xl shadow-primary/20 min-h-[280px] flex flex-col justify-end p-6 group">
-          <img 
-            src="/assets/study_mascot_2d_1788968332573.jpg" 
-            alt="" 
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+          <img
+            src="/assets/study_mascot_2d_1788968332573.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-          
+
           <div className="relative z-10 flex flex-col gap-3">
             <div className="flex items-center justify-between mb-1">
               <p className="text-xs font-bold uppercase tracking-widest text-white/70">
@@ -44,9 +44,11 @@ export function ModuleDetail({
                 {mod.order}
               </span>
             </div>
-            
+
             <div>
-              <h1 className="text-[28px] font-extrabold tracking-tight leading-tight text-white md:text-[32px]">{mod.title}</h1>
+              <h1 className="text-[28px] font-extrabold tracking-tight leading-tight text-white md:text-[32px]">
+                {mod.title}
+              </h1>
               <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[95%]">
                 {mod.description}
               </p>
@@ -60,7 +62,10 @@ export function ModuleDetail({
           </p>
           <div className="space-y-3">
             {mod.poinBelajar.map((item, i) => (
-              <div key={item} className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10 transition-colors hover:bg-primary/10">
+              <div
+                key={item}
+                className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10 transition-colors hover:bg-primary/10"
+              >
                 <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
                   <span className="text-[11px] font-bold">{i + 1}</span>
                 </div>
@@ -73,7 +78,7 @@ export function ModuleDetail({
 
       {/* Right Column (Sticky Sidebar on Desktop) */}
       <div className="mt-8 lg:mt-0 lg:sticky lg:top-24 flex flex-col gap-5 bg-card lg:p-6 lg:rounded-[1.75rem] lg:shadow-sm lg:ring-1 lg:ring-border/50">
-        <div className="hidden lg:flex flex-col gap-3 mb-2">
+        <div className="flex flex-col gap-3 mb-2">
           <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
             <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">
               <ListChecks className="size-4" />

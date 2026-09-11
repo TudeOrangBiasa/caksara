@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 
@@ -15,12 +16,14 @@ import {
   StepReadySection,
 } from "./onboarding-steps";
 
-const SPLASH_MS = 1400;
+const SPLASH_MS = 1500;
 const TOTAL_STEPS = 4;
 
-function Splash() {
+function Splash({ leaving }: { leaving: boolean }) {
   return (
-    <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-background px-6">
+    <div
+      className={`relative flex h-full flex-col items-center justify-center overflow-hidden bg-background px-6 transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
+    >
       <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02]"></div>
       <div className="absolute -left-32 -top-32 size-72 rounded-full bg-primary/20 blur-[100px]"></div>
       <div className="absolute -bottom-32 -right-32 size-72 rounded-full bg-warning/20 blur-[100px]"></div>
@@ -56,6 +59,7 @@ function StepBody({
   commitment,
   name,
   nameError,
+  inputRef,
   setGoal,
   setLevel,
   setCommitment,
@@ -69,6 +73,7 @@ function StepBody({
   commitment: string;
   name: string;
   nameError: string | null;
+  inputRef: RefObject<HTMLInputElement | null>;
   setGoal: (v: string) => void;
   setLevel: (v: string) => void;
   setCommitment: (v: string) => void;
@@ -83,6 +88,7 @@ function StepBody({
     <StepNameSection
       name={name}
       error={nameError}
+      inputRef={inputRef}
       onChange={(val) => {
         setName(val);
         if (nameError) setNameError(null);
@@ -99,6 +105,7 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
   const [commitment, setCommitment] = useState("santai");
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   function handleNext() {
     if (step < TOTAL_STEPS - 1) {
@@ -111,12 +118,14 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
   function handleNameSubmit() {
     const trimmed = name.trim();
     if (!trimmed) {
-      setStep(TOTAL_STEPS);
+      setNameError("Nama masih kosong, isi dulu ya.");
+      nameInputRef.current?.focus();
       return;
     }
     const parsed = profileNameSchema.safeParse(trimmed);
     if (!parsed.success) {
       setNameError(parsed.error.issues[0]?.message ?? "Nama tidak valid.");
+      nameInputRef.current?.focus();
       return;
     }
     setStep(TOTAL_STEPS);
@@ -160,6 +169,7 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
                 commitment={commitment}
                 name={name}
                 nameError={nameError}
+                inputRef={nameInputRef}
                 setGoal={setGoal}
                 setLevel={setLevel}
                 setCommitment={setCommitment}
@@ -185,10 +195,12 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
 
 export function OnboardingGate({ onComplete }: { onComplete: (name: string) => void }) {
   const [phase, setPhase] = useState<"splash" | "onboarding" | "ready">("splash");
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (phase !== "splash") return;
     const hadProfile = Boolean(loadProfile()?.name);
+    const fadeTimer = window.setTimeout(() => setLeaving(true), SPLASH_MS - 300);
     const timer = window.setTimeout(() => {
       if (hadProfile) {
         onComplete("");
@@ -196,10 +208,13 @@ export function OnboardingGate({ onComplete }: { onComplete: (name: string) => v
       }
       setPhase("onboarding");
     }, SPLASH_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(timer);
+    };
   }, [phase, onComplete]);
 
-  if (phase === "splash") return <Splash />;
+  if (phase === "splash") return <Splash leaving={leaving} />;
   if (phase === "onboarding") {
     return <MultiStepOnboarding onComplete={onComplete} />;
   }

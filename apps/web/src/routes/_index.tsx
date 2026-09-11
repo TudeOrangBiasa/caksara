@@ -133,7 +133,7 @@ export default function Home() {
         moduleId={view.mod.id}
         initialHearts={loadProfile()?.hearts ?? 5}
         onFinish={(score, detail) => {
-          if (!view.isLatihan && score.correct >= score.total * 0.7) {
+          if (!view.isLatihan) {
             markSelesai(view.mod.id);
           }
           void saveQuizSession(view.mod.id, detail, score);
@@ -177,7 +177,6 @@ export default function Home() {
       <LandingHome
         onStart={() => setNavTab("belajar")}
         onOpenKb={() => setNavTab("kb")}
-        onOpenGuru={() => setNavTab("guru")}
         onOpenTab={setNavTab}
       />
     ) : (

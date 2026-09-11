@@ -9,6 +9,8 @@ import type { CourseModule, ModuleStatus } from "./module-data";
 import { MasteryGrid } from "../../components/mastery-grid";
 import { BannerBudaya, SumberList, TipsBelajar } from "./belajar-extra";
 
+import { notifyModuleLocked } from "../../lib/notify";
+
 const statusMeta: Record<ModuleStatus, { label: string; dot: string }> = {
   selesai: { label: "Selesai", dot: "bg-success" },
   aktif: { label: "Aktif", dot: "bg-primary" },
@@ -82,8 +84,14 @@ function NodeButton({
   return (
     <button
       type="button"
-      onClick={() => onOpenDetail(mod)}
-      disabled={disabled}
+      onClick={() => {
+        if (disabled) {
+          notifyModuleLocked();
+          return;
+        }
+        onOpenDetail(mod);
+      }}
+      aria-disabled={disabled}
       className={cn(
         "group relative z-10 flex w-full overflow-hidden items-center gap-3 rounded-3xl p-4 text-left shadow-sm",
         isHero
@@ -271,14 +279,15 @@ export function ModuleTree({
                   <h2 className="text-lg font-extrabold tracking-tight">Kuis Campuran</h2>
                 </div>
               </div>
-              <img 
-                src="/assets/feature_quiz_2d_1788968425885.jpg" 
-                alt="Ilustrasi Kuis" 
-                className="size-20 rounded-2xl object-cover shadow-sm ring-1 ring-border/50 hidden sm:block" 
+              <img
+                src="/assets/feature_quiz_2d_1788968425885.jpg"
+                alt="Ilustrasi Kuis"
+                className="size-20 rounded-2xl object-cover shadow-sm ring-1 ring-border/50 hidden sm:block"
               />
             </div>
             <p className="text-[13px] font-medium leading-relaxed text-muted-foreground mb-4">
-              Ulangi materi yang sudah dihafal, tanpa mengulang dari awal. Semakin sering diulang, semakin nempel di ingatan.
+              Ulangi materi yang sudah dihafal, tanpa mengulang dari awal. Semakin sering diulang,
+              semakin nempel di ingatan.
             </p>
 
             <div className="space-y-2">

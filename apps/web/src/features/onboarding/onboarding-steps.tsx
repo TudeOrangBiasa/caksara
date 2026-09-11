@@ -1,6 +1,6 @@
 import { ArrowLeft, Sparkles } from "lucide-react";
 import type { RefObject } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 import { Input } from "@caksara/ui/components/input";
@@ -199,7 +199,6 @@ function StepNameInput({
           id="profile-name"
           placeholder="Misal: Putu, Wayan, Made..."
           value={value}
-          maxLength={20}
           aria-invalid={error ? true : undefined}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
@@ -225,20 +224,19 @@ function StepNameInput({
 export function StepNameSection({
   name,
   error,
+  inputRef,
   onChange,
   onSubmit,
 }: {
   name: string;
   error: string | null;
+  inputRef: RefObject<HTMLInputElement | null>;
   onChange: (value: string) => void;
   onSubmit: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     inputRef.current?.focus();
-  }, []);
-
+  }, [inputRef]);
   return (
     <div>
       <MascotBubble

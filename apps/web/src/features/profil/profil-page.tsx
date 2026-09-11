@@ -1,6 +1,5 @@
 import {
   CalendarCheck,
-  ChevronRight,
   Flame,
   Footprints,
   Map,
@@ -9,8 +8,6 @@ import {
   Sparkles,
   Trophy,
 } from "lucide-react";
-
-import { cn } from "@caksara/ui/lib/utils";
 
 import { ProfileAvatar } from "../../components/profile-avatar";
 import { AnimatedNumber } from "../../components/animated-number";
@@ -92,13 +89,13 @@ export function ProfilPage({
       {/* Left Column (Sticky Sidebar on Desktop) */}
       <div className="lg:sticky lg:top-24 flex flex-col gap-6">
         <header className="relative overflow-hidden rounded-[1.75rem] min-h-[220px] p-6 shadow-md flex flex-col justify-between group">
-          <img 
-            src="/assets/review_family_2d_1788968477297.jpg" 
-            alt="Profil background" 
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+          <img
+            src="/assets/review_family_2d_1788968477297.jpg"
+            alt="Profil background"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-          
+
           <div className="relative z-10 flex items-center gap-4">
             <span className="relative flex shrink-0 items-center justify-center rounded-full bg-white/20 p-1.5 shadow-sm backdrop-blur-md">
               <ProfileAvatar
@@ -118,11 +115,23 @@ export function ProfilPage({
               </p>
             </div>
           </div>
-          
+
           <div className="relative z-10 mt-8 grid grid-cols-3 gap-3">
-            <StatMini label="XP" value={profile?.xp ?? 0} color="bg-white/10 text-white border border-white/20" />
-            <StatMini label="Hati" value={profile?.hearts ?? 5} color="bg-white/10 text-white border border-white/20" />
-            <StatMini label="Streak" value={profile?.streak ?? 0} color="bg-white/10 text-white border border-white/20" />
+            <StatMini
+              label="XP"
+              value={profile?.xp ?? 0}
+              color="bg-white/10 text-white border border-white/20"
+            />
+            <StatMini
+              label="Hati"
+              value={profile?.hearts ?? 5}
+              color="bg-white/10 text-white border border-white/20"
+            />
+            <StatMini
+              label="Streak"
+              value={profile?.streak ?? 0}
+              color="bg-white/10 text-white border border-white/20"
+            />
           </div>
         </header>
 
@@ -169,11 +178,13 @@ export function ProfilPage({
               <Trophy className="size-5" />
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Progres Belajar</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                Progres Belajar
+              </p>
               <h2 className="text-lg font-extrabold tracking-tight">Level {level}</h2>
             </div>
           </div>
-          
+
           <div className="mt-2 flex items-center justify-between text-xs font-bold">
             <span>{intoLevel} XP</span>
             <span className="text-muted-foreground">Butuh {50 - intoLevel} XP lagi</span>
@@ -185,7 +196,10 @@ export function ProfilPage({
             />
           </div>
           <p className="mt-4 text-xs font-semibold text-muted-foreground">
-            <span className="text-foreground">{selesaiCount} dari {courseModules.length}</span> modul telah diselesaikan
+            <span className="text-foreground">
+              {selesaiCount} dari {courseModules.length}
+            </span>{" "}
+            modul telah diselesaikan
           </p>
         </div>
 
@@ -196,7 +210,9 @@ export function ProfilPage({
                 <Sparkles className="size-5" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Pencapaian</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Pencapaian
+                </p>
                 <h2 className="text-xl font-extrabold tracking-tight">Koleksi Lencana</h2>
               </div>
             </div>
@@ -209,7 +225,9 @@ export function ProfilPage({
               <div
                 key={b.title}
                 className={`flex flex-col items-center gap-2 rounded-2xl px-2 py-4 text-center transition-all ${
-                  b.unlocked ? "bg-primary/5 ring-1 ring-primary/20 shadow-sm" : "bg-muted/40 opacity-60 grayscale-[50%]"
+                  b.unlocked
+                    ? "bg-primary/5 ring-1 ring-primary/20 shadow-sm"
+                    : "bg-muted/40 opacity-60 grayscale-[50%]"
                 }`}
               >
                 <span
@@ -223,7 +241,9 @@ export function ProfilPage({
                 </span>
                 <div>
                   <p className="text-xs font-bold">{b.title}</p>
-                  <p className="mt-1 text-[10px] font-medium text-muted-foreground leading-snug max-w-[120px]">{b.desc}</p>
+                  <p className="mt-1 text-[10px] font-medium text-muted-foreground leading-snug max-w-[120px]">
+                    {b.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -271,7 +291,9 @@ export function ProfilPage({
 
 function StatMini({ label, value, color }: { label: string; value: number; color?: string }) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-[1.25rem] px-2 py-3 shadow-sm backdrop-blur-md ${color || 'bg-white/15'}`}>
+    <div
+      className={`flex flex-col items-center justify-center rounded-[1.25rem] px-2 py-3 shadow-sm backdrop-blur-md ${color || "bg-white/15"}`}
+    >
       <p className="text-2xl leading-none font-extrabold tracking-tight">
         <AnimatedNumber value={value} />
       </p>

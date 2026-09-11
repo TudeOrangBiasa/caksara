@@ -70,12 +70,10 @@ function FaqItem({
 export function LandingHome({
   onStart,
   onOpenKb,
-  onOpenGuru,
   onOpenTab,
 }: {
   onStart: () => void;
   onOpenKb: () => void;
-  onOpenGuru: () => void;
   onOpenTab: (t: NavTab) => void;
 }) {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
