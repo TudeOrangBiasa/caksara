@@ -113,13 +113,13 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
       {/* Left Column (Sticky Sidebar on Desktop) */}
       <div className="lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-6">
         <header className="relative mb-6 lg:mb-0 overflow-hidden rounded-[1.75rem] min-h-[200px] flex flex-col justify-end p-6 shadow-md group">
-          <img 
-            src="/assets/bali_lontar_2d_1788968315337.jpg" 
-            alt="" 
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+          <img
+            src="/assets/bali_lontar_2d_1788968315337.jpg"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-          
+
           <div className="relative z-10 flex-1 flex flex-col justify-end">
             <div className="flex items-center gap-3 mb-1">
               <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">
@@ -152,7 +152,9 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
 
           <div className="mt-5 space-y-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Kategori</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
+                Kategori
+              </p>
               <div className="flex flex-wrap gap-2">
                 <Chip active={category === "semua"} onClick={() => setCategory("semua")}>
                   Semua
@@ -171,13 +173,20 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
             </div>
 
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Tingkat Kesulitan</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
+                Tingkat Kesulitan
+              </p>
               <div className="flex flex-wrap gap-2">
                 <LevelChipFilter active={level === "semua"} onClick={() => setLevel("semua")}>
                   Semua Level
                 </LevelChipFilter>
                 {kbLevelSchema.options.map((l) => (
-                  <LevelChipFilter key={l} active={level === l} onClick={() => setLevel(l)} level={l}>
+                  <LevelChipFilter
+                    key={l}
+                    active={level === l}
+                    onClick={() => setLevel(l)}
+                    level={l}
+                  >
                     {LEVEL_LABEL[l]}
                   </LevelChipFilter>
                 ))}
@@ -228,13 +237,13 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
               if (items.length === 0) return null;
               const meta = KB_CATEGORY_META[cat];
               return (
-                <section
-                  key={cat}
-                  aria-labelledby={`kb-sec-${cat}`}
-                >
+                <section key={cat} aria-labelledby={`kb-sec-${cat}`}>
                   <header className="mb-4 flex flex-col gap-1 border-b border-border/40 pb-4">
                     <div className="flex items-center gap-2">
-                      <h2 id={`kb-sec-${cat}`} className="text-lg font-bold tracking-tight text-foreground">
+                      <h2
+                        id={`kb-sec-${cat}`}
+                        className="text-lg font-bold tracking-tight text-foreground"
+                      >
                         {meta.label}
                       </h2>
                       <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary">

@@ -5,13 +5,13 @@ import { WRESASTRA_AKSARA } from "./aksara-data";
 export function BannerBudaya() {
   return (
     <div className="relative overflow-hidden rounded-[1.75rem] shadow-xl shadow-primary/10 min-h-[220px] flex flex-col justify-end p-6 group">
-      <img 
-        src="/assets/bali_penjor_2d_1788968300643.jpg" 
-        alt="" 
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+      <img
+        src="/assets/bali_penjor_2d_1788968300643.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/60 to-transparent" />
-      
+
       <div className="relative z-10 flex flex-col items-start justify-end">
         <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">
           Tentang kurikulum
@@ -20,8 +20,8 @@ export function BannerBudaya() {
           Warisan Leluhur Bali
         </h2>
         <p className="mt-1.5 max-w-[40ch] text-[13px] font-medium leading-relaxed text-white/80">
-          Di sini kamu bakal belajar aksara, bahasa, dan budaya Bali pelan-pelan. 
-          Tenang, enggak usah buru-buru kok!
+          Di sini kamu bakal belajar aksara, bahasa, dan budaya Bali pelan-pelan. Tenang, enggak
+          usah buru-buru kok!
         </p>
       </div>
     </div>

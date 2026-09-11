@@ -89,17 +89,16 @@ export function TeacherChat() {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col md:max-w-2xl lg:max-w-6xl lg:grid lg:grid-cols-[340px_1fr] lg:gap-8 lg:p-6 lg:overflow-hidden">
-      
       {/* Desktop Sidebar (hidden on mobile) */}
       <div className="hidden lg:flex lg:flex-col lg:gap-6 overflow-y-auto pr-2 pb-6">
         <div className="relative overflow-hidden rounded-[1.75rem] shadow-sm min-h-[220px] flex flex-col justify-end p-6">
-          <img 
-            src="/assets/feature_teacher_2d_1788968442321.jpg" 
-            alt="Ilustrasi Guru" 
-            className="absolute inset-0 h-full w-full object-cover" 
+          <img
+            src="/assets/feature_teacher_2d_1788968442321.jpg"
+            alt="Ilustrasi Guru"
+            className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
-          
+
           <div className="relative z-10 flex flex-col items-start justify-end">
             <span className="flex size-10 items-center justify-center rounded-2xl bg-white/20 text-white backdrop-blur-md mb-3 shadow-inner">
               <Sparkles className="size-5" />
@@ -155,13 +154,13 @@ export function TeacherChat() {
           {messages.length <= 1 && (
             <div className="animate-in fade-in zoom-in-95 duration-700 delay-100 flex flex-col gap-6 py-2 lg:hidden">
               <div className="relative overflow-hidden rounded-[1.75rem] shadow-sm min-h-[220px] flex flex-col justify-end p-6">
-                <img 
-                  src="/assets/feature_teacher_2d_1788968442321.jpg" 
-                  alt="Ilustrasi Guru" 
-                  className="absolute inset-0 h-full w-full object-cover" 
+                <img
+                  src="/assets/feature_teacher_2d_1788968442321.jpg"
+                  alt="Ilustrasi Guru"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
-                
+
                 <div className="relative z-10 flex flex-col items-start justify-end">
                   <span className="flex size-10 items-center justify-center rounded-2xl bg-white/20 text-white backdrop-blur-md mb-3 shadow-inner">
                     <Sparkles className="size-5" />
@@ -170,11 +169,12 @@ export function TeacherChat() {
                     Tanya Bedawang Nala
                   </h3>
                   <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[280px]">
-                    Tanyakan apa saja seputar Aksara Bali. Saya akan mencarikan jawabannya dari berbagai sumber!
+                    Tanyakan apa saja seputar Aksara Bali. Saya akan mencarikan jawabannya dari
+                    berbagai sumber!
                   </p>
                 </div>
               </div>
-              
+
               <QuickReplies onPick={send} />
             </div>
           )}
