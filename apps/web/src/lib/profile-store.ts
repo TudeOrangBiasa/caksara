@@ -132,6 +132,11 @@ export async function reconcileProfileId(): Promise<string | null> {
 }
 
 export function createAnonProfile(name: string): UserProfile {
+  const parsed = profileNameSchema.safeParse(name);
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? "Nama tidak valid.");
+  }
+  const clean = parsed.data;
   const today = witaTodayStr();
   const mastery: Record<string, "belum" | "dipahami" | "ahli"> = {};
   for (const id of WRESASTRA_IDS) {
@@ -140,7 +145,7 @@ export function createAnonProfile(name: string): UserProfile {
   const profile: UserProfile = {
     id: anonId(),
     isAnon: true,
-    name,
+    name: clean,
     xp: 0,
     streak: 0,
     hearts: 5,
@@ -150,10 +155,11 @@ export function createAnonProfile(name: string): UserProfile {
     // Avatar acak dari lib (DiceBear, seed unik per profil); user bisa ganti nanti.
     avatar: {
       kind: "photo",
-      value: defaultAvatarUri(`${name.trim()}-${crypto.randomUUID().slice(0, 8)}`),
+      value: defaultAvatarUri(`${clean}-${crypto.randomUUID().slice(0, 8)}`),
     },
   };
-  persist(profile);
+  // Tulis sinkron: profil identitas tidak boleh hilang bila reload sebelum flush debounce.
+  persist(profile, true);
   return profile;
 }
 

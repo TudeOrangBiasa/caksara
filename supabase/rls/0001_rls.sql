@@ -1,7 +1,10 @@
 -- RLS awal CAKSARA (ADR-0002: Auth Anonymous default).
--- Cara pakai: jalankan di Supabase Dashboard > SQL Editor SETELAH
--- `bun run db:push` membuat tabel dari supabase/schema.ts.
--- Prasyarat: Authentication > Sign-in methods > Anonymous = ON.
+--
+-- Cara apply (pilih satu):
+-- 1. `bun run db:apply-sql supabase/rls/0001_rls.sql` (DATABASE_URL dari .env root)
+-- 2. Supabase Dashboard > SQL Editor > tempel file ini > Run (setelah `bun run db:push`).
+-- Prasyarat: tabel dari supabase/schema.ts sudah ada; Authentication > Anonymous = ON.
+-- File idempoten: aman dijalankan ulang (drop policy if exists + enable RLS).
 
 -- 1. Nyalakan RLS di tabel privat.
 alter table public.profiles enable row level security;

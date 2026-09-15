@@ -88,12 +88,16 @@ export default function Home() {
   const [kbQuery, setKbQuery] = useState("");
   const isDesktop = useIsDesktop();
 
-  const selesai = new Set<string>(
-    ["mod_01", "mod_02", "mod_03", "mod_04"].filter((id) => hasSelesai(id)),
-  );
+  const selesai = new Set<string>(courseModules.map((m) => m.id).filter((id) => hasSelesai(id)));
 
   const handleComplete = useCallback((name: string) => {
-    if (name) createAnonProfile(name);
+    if (name) {
+      try {
+        createAnonProfile(name);
+      } catch {
+        createAnonProfile("Penjelajah");
+      }
+    }
     setProfileLoaded(true);
   }, []);
 

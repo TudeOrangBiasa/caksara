@@ -41,6 +41,10 @@ export async function saveQuizSession(
   answers: QuizAnswerDetail[],
   score: { correct: number; total: number },
 ): Promise<SaveQuizSessionResult> {
+  const derivedCorrect = answers.filter((a) => a.correct).length;
+  if (derivedCorrect !== score.correct || answers.length !== score.total) {
+    return { saved: false, reason: "validation" };
+  }
   const parsed = saveQuizSessionInputSchema.safeParse({ moduleId, answers, score });
   if (!parsed.success) return { saved: false, reason: "validation" };
   try {

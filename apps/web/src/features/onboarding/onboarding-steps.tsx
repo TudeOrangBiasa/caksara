@@ -107,11 +107,15 @@ export function OnboardingTopBar({
         <div className="size-8 shrink-0" />
       )}
       <div className="flex-1">
+        <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+          Langkah {step + 1} dari {totalSteps}
+        </p>
         <div
           role="progressbar"
           aria-valuenow={progressPercent}
           aria-valuemin={0}
           aria-valuemax={100}
+          aria-label={`Langkah ${step + 1} dari ${totalSteps}`}
           className="h-2.5 w-full overflow-hidden rounded-full bg-muted/80"
         >
           <div

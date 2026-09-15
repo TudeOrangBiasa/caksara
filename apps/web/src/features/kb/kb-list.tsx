@@ -1,4 +1,4 @@
-import { BookOpen, FilterX, Library, Search, WifiOff } from "lucide-react";
+import { BookOpen, FilterX, Search } from "lucide-react";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
@@ -15,8 +15,6 @@ type LevelFilter = "semua" | KbLevel;
 interface KbListProps {
   onOpenEntry: (entry: KbEntry) => void;
   initialQuery?: string;
-  simulateError?: boolean;
-  simulateEmpty?: boolean;
 }
 
 const LEVEL_LABEL: Record<KbLevel, string> = { "1": "Level 1", "2": "Level 2", "3": "Level 3" };
@@ -46,7 +44,7 @@ const CATEGORY_CHIP: Record<CategoryFilter, string> = {
   budaya: "bg-success/10 text-success border-success/30",
 };
 
-export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty }: KbListProps) {
+export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
   const [query, setQuery] = useState(initialQuery ?? "");
   const [category, setCategory] = useState<CategoryFilter>("semua");
   const [level, setLevel] = useState<LevelFilter>("semua");
@@ -67,43 +65,6 @@ export function KbList({ onOpenEntry, initialQuery, simulateError, simulateEmpty
   });
 
   const hasActiveFilter = category !== "semua" || level !== "semua" || deferred !== "";
-
-  if (simulateError) {
-    return (
-      <EmptyState
-        illustration={<WifiOff className="size-7" />}
-        title="Gagal memuat daftar"
-        body="Ada masalah saat mengambil data KB. Cek koneksimu lalu coba sekali lagi."
-        tone="danger"
-        action={
-          <Button
-            className="h-11 w-full rounded-full font-semibold"
-            onClick={() => window.location.reload()}
-          >
-            Coba Lagi
-          </Button>
-        }
-      />
-    );
-  }
-
-  if (simulateEmpty) {
-    return (
-      <EmptyState
-        illustration={<Library className="size-7" />}
-        title="Belum ada isi KB"
-        body="Kamus aksara & budaya masih kosong. Sumbernya sedang disusun pelan-pelan."
-        action={
-          <Button
-            className="h-11 w-full rounded-full font-semibold"
-            onClick={() => setCategory("semua")}
-          >
-            Buka Semua
-          </Button>
-        }
-      />
-    );
-  }
 
   const showNoResults = filtered.length === 0 && hasActiveFilter;
   const showEmpty = filtered.length === 0 && !hasActiveFilter;

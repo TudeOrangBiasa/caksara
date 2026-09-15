@@ -1,4 +1,7 @@
+import { z } from "zod";
+
 const STORAGE_KEY = "caksara.module-selesai.v1";
+const selesaiIdsSchema = z.array(z.string().min(1));
 
 function safeStorage(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -11,8 +14,8 @@ function readSelesai(): Set<string> {
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return new Set();
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? new Set<string>(arr) : new Set();
+    const parsed = selesaiIdsSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? new Set<string>(parsed.data) : new Set();
   } catch {
     return new Set();
   }

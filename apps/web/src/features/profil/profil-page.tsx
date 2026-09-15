@@ -9,9 +9,11 @@ import {
   Trophy,
 } from "lucide-react";
 
+import { useSyncExternalStore } from "react";
+
 import { ProfileAvatar } from "../../components/profile-avatar";
 import { AnimatedNumber } from "../../components/animated-number";
-import { loadProfile } from "../../lib/profile-store";
+import { loadProfile, subscribeProfile } from "../../lib/profile-store";
 import { courseModules } from "../module/module-data";
 
 interface Badge {
@@ -76,7 +78,7 @@ export function ProfilPage({
   onOpenSettings: () => void;
   onOpenShare: () => void;
 }) {
-  const profile = loadProfile();
+  const profile = useSyncExternalStore(subscribeProfile, loadProfile, loadProfile);
   const xp = profile?.xp ?? 0;
   const level = Math.floor(xp / 50) + 1;
   const intoLevel = xp % 50;
