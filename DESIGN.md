@@ -1,29 +1,30 @@
 ---
-version: alpha
+version: alpha.1
 name: Caksara — Aksara Bali
 description: Web edutainment sakral-terracotta for Profil Anon learning Wresastra via Sesi Kuis
 colors:
-  primary: "#af5234"
-  primary-50: "#fbeae5"
-  primary-100: "#f0cfc5"
-  primary-200: "#e0a897"
-  primary-300: "#ce826b"
-  primary-500: "#af5234"
-  primary-700: "#873b24"
-  primary-800: "#602614"
-  primary-900: "#39160a"
-  primary-950: "#160703"
-  secondary: "#eee4cf"
-  secondary-50: "#f8f5ee"
-  accent: "#d79628"
-  accent-50: "#fbecd9"
-  destructive: "#df2225"
-  success: "#409d48"
-  warning: "#ea9941"
-  neutral: "#f8f5ee"
-  neutral-950: "#0f0a08"
-  background: "#ffffff"
-  foreground: "#0a0a0a"
+  primary: "oklch(0.55 0.13 38)"
+  primary-foreground: "oklch(0.985 0 0)"
+  primary-dark: "oklch(0.7 0.12 38)"
+  primary-dark-foreground: "oklch(0.145 0 0)"
+  secondary: "oklch(0.92 0.03 85)"
+  secondary-foreground: "oklch(0.35 0.08 38)"
+  muted: "oklch(0.97 0.01 85)"
+  muted-foreground: "oklch(0.56 0.02 45)"
+  accent: "oklch(0.72 0.14 75)"
+  accent-foreground: "oklch(0.2 0.05 38)"
+  destructive: "oklch(0.58 0.22 27)"
+  success: "oklch(0.62 0.15 145)"
+  warning: "oklch(0.75 0.14 65)"
+  mastery-belum: "oklch(0.97 0.01 85)"
+  mastery-dipahami: "oklch(0.72 0.14 75)"
+  mastery-ahli: "oklch(0.55 0.13 38)"
+  border: "oklch(0.92 0.01 85)"
+  input: "oklch(0.92 0.01 85)"
+  ring: "oklch(0.55 0.13 38)"
+  background: "oklch(1 0 0)"
+  foreground: "oklch(0.145 0 0)"
+  radius: "0.75rem"
 typography:
   display:
     fontFamily: "Inter Variable"
@@ -90,15 +91,15 @@ Design read: "Reading this as: web edutainment for pelajar Bali, with a sakral-t
 
 ## Colors
 
-Palette is warm terracotta + parchment + gold, computed via **oklch-skill** palette generation (delta 0.4, L 0.95→0.15, chroma clamped per step to stay in sRGB gamut, same C% per hue). Single accent lock.
+Palette is burnt-orange + neutral + gold. Single accent lock.
 
-- **Primary (#a5? terracotta oklch 0.55 0.13 38):** CTA, Modul aktif, Mastery ahli. Light 50–300 for hover, dark 700–950 for text on dark.
-- **Secondary (sand oklch 0.92 0.03 85):** card surface, parchment calm.
-- **Accent (emas oklch 0.72 0.14 75):** highlight, Mastery dipahami.
-- **Neutral (limestone oklch 0.97 0.01 85):** page base, softer than pure white.
-- **Semantic:** Destructive Hati `0.58 0.22 27`, Success XP `0.62 0.15 145`, Warning Streak `0.75 0.14 65`. All checked via oklch accessibility-contrast (L gap >0.6, APCA Lc 60+).
+- **Primary (terracotta light `oklch(0.55 0.13 38)`, dark `oklch(0.7 0.12 38)`):** CTA, Modul aktif, pill aktif. Pair with `primary-foreground`.
+- **Secondary/Muted (warm limestone light `oklch(0.92 0.03 85)`, dark `oklch(0.27 0.02 45)`):** card surface, track progress, chip.
+- **Accent (emas `oklch(0.72 0.14 75)`):** highlight, Mastery dipahami, XP.
+- **Semantic:** Destructive Hati `0.58 0.22 27`, Success `0.62 0.15 145`, Warning Streak `0.75 0.14 65`. Dark mode: warm deep background, white text.
+- **Mastery:** Belum neutral, Dipahami emas, Ahli terracotta (`0.55 0.13 38` light).
 
-Tokens are normative; prose describes use. No hex hardcode in components — use `bg-primary` etc.
+Tokens are normative (`packages/ui/src/lib/tokens.ts` mirrors `globals.css` 36/36); prose describes use. No hex hardcode in components — use `bg-primary` etc.
 
 ## Typography
 
@@ -116,7 +117,7 @@ Tonal layers, not heavy shadows. Background off-white, cards pure white. Shadow 
 
 ## Shapes
 
-Shape lock: **soft 12–16px** for cards (`rounded lg/xl`), **8px** for inputs, `full` for Hati/XP pills. One scale, consistent. Prototype uses `rounded-xl` for Modul cards, `rounded-lg` for Wresastra grid.
+Shape lock: base `--radius 0.75rem` M3 medium, cards `rounded-3xl`, inputs `rounded-2xl`, `full` for Hati/XP pills, search, and CTA. One scale, consistent.
 
 ## Components
 
@@ -128,3 +129,8 @@ Use shadcn/ui components via `npx shadcn@latest add` — Button, Card, Badge, Pr
 - Do: `bg-primary` etc, `gap-*` not `space-y-*`, `size-*` not `w-* h-*`.
 - Don't: mix Fluent/Carbon, don't use hex in components, don't default to warm beige #f5f1ea.
 - Don't: use Duolingo lime `#a5ed6e` visual — keep terracotta.
+
+## Changelog
+
+- **alpha.1** — V0 tokens SSOT: `tokens.ts` mirrors `globals.css` warm SSOT (terracotta `0.55/0.70` hue 38, limestone neutrals, radius `0.75rem`); frontmatter oklch; per-token docs + governance header.
+- **alpha** — Initial palette (warm limestone scale, radius `0.75rem`).

@@ -4,7 +4,16 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+1B00-1B7F;
+  unicode-range: U+001D, U+1B00-1B7F, U+200C-200D, U+25CC;
+}
+
+@font-face {
+  font-family: "Noto Sans Balinese";
+  src: url("/fonts/NotoSansBalinese-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+001D, U+1B00-1B7F, U+200C-200D, U+25CC;
 }
 
 [lang="ban"],

@@ -1,29 +1,157 @@
+/**
+ * Token governance: nilai di sini adalah mirror normatif dari
+ * `packages/ui/src/styles/globals.css` (`:root` = light, `.dark` = dark).
+ * Aturan: token baru → catat di ADR dulu, jangan hardcode hex/oklch di komponen.
+ * Pakai `bg-primary`, `text-muted-foreground`, dsb. — bukan nilai literal.
+ */
 import { z } from "zod";
 
 const oklch = z.string().regex(/^oklch\(.+\)$/u, "expected oklch(...)");
 
 export const tokenSchema = z.object({
-  primary: oklch,
-  primaryForeground: oklch,
-  secondary: oklch,
-  secondaryForeground: oklch,
-  muted: oklch,
-  mutedForeground: oklch,
-  accent: oklch,
-  accentForeground: oklch,
-  destructive: oklch,
-  success: oklch,
-  warning: oklch,
-  masteryBelum: oklch,
-  masteryDipahami: oklch,
-  masteryAhli: oklch,
-  border: oklch,
-  input: oklch,
-  ring: oklch,
-  radius: z.string(),
+  /** CTA utama, modul aktif, tombol pill. Jangan: teks kecil di atasnya tanpa foreground. */
+  primary: oklch.describe("CTA & active states; pair with primaryForeground"),
+  /** Teks di atas primary. Jangan: dipakai di luar permukaan primary. */
+  primaryForeground: oklch.describe("Text on primary surfaces only"),
+  /** Permukaan sekunder netral. Jangan: untuk CTA. */
+  secondary: oklch.describe("Secondary surfaces, not CTAs"),
+  /** Teks di atas secondary. */
+  secondaryForeground: oklch.describe("Text on secondary surfaces"),
+  /** Latar redup (track progress, chip). Jangan: teks penting di atasnya. */
+  muted: oklch.describe("Muted tracks & chips"),
+  /** Teks sekunder/deskripsi. Jangan: untuk judul atau aksi. */
+  mutedForeground: oklch.describe("Secondary text only, never headings"),
+  /** Aksen emas: highlight & XP. Jangan: jadi warna CTA kedua. */
+  accent: oklch.describe("Gold highlight & XP; single accent lock"),
+  /** Teks di atas accent. */
+  accentForeground: oklch.describe("Text on accent surfaces"),
+  /** Hati habis, reset, error. Jangan: untuk sukses/info. */
+  destructive: oklch.describe("Errors & destructive actions"),
+  /** Berhasil, selesai, XP positif. */
+  success: oklch.describe("Success states"),
+  /** Peringatan streak. */
+  warning: oklch.describe("Warnings"),
+  /** Tile mastery yang belum dipelajari. */
+  masteryBelum: oklch.describe("Unlearned mastery tile"),
+  /** Tile mastery tahap dipahami. */
+  masteryDipahami: oklch.describe("In-progress mastery tile"),
+  /** Tile mastery tahap ahli. */
+  masteryAhli: oklch.describe("Mastered tile"),
+  /** Garis pembatas. Jangan: bayangan hitam pekat. */
+  border: oklch.describe("Hairline dividers"),
+  /** Latar input. */
+  input: oklch.describe("Input backgrounds"),
+  /** Fokus ring aksesibilitas. */
+  ring: oklch.describe("Focus rings"),
+  /** Radius dasar 0.75rem M3 medium; kartu pakai 3xl. Jangan: radius acak per komponen. */
+  radius: z.string().describe("Base radius; cards use 3xl"),
 });
 
 export type Tokens = z.infer<typeof tokenSchema>;
+
+const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/u, "expected #rrggbb");
+
+/**
+ * Token ilustrasi & cetak (maskot Bedawang, konfeti, kartu PNG): HEX tetap,
+ * sama di light/dark (ADR-0011). Jangan: untuk teks UI, CTA, atau state.
+ */
+export const illustrationTokenSchema = z.object({
+  /** Cangkang maskot. */
+  bedawangShell: hex.describe("Mascot shell"),
+  /** Sorot cangkang maskot. */
+  bedawangShellEdge: hex.describe("Mascot shell highlight"),
+  /** Garis & bayangan cangkang. */
+  bedawangShellDark: hex.describe("Mascot shell lines"),
+  /** Kepala maskot. */
+  bedawangHead: hex.describe("Mascot head"),
+  /** Bayangan kepala. */
+  bedawangHeadDark: hex.describe("Mascot head shade"),
+  /** Kaki/sirip maskot. */
+  bedawangLeg: hex.describe("Mascot limbs"),
+  /** Perut & ombak. */
+  bedawangBelly: hex.describe("Mascot belly"),
+  /** Mata, mulut, garis wajah. */
+  bedawangInk: hex.describe("Mascot line art"),
+  /** Kilau mata. */
+  bedawangHighlight: hex.describe("Mascot eye sparkle"),
+  /** Pipi merona. */
+  bedawangBlush: hex.describe("Mascot blush"),
+  /** Air mata & aksen mood. */
+  bedawangGem: hex.describe("Mascot tear accent"),
+  /** Konfeti emas 1-6 (terang ke gelap). */
+  confetti1: hex.describe("Confetti gold 1"),
+  confetti2: hex.describe("Confetti gold 2"),
+  confetti3: hex.describe("Confetti gold 3"),
+  confetti4: hex.describe("Confetti gold 4"),
+  confetti5: hex.describe("Confetti gold 5"),
+  confetti6: hex.describe("Confetti gold 6"),
+  /** Kertas kartu prestasi. */
+  cardBg: hex.describe("Share card paper"),
+  /** Kartu statistik & panel kartu. */
+  cardBgDeep: hex.describe("Share card panel"),
+  /** Teks kartu. */
+  cardInk: hex.describe("Share card text"),
+  /** Teks sekunder kartu. */
+  cardMuted: hex.describe("Share card secondary text"),
+  /** Garis kartu. */
+  cardLine: hex.describe("Share card hairline"),
+  /** Aksen terracotta kartu. */
+  cardPrimary: hex.describe("Share card accent"),
+  /** Varian gelap aksen kartu. */
+  cardPrimaryDark: hex.describe("Share card accent dark"),
+  /** Emas kartu (avatar, pemisah). */
+  cardGold: hex.describe("Share card gold"),
+  /** Teks di atas aksen kartu. */
+  cardCream: hex.describe("Share card on-accent text"),
+  /** Putih kartu. */
+  cardWhite: hex.describe("Share card white"),
+  /** Tile mastery belum/dipahami/ahli di kartu. */
+  cardMasteryBelum: hex.describe("Share card unlearned tile"),
+  cardMasteryDipahami: hex.describe("Share card learning tile"),
+  cardMasteryAhli: hex.describe("Share card mastered tile"),
+  /** Teks status mastery di kartu. */
+  cardStatusBelum: hex.describe("Share card unlearned label"),
+  cardStatusDipahami: hex.describe("Share card learning label"),
+  cardStatusAhli: hex.describe("Share card mastered label"),
+});
+
+export type IllustrationTokens = z.infer<typeof illustrationTokenSchema>;
+
+export const illustrationTokens = {
+  bedawangShell: "#b85c32",
+  bedawangShellEdge: "#d98a52",
+  bedawangShellDark: "#8f4526",
+  bedawangHead: "#e59a6b",
+  bedawangHeadDark: "#b76a3d",
+  bedawangLeg: "#d9824f",
+  bedawangBelly: "#f6e7c9",
+  bedawangInk: "#3a2417",
+  bedawangHighlight: "#ffffff",
+  bedawangBlush: "#e58a74",
+  bedawangGem: "#8ecae6",
+  confetti1: "#f59e0b",
+  confetti2: "#fbbf24",
+  confetti3: "#fcd34d",
+  confetti4: "#fde68a",
+  confetti5: "#d97706",
+  confetti6: "#b45309",
+  cardBg: "#faf1e2",
+  cardBgDeep: "#f1dfc2",
+  cardInk: "#3a2a1c",
+  cardMuted: "#7a6350",
+  cardLine: "#e3cdab",
+  cardPrimary: "#b05a30",
+  cardPrimaryDark: "#873f1e",
+  cardGold: "#d9a441",
+  cardCream: "#fff8ec",
+  cardWhite: "#ffffff",
+  cardMasteryBelum: "#d6c8b6",
+  cardMasteryDipahami: "#e0b24f",
+  cardMasteryAhli: "#b05a30",
+  cardStatusBelum: "#7a6350",
+  cardStatusDipahami: "#6b4b12",
+  cardStatusAhli: "#fff8ec",
+} satisfies IllustrationTokens;
 
 export const tokens = {
   light: {
@@ -67,3 +195,36 @@ export const tokens = {
     radius: "0.75rem",
   },
 } satisfies Record<string, Tokens>;
+
+/**
+ * Token depth minimal premium (bukan oklch murni, multi-shadow + inset).
+ * Terpisah dari `tokenSchema` 19 field. Mirror normatif dari
+ * `packages/ui/src/styles/globals.css` (`:root` = light, `.dark` = dark).
+ */
+export const depthTokenSchema = z.object({
+  /** Bayangan halus kartu standar. */
+  shadowSm: z.string().describe("Subtle card shadow"),
+  /** Bayangan sedang hero dan nav mengambang. */
+  shadowMd: z.string().describe("Hero and floating nav shadow"),
+  /** Bayangan besar hero dan nav mengambang. */
+  shadowLg: z.string().describe("Large hero shadow"),
+  /** Kilau atas hero dan nav mengambang. */
+  highlight: z.string().describe("Top highlight for hero and nav"),
+});
+
+export type DepthTokens = z.infer<typeof depthTokenSchema>;
+
+export const depthTokens = {
+  light: {
+    shadowSm: "0 1px 2px oklch(0.35 0.05 38 / 8%), 0 1px 3px oklch(0.35 0.05 38 / 6%)",
+    shadowMd: "0 4px 12px oklch(0.35 0.05 38 / 12%), 0 2px 4px oklch(0.35 0.05 38 / 8%)",
+    shadowLg: "0 12px 32px oklch(0.35 0.05 38 / 18%), 0 4px 8px oklch(0.35 0.05 38 / 10%)",
+    highlight: "inset 0 1px 0 oklch(1 0 0 / 55%)",
+  },
+  dark: {
+    shadowSm: "0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 24%)",
+    shadowMd: "0 4px 12px oklch(0 0 0 / 40%), 0 2px 4px oklch(0 0 0 / 30%)",
+    shadowLg: "0 12px 32px oklch(0 0 0 / 55%), 0 4px 8px oklch(0 0 0 / 40%)",
+    highlight: "inset 0 1px 0 oklch(1 0 0 / 8%)",
+  },
+} satisfies Record<string, DepthTokens>;

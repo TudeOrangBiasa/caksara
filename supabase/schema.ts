@@ -26,7 +26,7 @@ export const modules = pgTable("modules", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   theme: text("theme"),
-  order: integer('"order"').notNull(),
+  order: integer("order").notNull(),
   prereqId: text("prereq_id"),
 });
 
