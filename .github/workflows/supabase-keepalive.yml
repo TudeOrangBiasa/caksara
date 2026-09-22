@@ -1,0 +1,29 @@
+name: supabase-keepalive
+
+on:
+  schedule:
+    # Tiap 3 hari jam 02:00 UTC — cukup untuk cegah auto-pause Supabase free tier
+    # (pause setelah ~7 hari tanpa aktivitas). Jangan tiap jam: hemat resource.
+    - cron: "0 2 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Auth health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/auth/v1/health")
+          echo "auth-health: $code"
+          [ "$code" = "200" ] || exit 1
+
+      - name: Ping Supabase DB (rest)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/modules?select=id&limit=1")
+          echo "rest-modules: $code"
+          [ "$code" = "200" ] || exit 1
