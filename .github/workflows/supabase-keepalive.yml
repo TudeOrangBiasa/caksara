@@ -10,6 +10,8 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Ping Supabase Auth health
         run: |
@@ -20,10 +22,10 @@ jobs:
           [ "$code" = "200" ] || exit 1
 
       - name: Ping Supabase DB (rest)
+        continue-on-error: true
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/modules?select=id&limit=1")
-          echo "rest-modules: $code"
-          [ "$code" = "200" ] || exit 1
+          echo "rest-modules: $code (info only — tabel modules belum tentu ada sebelum db:push)"
