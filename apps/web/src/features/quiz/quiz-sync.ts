@@ -41,12 +41,13 @@ export async function saveQuizSession(
   answers: QuizAnswerDetail[],
   score: { correct: number; total: number },
 ): Promise<SaveQuizSessionResult> {
-  const derivedCorrect = answers.filter((a) => a.correct).length;
-  if (derivedCorrect !== score.correct || answers.length !== score.total) {
-    return { saved: false, reason: "validation" };
-  }
   const parsed = saveQuizSessionInputSchema.safeParse({ moduleId, answers, score });
   if (!parsed.success) return { saved: false, reason: "validation" };
+  const { moduleId: mod, answers: validAnswers, score: validScore } = parsed.data;
+  const derivedCorrect = validAnswers.filter((a) => a.correct).length;
+  if (derivedCorrect !== validScore.correct || validAnswers.length !== validScore.total) {
+    return { saved: false, reason: "validation" };
+  }
   try {
     const supabase = getSupabase();
     if (!supabase) return { saved: false, reason: "no-backend" };
@@ -59,19 +60,19 @@ export async function saveQuizSession(
       .from("quiz_sessions")
       .insert({
         profile_id: uid,
-        module_id: moduleId,
-        questions: answers,
+        module_id: mod,
+        questions: validAnswers,
         status: "done",
-        score: score.correct,
-        current_index: score.total,
+        score: validScore.correct,
+        current_index: validScore.total,
       })
       .select("id")
       .single();
     const sessionId = (session as { id: number } | null)?.id;
     if (error || !sessionId) return { saved: false, reason: "server" };
-    if (answers.length === 0) return { saved: true };
+    if (validAnswers.length === 0) return { saved: true };
     const { error: answersError } = await supabase.from("answers").insert(
-      answers.map((a) => ({
+      validAnswers.map((a) => ({
         session_id: sessionId,
         question_idx: a.questionIndex,
         correct: a.correct,
