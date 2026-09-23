@@ -37,7 +37,7 @@
     "proof:ui": "bun scripts/proof-ui.ts",
     "check:loc": "node scripts/check-loc.js",
     "check:secrets": "node scripts/check-secrets.js",
-    "lint:tailwind": "node scripts/lint-tailwind.js",
+    "lint:tailwind": "node scripts/lint-tailwind.js && bunx oxlint",
     "code-review": "echo \"code-review: run /code-review (Standards + Spec) — see docs/CODING_STANDARDS.md + CONTEXT.md\" && oxlint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@caksara/config": "workspace:*",
+    "@shadcn/lint": "^0.2.0",
     "@types/node": "catalog:",
     "drizzle-kit": "^0.31.4",
     "husky": "^9.1.7",

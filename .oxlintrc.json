@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "unicorn", "import", "oxc"],
+  "jsPlugins": ["@shadcn/lint"],
   "categories": {
     "correctness": "error",
     "suspicious": "warn",
@@ -26,7 +27,17 @@
     "@typescript-eslint/prefer-nullish-coalescing": "warn",
     "unicorn/no-abusive-eslint-disable": "warn",
     "import/no-duplicates": "warn",
-    "import/consistent-type-specifier-style": ["warn", "prefer-top-level"]
+    "import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
+    "shadcn/no-arbitrary-values": "warn",
+    "shadcn/no-inline-styles": "warn",
+    "shadcn/no-raw-colors": "warn",
+    "shadcn/no-unknown-classes": "off"
+  },
+  "settings": {
+    "shadcn": {
+      "ui": "@caksara/ui/components",
+      "note": "Lihat DESIGN.md + docs/agents/ui-proof.md untuk aturan desain dan pengecualian yang disetujui."
+    }
   },
   "overrides": [
     {

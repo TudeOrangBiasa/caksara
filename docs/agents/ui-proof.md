@@ -10,6 +10,8 @@ Aturan lampiran mengikuti pola `pr-screenshots`
 
 ```bash
 npm i -g agent-browser && agent-browser install
+# atau sekali jalan tanpa install global:
+# command -v agent-browser || npm i -g agent-browser && agent-browser install
 ```
 
 `agent-browser install` mengunduh Chrome versi cocok. Tanpa ini semua perintah
@@ -43,14 +45,12 @@ tidak ditemukan. Butuh rekaman video? Pastikan `ffmpeg` ada (`which ffmpeg`).
 
 ## Perintah inti
 
-| Perlu           | Perintah                                                  |
-| --------------- | --------------------------------------------------------- |
-| Buka + snapshot | `open <url>`, `snapshot`                                  |
-| Viewport        | `set viewport 390 844` / `set viewport 1280 800`          |
-| Tema            | `set media dark` / `set media light`                      |
-| Foto            | `screenshot <path>`                                       |
-| Rekam           | `record start <path.webm>` … `record stop` (butuh ffmpeg) |
-| Tutup           | `close --all`                                             |
+| Buka + snapshot | `open <url>`, `snapshot` |
+| Viewport | `set viewport 390 844` / `set viewport 1280 800` |
+| Tema (app class-based, root.tsx) | klik toggle `Ganti ke mode...` dari snapshot, bukan `set media` |
+| Foto | `screenshot <path>` |
+| Rekam | `record start <path.webm>` … `record stop` (butuh ffmpeg) |
+| Tutup | `close --all` |
 
 Detail selalu versi-terkini dari CLI (tidak disalin ke sini supaya tidak basi):
 

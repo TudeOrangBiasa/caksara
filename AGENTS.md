@@ -16,10 +16,9 @@ React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · D
 ## Workflow
 
 1. Ambil ticket dari GitHub Issues dengan label `ready-for-agent`, kerjakan blockers-first (`#2` DB → `#3` KB → `#4` Edge → `#5` Auth/Tree → `#6` Quiz → `#7`/`#8` parallel)
-2. Tiap ticket dikerjakan di fresh context, drive `/tdd` internally, tutup dengan `/code-review` (Standards + Spec)
-3. Jangan push spec/plan sebagai file — Issues adalah tracker
-
-## Commands
+2. Tiap ticket = branch baru `feat/<nama>` (fix: `fix/<nama>`, chores: `chore/<nama>`) dari `develop` yang sync ke `origin/main`. Push langsung ke `develop`/`main` dilarang — semua via PR + review + CI hijau (detail: `docs/CODING_STANDARDS.md` §11)
+3. Tiap ticket dikerjakan di fresh context, drive `/tdd` internally, tutup dengan `/code-review` (Standards + Spec)
+4. Jangan push spec/plan sebagai file — Issues adalah tracker
 
 ```bash
 bun install                    # install (1283 packages)
