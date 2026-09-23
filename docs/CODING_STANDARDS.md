@@ -14,7 +14,7 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 
 - `oxlint` (bukan ESLint) + `oxfmt`. Jalankan `bun run check` sebelum commit.
 - Config: `.oxlintrc.json`, `.oxfmtrc.json`. Jangan tambah ESLint/Prettier.
-- **Tailwind lint** — `bun run lint:tailwind` wajib hijau (= skrip lokal cek duplikat + `oxlint` memuat aturan `@shadcn/lint`). Keputusan aturan dikunci di ADR 0012: arbitrary/inline/raw warn, unknown/restyle/require-static off. Cek bad codes Tailwind: no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
+- **Tailwind lint** — `bun run lint:tailwind` wajib hijau (= skrip lokal cek duplikat + `oxlint` memuat 6 aturan `@shadcn/lint`, semua `warn`). Keputusan dikunci di ADR 0012 (baseline 356: arbitrary 234/raw 42/restyle 40/inline 27/unknown 13/static 0; review ulang 2026-10-23). Cek bad codes Tailwind: no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
 
 ## 3. Struktur (Dev Guide §3)
 

@@ -31,7 +31,9 @@
     "shadcn/no-arbitrary-values": "warn",
     "shadcn/no-inline-styles": "warn",
     "shadcn/no-raw-colors": "warn",
-    "shadcn/no-unknown-classes": "off"
+    "shadcn/no-restyle": ["warn", { "allow": ["layout"] }],
+    "shadcn/no-unknown-classes": "warn",
+    "shadcn/require-static-classes": "warn"
   },
   "settings": {
     "shadcn": {
@@ -40,6 +42,14 @@
     }
   },
   "overrides": [
+    {
+      "files": ["packages/ui/src/components/**"],
+      "rules": {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/require-static-classes": "off"
+      }
+    },
     {
       "files": ["scripts/*.js"],
       "rules": {
