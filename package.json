@@ -34,6 +34,7 @@
     "deploy:prod": "vercel deploy --prod",
     "deploy:check": "vercel deploy --dry",
     "check": "oxlint && oxfmt --write",
+    "proof:ui": "bun scripts/proof-ui.ts",
     "check:loc": "node scripts/check-loc.js",
     "check:secrets": "node scripts/check-secrets.js",
     "lint:tailwind": "node scripts/lint-tailwind.js",
