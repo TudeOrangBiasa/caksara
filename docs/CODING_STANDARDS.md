@@ -14,7 +14,7 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 
 - `oxlint` (bukan ESLint) + `oxfmt`. Jalankan `bun run check` sebelum commit.
 - Config: `.oxlintrc.json`, `.oxfmtrc.json`. Jangan tambah ESLint/Prettier.
-- **Tailwind lint** — `bun run lint:tailwind` wajib hijau. Cek bad codes Tailwind: class order (via `prettier-plugin-tailwindcss` / `rustywind` / `eslint-plugin-tailwindcss`), no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
+- **Tailwind lint** — `bun run lint:tailwind` wajib hijau (= skrip lokal cek duplikat + `oxlint` memuat 6 aturan `@shadcn/lint`, semua `warn`). Keputusan dikunci di ADR 0012 (baseline 356: arbitrary 234/raw 42/restyle 40/inline 27/unknown 13/static 0; review ulang 2026-10-23). Cek bad codes Tailwind: no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
 
 ## 3. Struktur (Dev Guide §3)
 
@@ -60,7 +60,22 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 ## 11. Git
 
 - Commit tracer-bullet per tiket, blockers-first. `bts.jsonc` jangan dihapus.
-- Branch `feat/<feature-name>` (bukan numbered), PR wajib dengan body, `main` protected (require 1 approving + strict status checks).
+- **Branch per tiket, push hanya via PR.** Setiap fitur/fix tiket = branch baru
+  `feat/<nama-fitur>` (fix kecil: `fix/<nama>`, chores/ci: `chore/<nama>`) dari
+  `develop` yang sudah sync ke `origin/main`. Push langsung ke `develop`/`main`
+  dilarang — semua perubahan masuk lewat PR + review + CI hijau.
+- **PR wajib pakai template** (`.github/pull_request_template.md`): What/Why,
+  Test plan (perintah + hasil), Screenshots (bila UI), Risk & rollback.
+  PR tanpa bagian Test plan diisi = belum siap review.
+- **Bukti visual FE wajib via agent-browser** (https://agent-browser.dev/):
+  `bun run proof:ui -- <url> docs/proof/<nama-pr>` untuk screenshots
+  390px/1280px + light/dark + rekaman `flow.webm`. Pasang pola before/after
+  pr-screenshots langsung di body, tanpa `<details>`. Panduan lengkap:
+  `docs/agents/ui-proof.md`. Install: `npm i -g agent-browser && agent-browser install`.
+- `main` protected (require 1 approving + strict status checks).
+- **Linter PR body (CI):** workflow `pr-lint` fail bila body kosong, masih berisi
+  placeholder `url-gambar-*`, tanpa perintah test (`bun|bunx|npm`), atau bagian
+  Screenshots tanpa gambar dan tanpa kata `backend-only`.
 
 ## 12. Writing & TypeScript Guides
 

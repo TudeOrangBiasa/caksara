@@ -1,0 +1,70 @@
+name: pr-lint
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  ui-changed:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      touched: ${{ steps.diff.outputs.touched }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          files=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
+          echo "$files"
+          if echo "$files" | grep -qE "^(apps/web|packages/ui)/"; then
+            echo "touched=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "touched=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  body:
+    runs-on: ubuntu-latest
+    needs: ui-changed
+    permissions:
+      contents: read
+    steps:
+      - name: Lint PR body
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+          UI_TOUCHED: ${{ needs.ui-changed.outputs.touched }}
+        run: |
+          fail() { echo "✖ pr-lint: $1"; exit 1; }
+
+          # 1. Body tidak boleh kosong
+          [ -n "$BODY" ] || fail "body kosong — isi sesuai .github/pull_request_template.md"
+
+          # 2. Tidak boleh masih ada placeholder yang belum diisi
+          echo "$BODY" | grep -qiE "url-gambar-(before|after)" \
+            && fail "masih ada placeholder url-gambar — ganti dengan URL gambar / tulis backend-only"
+
+          # 3. Wajib ada Test plan berisi perintah test/build/lint
+          echo "$BODY" | grep -qiE "## Test plan" || fail "bagian '## Test plan' hilang"
+          echo "$BODY" | grep -qiE "(bun|bunx|npm)( run| test|x )" \
+            || fail "Test plan tanpa perintah (bun/bunx/npm) — tulis perintah + hasilnya"
+
+          # 4. Screenshots: UI tersentuh wajib gambar; non-UI boleh backend-only
+          echo "$BODY" | grep -qiE "## Screenshots" || fail "bagian '## Screenshots' hilang"
+          has_images=$(echo "$BODY" | grep -qiE "!\[.*\]\(.*\)|<img " && echo yes || echo no)
+          is_backend_only=$(echo "$BODY" | grep -qiE "backend-only" && echo yes || echo no)
+          if [ "$UI_TOUCHED" = "true" ]; then
+            [ "$has_images" = "yes" ] \
+              || fail "PR menyentuh apps/web|packages/ui tapi tanpa gambar — lampirkan before/after visible 375/1280 via agent-browser (lihat docs/agents/ui-proof.md)"
+          else
+            if [ "$is_backend_only" = "yes" ]; then
+              echo "  (backend-only, screenshots dilewati)"
+            else
+              [ "$has_images" = "yes" ] \
+                || fail "Screenshots tanpa gambar — lampirkan before/after atau tulis backend-only"
+            fi
+          fi
+
+          echo "✓ pr-lint: body OK (ui-touched=$UI_TOUCHED)"
