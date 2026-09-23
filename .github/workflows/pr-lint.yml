@@ -13,6 +13,7 @@ jobs:
     outputs:
       touched: ${{ steps.diff.outputs.touched }}
     steps:
+      - uses: actions/checkout@v4
       - id: diff
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
