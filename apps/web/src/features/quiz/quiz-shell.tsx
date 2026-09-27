@@ -5,6 +5,7 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { EmptyState } from "../../components/empty-state";
+import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { notifyHeartsRefilled } from "../../lib/notify";
 import { playCue } from "../../lib/sound";
 import type { Question, Quiz } from "../../lib/zod/question";
@@ -73,7 +74,11 @@ function QuestionBody({
   if (question.type === "dengar_pilih" || question.type === "kenali_visual") {
     return (
       <div className="space-y-4">
-        <KenaliVisualPrompt question={question} />
+        <KenaliVisualPrompt
+          question={question}
+          showFeedback={session.showFeedback}
+          isCorrect={answer ? isAnswerCorrect(question, answer) : undefined}
+        />
         <QuizChoice
           question={question}
           selectedIndex={answer?.selectedIndex ?? null}
@@ -314,7 +319,7 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
         >
           {quiz.questions.map((_, i) => (
             <span
-              key={`${session.currentIndex}-${i}`}
+              key={i}
               className={cn(
                 "h-2 flex-1 rounded-full transition-all duration-200 ease-out",
                 i < session.currentIndex

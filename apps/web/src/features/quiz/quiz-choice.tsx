@@ -12,7 +12,7 @@ interface QuizChoiceProps {
 export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: QuizChoiceProps) {
   if (!("choices" in question)) return null;
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       {question.choices.map((choice, i) => {
         const isSelected = selectedIndex === i;
         const isCorrect = choice.isCorrect;
