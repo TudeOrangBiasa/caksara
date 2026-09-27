@@ -24,7 +24,7 @@ import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
-import { buildMixedQuiz, buildQuiz } from "../features/quiz/quiz-data";
+import { buildMixedQuiz, buildQuiz, buildTracerQuiz } from "../features/quiz/quiz-data";
 import type { Quiz } from "../lib/zod/question";
 import {
   applyOvernightReset,
@@ -53,6 +53,7 @@ type View =
     };
 
 function deriveQuizForMod(mod: CourseModule): Quiz {
+  if (mod.id === "mod_01") return buildTracerQuiz(mod.id);
   return buildQuiz(mod.id);
 }
 

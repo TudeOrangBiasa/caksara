@@ -32,6 +32,8 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             type="button"
             disabled={showFeedback}
             onClick={() => onSelect(i)}
+            aria-label={`Pilihan ${i + 1}: ${choice.text}`}
+            aria-pressed={isSelected}
             className={cn(
               "flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",
               stateClass,
