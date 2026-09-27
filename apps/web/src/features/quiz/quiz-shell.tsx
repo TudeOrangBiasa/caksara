@@ -5,8 +5,8 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { EmptyState } from "../../components/empty-state";
-import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { notifyHeartsRefilled } from "../../lib/notify";
+import { playCue } from "../../lib/sound";
 import type { Question, Quiz } from "../../lib/zod/question";
 import { Cocokkan } from "./quiz-cocokkan";
 import { SusunAksara } from "./quiz-susun";
