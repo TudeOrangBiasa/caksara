@@ -8,25 +8,17 @@ export const profileNameSchema = z
 
 export type ProfileName = z.infer<typeof profileNameSchema>;
 
-export const bedawangShellSchema = z.enum(["asli", "terakota", "emas", "daun"]);
-export const bedawangHeadSchema = z.enum(["asli", "krim", "belly"]);
-export const bedawangAccessorySchema = z.enum(["none", "bunga", "udeng", "kacamata"]);
 export const bedawangMoodSchema = z.enum(["senang", "semangat", "sedih"]);
+export type BedawangMood = z.infer<typeof bedawangMoodSchema>;
 
-export const bedawangConfigSchema = z.object({
-  shell: bedawangShellSchema,
-  head: bedawangHeadSchema,
-  accessory: bedawangAccessorySchema,
-  mood: bedawangMoodSchema,
-});
+export const bedawangConfigSchema = z
+  .object({ mood: bedawangMoodSchema })
+  .catchall(z.unknown())
+  .transform(({ mood }) => ({ mood }))
+  .pipe(z.object({ mood: bedawangMoodSchema }).catch({ mood: "senang" }));
 export type BedawangConfig = z.infer<typeof bedawangConfigSchema>;
 
-export const DEFAULT_BEDAWANG: BedawangConfig = {
-  shell: "asli",
-  head: "asli",
-  accessory: "none",
-  mood: "senang",
-};
+export const DEFAULT_BEDAWANG: BedawangConfig = { mood: "senang" };
 
 export const profileAvatarSchema = z.union([
   z.object({

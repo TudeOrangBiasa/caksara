@@ -24,6 +24,8 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             : "border-destructive bg-destructive/10";
         } else if (showFeedback && isCorrect) {
           stateClass = "border-success bg-success/5";
+        } else if (isSelected) {
+          stateClass = "border-cta bg-cta/10";
         }
 
         return (
@@ -33,7 +35,7 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             disabled={showFeedback}
             onClick={() => onSelect(i)}
             className={cn(
-              "flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",
+              "tile-duo flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-150 ease-out active:scale-[0.98]",
               stateClass,
               showFeedback && "cursor-default",
             )}

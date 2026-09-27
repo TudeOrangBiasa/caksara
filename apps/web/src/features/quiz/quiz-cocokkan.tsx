@@ -33,8 +33,8 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
             disabled={disabled}
             onClick={() => setSelectedLeft(p.left)}
             className={cn(
-              "font-balinese w-full rounded-lg border p-3 text-2xl transition-colors",
-              selectedLeft === p.left ? "border-primary bg-primary/10" : "border-border bg-card",
+              "tile-duo font-balinese w-full rounded-xl border-2 p-3 text-2xl transition-all duration-150 ease-out",
+              selectedLeft === p.left ? "border-cta bg-cta/10" : "border-border bg-card",
             )}
           >
             {p.left}
@@ -48,7 +48,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
             type="button"
             disabled={disabled || selectedLeft === null}
             onClick={() => handleRight(right)}
-            className="w-full rounded-lg border border-border bg-card p-3 text-sm transition-colors hover:bg-muted/50"
+            className="tile-duo w-full rounded-xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50"
           >
             {right}
           </button>

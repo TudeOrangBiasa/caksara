@@ -8,7 +8,7 @@ import { Label } from "@caksara/ui/components/label";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
-import type { BedawangMood } from "../../components/bedawang";
+import type { BedawangMood } from "../../lib/zod/profile";
 import { ONBOARDING_COMMITMENTS, ONBOARDING_GOALS, ONBOARDING_LEVELS } from "./onboarding-data";
 import type { OnboardingOption } from "./onboarding-data";
 

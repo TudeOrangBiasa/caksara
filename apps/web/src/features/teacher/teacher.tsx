@@ -243,10 +243,10 @@ function Bubble({
       )}
       <div
         className={cn(
-          "max-w-[82%] px-4 py-2.5",
+          "max-w-[82%] border-2 px-4 py-2.5 text-sm leading-relaxed",
           isUser
-            ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
+            ? "rounded-3xl rounded-br-sm border-transparent bg-primary text-primary-foreground"
+            : "rounded-xl border-border bg-card text-foreground shadow-none",
         )}
       >
         {msg.title && (
@@ -300,7 +300,7 @@ function ThinkingBubble() {
   return (
     <div className="flex justify-start">
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
-      <div className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm">
+      <div className="flex items-center gap-1 rounded-xl border-2 border-border bg-card px-4 py-3">
         <span
           className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
           style={{ animationDelay: "0ms" }}

@@ -57,7 +57,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
             type="button"
             disabled={disabled}
             onClick={() => take(i)}
-            className="font-balinese rounded-lg border border-border bg-card px-3 py-2 text-2xl transition-colors hover:bg-muted/50"
+            className="tile-duo font-balinese rounded-xl border-2 border-border bg-card px-3 py-2 text-2xl transition-all duration-150 ease-out hover:bg-muted/50"
           >
             {tile}
           </button>

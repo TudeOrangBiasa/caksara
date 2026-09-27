@@ -57,11 +57,11 @@ function ProgresCard({ totalSelesai, progress }: { totalSelesai: number; progres
         <span>{totalSelesai} selesai</span>
         <span>{courseModules.length} total</span>
       </div>
-      <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-muted">
+      <div className="mt-1.5 h-4 overflow-hidden rounded-full border-2 border-border bg-border">
         <div
           className={cn(
-            "h-full rounded-full transition-all duration-500",
-            progress === 1 ? "bg-success" : "bg-primary",
+            "h-full rounded-full shadow-highlight transition-all duration-150 ease-out",
+            progress === 1 ? "bg-accent" : "bg-cta",
           )}
           style={{ width: `${progress * 100}%` }}
         />
@@ -93,14 +93,14 @@ function NodeButton({
       }}
       aria-disabled={disabled}
       className={cn(
-        "group relative z-10 flex w-full overflow-hidden items-center gap-3 rounded-3xl p-4 text-left shadow-sm",
+        "group relative z-10 flex w-full overflow-hidden items-center gap-3 rounded-xl border-2 p-4 text-left transition-all duration-150 ease-out",
         isHero
-          ? "bg-primary text-primary-foreground"
+          ? "border-transparent bg-cta text-primary-foreground shadow-duo"
           : status === "selesai"
-            ? "bg-card hover:bg-muted/60"
-            : "bg-card opacity-60",
+            ? "tile-duo border-border bg-card hover:bg-muted/60"
+            : "border-border bg-card opacity-60",
         !disabled && !isHero && "transition-all duration-200",
-        !disabled && !isHero && status === "selesai" && "hover:-translate-y-0.5 hover:shadow-sm",
+        !disabled && !isHero && status === "selesai" && "hover:-translate-y-0.5",
         !disabled && isHero && "transition-transform active:scale-[0.99]",
       )}
     >

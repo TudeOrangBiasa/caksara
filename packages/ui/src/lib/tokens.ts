@@ -27,8 +27,12 @@ export const tokenSchema = z.object({
   accentForeground: oklch.describe("Text on accent surfaces"),
   /** Hati habis, reset, error. Jangan: untuk sukses/info. */
   destructive: oklch.describe("Errors & destructive actions"),
-  /** Berhasil, selesai, XP positif. */
+  /** Berhasil, selesai, XP positif. Jangan: fill CTA light (gagal AA putih) — pakai cta. */
   success: oklch.describe("Success states"),
+  /** Fill CTA Duo: success yang digelapkan khusus CTA (AA 4.95:1 light, 7.26:1 dark). */
+  cta: oklch.describe("Duo CTA fill; dark equals success"),
+  /** Tepi/bayangan CTA Duo: selalu lebih gelap dari cta se-mode. Tanpa teks di atasnya. */
+  ctaEdge: oklch.describe("Duo CTA edge shadow, darker than cta"),
   /** Peringatan streak. */
   warning: oklch.describe("Warnings"),
   /** Tile mastery yang belum dipelajari. */
@@ -43,6 +47,10 @@ export const tokenSchema = z.object({
   input: oklch.describe("Input backgrounds"),
   /** Fokus ring aksesibilitas. */
   ring: oklch.describe("Focus rings"),
+  /** Hard edge-shadow Duo y+4 no-blur. */
+  shadowDuo: z.string().describe("Duo hard edge shadow y+4"),
+  /** Radius pill CTA Duo. */
+  radiusPill: z.string().describe("Duo CTA pill radius"),
   /** Radius dasar 0.75rem M3 medium; kartu pakai 3xl. Jangan: radius acak per komponen. */
   radius: z.string().describe("Base radius; cards use 3xl"),
 });
@@ -165,6 +173,8 @@ export const tokens = {
     accentForeground: "oklch(0.2 0.05 38)",
     destructive: "oklch(0.58 0.22 27)",
     success: "oklch(0.62 0.15 145)",
+    cta: "oklch(0.52 0.15 145)",
+    ctaEdge: "oklch(0.45 0.14 145)",
     warning: "oklch(0.75 0.14 65)",
     masteryBelum: "oklch(0.97 0.01 85)",
     masteryDipahami: "oklch(0.72 0.14 75)",
@@ -173,6 +183,8 @@ export const tokens = {
     input: "oklch(0.92 0.01 85)",
     ring: "oklch(0.55 0.13 38)",
     radius: "0.75rem",
+    shadowDuo: "0 4px 0 0 var(--cta-edge)",
+    radiusPill: "999px",
   },
   dark: {
     primary: "oklch(0.7 0.12 38)",
@@ -185,6 +197,8 @@ export const tokens = {
     accentForeground: "oklch(0.985 0 0)",
     destructive: "oklch(0.704 0.191 22.216)",
     success: "oklch(0.68 0.14 145)",
+    cta: "oklch(0.68 0.14 145)",
+    ctaEdge: "oklch(0.55 0.14 145)",
     warning: "oklch(0.78 0.13 65)",
     masteryBelum: "oklch(0.27 0.02 45)",
     masteryDipahami: "oklch(0.72 0.14 75)",
@@ -193,6 +207,8 @@ export const tokens = {
     input: "oklch(1 0 0 / 15%)",
     ring: "oklch(0.7 0.12 38)",
     radius: "0.75rem",
+    shadowDuo: "0 4px 0 0 var(--cta-edge)",
+    radiusPill: "999px",
   },
 } satisfies Record<string, Tokens>;
 

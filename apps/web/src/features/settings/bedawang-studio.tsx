@@ -1,38 +1,11 @@
 import { useState } from "react";
-import type { CSSProperties } from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
-import type {
-  BedawangAccessory,
-  BedawangConfig,
-  BedawangHead,
-  BedawangMood,
-  BedawangShell,
-} from "../../lib/zod/profile";
+import type { BedawangConfig, BedawangMood } from "../../lib/zod/profile";
 import { DEFAULT_BEDAWANG } from "../../lib/zod/profile";
 import { setAvatar } from "../../lib/profile-store";
-
-const SHELLS: { id: BedawangShell; label: string; style: CSSProperties }[] = [
-  { id: "asli", label: "Asli", style: { backgroundColor: "var(--bedawang-shell)" } },
-  { id: "terakota", label: "Terakota", style: { backgroundColor: "var(--primary)" } },
-  { id: "emas", label: "Emas", style: { backgroundColor: "var(--accent)" } },
-  { id: "daun", label: "Daun", style: { backgroundColor: "var(--success)" } },
-];
-
-const HEADS: { id: BedawangHead; label: string; style: CSSProperties }[] = [
-  { id: "asli", label: "Asli", style: { backgroundColor: "var(--bedawang-head)" } },
-  { id: "krim", label: "Krim", style: { backgroundColor: "var(--card-cream)" } },
-  { id: "belly", label: "Pasir", style: { backgroundColor: "var(--bedawang-belly)" } },
-];
-
-const ACCESSORIES: { id: BedawangAccessory; label: string }[] = [
-  { id: "none", label: "Polos" },
-  { id: "bunga", label: "Bunga" },
-  { id: "udeng", label: "Udeng" },
-  { id: "kacamata", label: "Kacamata" },
-];
 
 const MOODS: { id: BedawangMood; label: string }[] = [
   { id: "senang", label: "Senang" },
@@ -83,14 +56,14 @@ function OptionRow<T extends string>({
   );
 }
 
-/** Studio mini: utak-atik Bedawang lalu simpan jadi avatar. */
+/** Studio mini: pilih mood Bedawang lalu simpan jadi avatar. */
 export function BedawangStudio({ current }: { current: BedawangConfig | null }) {
   const [draft, setDraft] = useState<BedawangConfig>(current ?? DEFAULT_BEDAWANG);
   const [justSaved, setJustSaved] = useState(false);
-  const isActive = current !== null && JSON.stringify(current) === JSON.stringify(draft);
+  const isActive = current !== null && current.mood === draft.mood;
 
-  function pick<K extends keyof BedawangConfig>(key: K, val: BedawangConfig[K]) {
-    setDraft((d) => ({ ...d, [key]: val }));
+  function pickMood(mood: BedawangMood) {
+    setDraft({ mood });
     setJustSaved(false);
   }
 
@@ -102,50 +75,17 @@ export function BedawangStudio({ current }: { current: BedawangConfig | null }) 
   return (
     <div className="mt-4 rounded-3xl bg-card p-5">
       <div className="flex items-center gap-4">
-        <Bedawang
-          shell={draft.shell}
-          head={draft.head}
-          acc={draft.accessory}
-          mood={draft.mood}
-          interactive
-          blink
-          className="size-24 shrink-0"
-        />
+        <Bedawang mood={draft.mood} interactive className="size-24 shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="text-base font-bold">Studio Bedawang</p>
           <p className="text-xs text-muted-foreground">
-            Ketuk Bedawang untuk reaksi. Atur warna, hiasan, dan mood sesukamu.
+            Ketuk Bedawang untuk reaksi. Pilih mood sesukamu.
           </p>
         </div>
       </div>
 
       <div className="mt-4 space-y-3">
-        <OptionRow
-          label="Warna cangkang"
-          options={SHELLS}
-          value={draft.shell}
-          onPick={(id) => pick("shell", id)}
-          renderSwatch={(id) => SHELLS.find((s) => s.id === id)?.style}
-        />
-        <OptionRow
-          label="Warna kepala"
-          options={HEADS}
-          value={draft.head}
-          onPick={(id) => pick("head", id)}
-          renderSwatch={(id) => HEADS.find((h) => h.id === id)?.style}
-        />
-        <OptionRow
-          label="Hiasan"
-          options={ACCESSORIES}
-          value={draft.accessory}
-          onPick={(id) => pick("accessory", id)}
-        />
-        <OptionRow
-          label="Mood"
-          options={MOODS}
-          value={draft.mood}
-          onPick={(id) => pick("mood", id)}
-        />
+        <OptionRow label="Mood" options={MOODS} value={draft.mood} onPick={pickMood} />
       </div>
 
       <button

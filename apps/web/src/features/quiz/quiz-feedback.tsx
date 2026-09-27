@@ -18,8 +18,8 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
   return (
     <div
       className={cn(
-        "mt-4 animate-card-pop rounded-3xl p-4",
-        isCorrect ? "bg-success/15" : "bg-destructive/10",
+        "mt-4 -mx-4 animate-card-pop border-t-2 px-4 pt-4 pb-1",
+        isCorrect ? "border-success bg-success/10" : "border-destructive bg-destructive/10",
       )}
     >
       <div className="flex items-start gap-3">
@@ -39,12 +39,11 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
         </div>
       </div>
       <Button
+        variant="cta"
         onClick={onNext}
         className={cn(
-          "mt-3 h-12 w-full rounded-full text-base font-semibold",
-          isCorrect
-            ? "bg-success text-white hover:bg-success/90"
-            : "bg-destructive text-white hover:bg-destructive/90",
+          "mt-3 h-12 w-full text-base font-bold tracking-wide",
+          !isCorrect && "bg-destructive text-white",
         )}
       >
         {isLast ? "Lihat Hasil" : "Lanjut"}
