@@ -14,7 +14,7 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
   const isAudio = question.audioUrl || question.type === "dengar_pilih";
   return (
     <div className="mb-4 flex gap-3">
-      <Bedawang mood="semangat" className="size-10 shrink-0" />
+      <Bedawang mood="semangat" className="size-12 shrink-0" />
       <div
         className={cn(
           "relative min-w-0 flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3",
