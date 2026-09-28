@@ -462,10 +462,6 @@ export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
   });
 }
 
-export function buildQuiz(moduleId: string): Quiz {
-  return buildSessionQuiz(moduleId);
-}
-
 export function buildMixedQuiz(moduleIds: string[]): Quiz {
   const questions = moduleIds.flatMap((id) => QUIZ_BANK[id] ?? []);
   const shuffled = questions

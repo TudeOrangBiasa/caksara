@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
 import { ensureAnonSession, getSupabase } from "../../lib/supabase";
+import { notifyQuizFallback } from "../../lib/notify";
 import { getAdaptiveLevel } from "./quiz-data";
 
 export type QuizSource = "gemini" | "fallback" | "offline" | "cache";
@@ -129,11 +130,11 @@ export function useQuizLaunch(
     source: "fallback",
     offline: false,
   });
-
   useEffect(() => {
     let alive = true;
     void fetchGeneratedQuiz(moduleId, opts).then((g) => {
       if (!alive) return;
+      if (g.offline) notifyQuizFallback();
       setState({ status: "ready", quiz: g.quiz, source: g.source, offline: g.offline });
     });
     return () => {
