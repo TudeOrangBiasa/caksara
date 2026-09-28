@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { BookOpenCheck, Sparkles } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
@@ -17,9 +17,11 @@ interface QuizFeedbackProps {
 export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFeedbackProps) {
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={cn(
-        "mt-4 animate-card-pop rounded-3xl p-4",
-        isCorrect ? "bg-success/15" : "bg-destructive/10",
+        "mt-4 rounded-3xl p-4",
+        isCorrect ? "animate-card-pop bg-success/15" : "animate-shake bg-destructive/10",
       )}
     >
       <div className="flex items-start gap-3">
@@ -36,6 +38,12 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
             )}
           </div>
           {explanation && <p className="mt-1 text-sm text-muted-foreground">{explanation}</p>}
+          {!isCorrect && (
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">
+              <BookOpenCheck className="size-3.5 shrink-0 text-primary" />
+              Penjelasan dari Basis Pengetahuan
+            </p>
+          )}
         </div>
       </div>
       <Button

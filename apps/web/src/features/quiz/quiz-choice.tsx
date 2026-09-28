@@ -12,7 +12,7 @@ interface QuizChoiceProps {
 export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: QuizChoiceProps) {
   if (!("choices" in question)) return null;
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       {question.choices.map((choice, i) => {
         const isSelected = selectedIndex === i;
         const isCorrect = choice.isCorrect;
@@ -32,6 +32,8 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             type="button"
             disabled={showFeedback}
             onClick={() => onSelect(i)}
+            aria-label={`Pilihan ${i + 1}: ${choice.text}`}
+            aria-pressed={isSelected}
             className={cn(
               "flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",
               stateClass,

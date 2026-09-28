@@ -1,24 +1,10 @@
 import { Flame, Target, ChevronRight, BookOpen, Library, Bot, Trophy } from "lucide-react";
 
-import { courseModules } from "../module/module-data";
-import type { CourseModule } from "../module/module-data";
+import { courseModules, deriveStatus } from "../module/module-data";
+import type { CourseModule, ModuleStatus } from "../module/module-data";
 import type { UserProfile } from "../../lib/zod/profile";
 
 import { notifyModuleLocked } from "../../lib/notify";
-
-type ModuleStatus = "aktif" | "selesai" | "terkunci";
-
-function deriveStatus(selesai: ReadonlySet<string>): ModuleStatus[] {
-  let foundActive = false;
-  return courseModules.map((m) => {
-    if (selesai.has(m.id)) return "selesai";
-    if (!foundActive) {
-      foundActive = true;
-      return "aktif";
-    }
-    return "terkunci";
-  });
-}
 
 function FeaturedModul({
   mod,

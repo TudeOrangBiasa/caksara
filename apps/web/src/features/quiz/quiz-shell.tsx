@@ -1,9 +1,10 @@
-import { ArrowLeft, Heart, HeartCrack, RotateCcw } from "lucide-react";
+import { ArrowLeft, BookX, Heart, HeartCrack, RotateCcw } from "lucide-react";
 import { useEffect, useReducer, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
+import { EmptyState } from "../../components/empty-state";
 import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { notifyHeartsRefilled } from "../../lib/notify";
 import { playCue } from "../../lib/sound";
@@ -73,7 +74,11 @@ function QuestionBody({
   if (question.type === "dengar_pilih" || question.type === "kenali_visual") {
     return (
       <div className="space-y-4">
-        <KenaliVisualPrompt question={question} />
+        <KenaliVisualPrompt
+          question={question}
+          showFeedback={session.showFeedback}
+          isCorrect={answer ? isAnswerCorrect(question, answer) : undefined}
+        />
         <QuizChoice
           question={question}
           selectedIndex={answer?.selectedIndex ?? null}
@@ -164,42 +169,6 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
   const [gameOver, setGameOver] = useState(false);
   const [resumeOffer, setResumeOffer] = useState<QuizResume | null>(() => loadResume(moduleId));
   const [resumed, setResumed] = useState(false);
-  const current = quiz.questions[session.currentIndex];
-  if (!current) return null;
-
-  useEffect(() => {
-    updateStreak();
-    if (refillHearts()) notifyHeartsRefilled();
-  }, []);
-
-  // Buffer lokal: simpan progres tiap jawaban (kecuali dialog resume masih terbuka).
-  useEffect(() => {
-    if (resumeOffer && !resumed) return;
-    if (isSessionComplete(session)) return;
-    saveResume({
-      moduleId,
-      currentIndex: session.currentIndex,
-      answers: [...session.answers.entries()],
-      hearts,
-      updatedAt: Date.now(),
-    });
-  }, [session, hearts, moduleId, resumeOffer, resumed]);
-
-  const handleResume = () => {
-    const offer = resumeOffer;
-    if (offer) {
-      dispatch({ type: "HYDRATE", currentIndex: offer.currentIndex, answers: offer.answers });
-      setHeartsState(offer.hearts);
-    }
-    setResumed(true);
-  };
-
-  const handleRestart = () => {
-    clearResume(moduleId);
-    setResumeOffer(null);
-    setResumed(true);
-  };
-
   const submitAnswer = (questionIndex: number, answer: QuizAnswer) => {
     if (session.answers.has(questionIndex)) return;
     dispatch({ type: "ANSWER", questionIndex, answer });
@@ -217,14 +186,6 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
     }
   };
 
-  const handleRetry = () => {
-    clearResume(moduleId);
-    setHeartsState(5);
-    setHearts(5);
-    setGameOver(false);
-    dispatch({ type: "RESET" });
-  };
-
   const handleNext = () => {
     if (isSessionComplete(session)) {
       clearResume(moduleId);
@@ -240,6 +201,86 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
     }
   };
 
+  const current = quiz.questions[session.currentIndex];
+
+  useEffect(() => {
+    updateStreak();
+    if (refillHearts()) notifyHeartsRefilled();
+  }, []);
+
+  // Buffer lokal: simpan progres tiap jawaban (kecuali dialog resume masih terbuka).
+  useEffect(() => {
+    if (!current) return;
+    if (resumeOffer && !resumed) return;
+    if (isSessionComplete(session)) return;
+    saveResume({
+      moduleId,
+      currentIndex: session.currentIndex,
+      answers: [...session.answers.entries()],
+      hearts,
+      updatedAt: Date.now(),
+    });
+  }, [current, session, hearts, moduleId, resumeOffer, resumed]);
+
+  // Keyboard desktop (#22): 1-4 memilih, Enter lanjut setelah feedback.
+  useEffect(() => {
+    if (!current) return;
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
+      if (e.key === "Enter" && session.showFeedback) {
+        e.preventDefault();
+        handleNext();
+      } else if (!session.showFeedback && e.key >= "1" && e.key <= "4") {
+        const index = Number(e.key) - 1;
+        const question = quiz.questions[session.currentIndex];
+        if (question && "choices" in question && index < question.choices.length) {
+          submitAnswer(session.currentIndex, { selectedIndex: index });
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const handleResume = () => {
+    const offer = resumeOffer;
+    if (offer) {
+      dispatch({ type: "HYDRATE", currentIndex: offer.currentIndex, answers: offer.answers });
+      setHeartsState(offer.hearts);
+    }
+    setResumed(true);
+  };
+
+  const handleRestart = () => {
+    clearResume(moduleId);
+    setResumeOffer(null);
+    setResumed(true);
+  };
+
+  const handleRetry = () => {
+    clearResume(moduleId);
+    setHeartsState(5);
+    setHearts(5);
+    setGameOver(false);
+    dispatch({ type: "RESET" });
+  };
+
+  if (quiz.questions.length === 0) {
+    return (
+      <EmptyState
+        illustration={<BookX className="size-7" />}
+        title="Belum ada soal"
+        body="Modul ini belum punya soal. Balik dulu, kami siapkan materinya."
+        action={
+          <Button className="h-11 w-full rounded-full font-semibold" onClick={onBack}>
+            Kembali
+          </Button>
+        }
+      />
+    );
+  }
+
   if (gameOver) {
     return <GameOver onRetry={handleRetry} onBack={onBack} />;
   }
@@ -254,6 +295,8 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
       />
     );
   }
+
+  if (!current) return null;
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 py-5 md:max-w-xl">
@@ -272,28 +315,32 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
           aria-valuenow={session.currentIndex + 1}
           aria-valuemin={0}
           aria-valuemax={quiz.questions.length}
+          aria-label={`Soal ${session.currentIndex + 1} dari ${quiz.questions.length}`}
         >
           {quiz.questions.map((_, i) => (
             <span
               key={i}
               className={cn(
-                "h-2 flex-1 rounded-full transition-colors",
+                "h-2 flex-1 rounded-full transition-all duration-200 ease-out",
                 i < session.currentIndex
                   ? "bg-primary"
                   : i === session.currentIndex
-                    ? "bg-primary/60"
+                    ? "animate-quiz-progress bg-primary/60"
                     : "bg-muted",
               )}
             />
           ))}
         </div>
         <span
+          role="status"
+          aria-live="polite"
+          aria-label={`Sisa ${hearts} Hati`}
           className={cn(
             "flex shrink-0 items-center gap-1 rounded-full bg-card px-2.5 py-1 text-sm font-bold tabular-nums text-destructive",
             hearts <= 2 && "animate-heart-pulse",
           )}
         >
-          <Heart className="size-4 fill-current" />
+          <Heart className="size-4 fill-current" aria-hidden />
           {hearts}
         </span>
       </div>
@@ -305,17 +352,21 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
         {current.type !== "kenali_visual" && (
           <h2 className="mb-4 text-lg font-medium">{current.prompt}</h2>
         )}
-
-        <QuestionBody
-          question={current}
-          session={session}
-          setAnswer={(answer) => submitAnswer(session.currentIndex, answer)}
-        />
+        <div key={session.currentIndex} className="animate-slide-up">
+          <QuestionBody
+            question={current}
+            session={session}
+            setAnswer={(answer) => submitAnswer(session.currentIndex, answer)}
+          />
+        </div>
 
         {session.showFeedback && (
           <QuizFeedback
             isCorrect={isAnswerCorrect(current, session.answers.get(session.currentIndex) ?? {})}
-            explanation={current.explanation}
+            explanation={
+              current.explanation ??
+              (current.sourceRef ? `Sumber: ${current.sourceRef}` : undefined)
+            }
             onNext={handleNext}
             isLast={session.currentIndex === quiz.questions.length - 1}
           />

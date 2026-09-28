@@ -3,6 +3,11 @@ import type { BedawangAccessory, BedawangHead, BedawangShell } from "../lib/zod/
 
 export type BedawangMood = "senang" | "semangat" | "sedih";
 
+// HACK(debt): pakai SATU set nama saja (bedawang-*). Varian mascot-* identik
+// byte-for-byte (md5 sama) — duplikasi ~1,1MB, lihat debt issue. JPG lama
+// (new-hero-mascot.jpg) tak lagi dirujuk kode; dibiarkan agar tidak break
+// pemakai tak terduga, hapus terpisah.
+
 export interface BedawangProps {
   mood?: BedawangMood;
   className?: string;
@@ -16,7 +21,15 @@ export interface BedawangProps {
   onClick?: () => void;
 }
 
-export function Bedawang({ className, animate, interactive, onClick }: BedawangProps) {
+const MOOD_SRC: Record<BedawangMood, string> = {
+  senang: "/assets/bedawang-happy.png",
+  semangat: "/assets/bedawang-waving.png",
+  sedih: "/assets/bedawang-standing.png",
+};
+
+const DEFAULT_SRC = "/assets/bedawang-standing.png";
+
+export function Bedawang({ mood, className, animate, interactive, onClick }: BedawangProps) {
   return (
     <div
       className={cn("relative overflow-hidden rounded-full", className)}
@@ -24,8 +37,8 @@ export function Bedawang({ className, animate, interactive, onClick }: BedawangP
       style={{ cursor: interactive ? "pointer" : "default" }}
     >
       <img
-        src="/assets/new-hero-mascot.jpg"
-        alt="Maskot Caksara"
+        src={mood ? MOOD_SRC[mood] : DEFAULT_SRC}
+        alt="Maskot Bedawang Nala"
         className={cn("h-full w-full object-cover", animate && "animate-pulse")}
       />
     </div>
