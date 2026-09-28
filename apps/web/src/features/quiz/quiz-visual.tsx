@@ -32,7 +32,11 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
           )}
         />
         {isAudio ? (
-          <QuizAudio audioUrl={question.audioUrl} audioType={question.audioType} />
+          <QuizAudio
+            audioUrl={question.audioUrl}
+            audioType={question.audioType}
+            latinText={question.latinText}
+          />
         ) : (
           <p className="font-balinese text-4xl leading-loose break-words text-card-foreground sm:text-5xl">
             {question.prompt}

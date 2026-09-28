@@ -14,7 +14,16 @@ interface CocokkanProps {
 export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
 
-  const rightsShuffled = useMemoShuffle(pairs.map((p) => p.right));
+  const [rightsShuffled] = useState(() => {
+    const a = pairs.map((p) => p.right);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i] as string;
+      a[i] = a[j] as string;
+      a[j] = t;
+    }
+    return a;
+  });
 
   function handleRight(right: string) {
     const pair = pairs.find((p) => p.left === selectedLeft);
@@ -25,7 +34,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div className="space-y-2">
+      <div className="space-y-2" aria-label="Kolom aksara">
         {pairs.map((p) => (
           <button
             key={p.left}
@@ -39,19 +48,25 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
                 : "border-border bg-card hover:bg-muted/50",
             )}
             aria-pressed={selectedLeft === p.left}
+            aria-label={`Aksara ${p.left}`}
           >
             {p.left}
           </button>
         ))}
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2" aria-label="Kolom arti">
         {rightsShuffled.map((right, i) => (
           <button
             key={`${right}-${i}`}
             type="button"
             disabled={disabled || selectedLeft === null}
             onClick={() => handleRight(right)}
-            className="tile-duo w-full rounded-xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
+            className={cn(
+              "tile-duo w-full rounded-xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
+              // Crossfade: kolom kanan menegaskan status tunggu vs siap dipasangkan.
+              selectedLeft === null ? "opacity-60" : "opacity-100",
+            )}
+            aria-label={`Arti ${right}`}
           >
             {right}
           </button>
@@ -72,16 +87,4 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
       )}
     </div>
   );
-}
-
-function useMemoShuffle<T>(arr: T[]): T[] {
-  const [state] = useState(() => {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  });
-  return state;
 }
