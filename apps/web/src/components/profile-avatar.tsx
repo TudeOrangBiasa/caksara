@@ -60,11 +60,17 @@ export function ProfileAvatar({
   }
   if (
     avatar?.kind === "photo" &&
-    (avatar.value.startsWith("data:image") || avatar.value.startsWith("/assets/avatar-"))
+    (avatar.value.startsWith("data:image") ||
+      avatar.value.startsWith("/assets/") ||
+      avatar.value.startsWith("http"))
   ) {
+    const svgFallback = defaultAvatarUri(name);
     return (
       <img
         src={avatar.value}
+        onError={(e) => {
+          if (e.currentTarget.src !== svgFallback) e.currentTarget.src = svgFallback;
+        }}
         alt={`Foto ${name}`}
         className={cn("rounded-full object-cover", className)}
       />
