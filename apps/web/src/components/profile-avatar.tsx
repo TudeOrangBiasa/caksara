@@ -58,11 +58,11 @@ export function ProfileAvatar({
       </span>
     );
   }
+  // Allowlist sempit: foto upload (data:image) + avatar IP lokal
+  // (/assets/avatar-*.webp). BUKAN /assets/ umum, BUKAN http(s) eksternal.
   if (
     avatar?.kind === "photo" &&
-    (avatar.value.startsWith("data:image") ||
-      avatar.value.startsWith("/assets/") ||
-      avatar.value.startsWith("http"))
+    (avatar.value.startsWith("data:image") || avatar.value.startsWith("/assets/avatar-"))
   ) {
     const svgFallback = defaultAvatarUri(name);
     return (
