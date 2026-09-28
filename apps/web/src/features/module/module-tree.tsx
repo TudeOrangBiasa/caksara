@@ -1,6 +1,7 @@
 import { Check, Clock, ListChecks, Lock, Play, Repeat } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
+import { Progress } from "@caksara/ui/components/progress";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { loadProfile, subscribeProfile } from "../../lib/profile-store";
@@ -57,15 +58,11 @@ function ProgresCard({ totalSelesai, progress }: { totalSelesai: number; progres
         <span>{totalSelesai} selesai</span>
         <span>{courseModules.length} total</span>
       </div>
-      <div className="mt-1.5 h-4 overflow-hidden rounded-full border-2 border-border bg-border">
-        <div
-          className={cn(
-            "h-full rounded-full shadow-highlight transition-all duration-150 ease-out",
-            progress === 1 ? "bg-accent" : "bg-cta",
-          )}
-          style={{ width: `${progress * 100}%` }}
-        />
-      </div>
+      <Progress
+        value={progress * 100}
+        tone={progress === 1 ? "complete" : "cta"}
+        className="mt-1.5"
+      />
     </section>
   );
 }

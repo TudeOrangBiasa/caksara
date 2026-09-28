@@ -260,10 +260,10 @@ function Bubble({
       )}
       <div
         className={cn(
-          "max-w-[82%] border-2 px-4 py-2.5 text-sm leading-relaxed",
+          "max-w-[82%] px-4 py-2.5",
           isUser
-            ? "rounded-3xl rounded-br-sm border-transparent bg-primary text-primary-foreground"
-            : "rounded-xl border-border bg-card text-foreground shadow-none",
+            ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
+            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
         )}
       >
         {msg.title && (
@@ -323,7 +323,7 @@ function ThinkingBubble() {
     >
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
       <div
-        className="flex items-center gap-1 rounded-xl border-2 border-border bg-card px-4 py-3"
+        className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm"
         aria-hidden
       >
         <span

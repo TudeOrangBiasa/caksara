@@ -3,10 +3,10 @@ import { cn } from "@caksara/ui/lib/utils";
 interface ProgressProps {
   value: number;
   className?: string;
-  accent?: boolean;
+  tone?: "cta" | "complete";
 }
 
-export function Progress({ value, className, accent }: ProgressProps) {
+export function Progress({ value, className, tone = "cta" }: ProgressProps) {
   return (
     <div
       role="progressbar"
@@ -21,7 +21,7 @@ export function Progress({ value, className, accent }: ProgressProps) {
       <div
         className={cn(
           "h-full rounded-full shadow-highlight transition-all duration-150 ease-out",
-          accent ? "bg-accent" : "bg-cta",
+          tone === "complete" ? "bg-accent" : "bg-cta",
         )}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />

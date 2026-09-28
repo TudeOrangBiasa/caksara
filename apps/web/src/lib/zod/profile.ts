@@ -15,7 +15,8 @@ export const bedawangConfigSchema = z
   .object({ mood: bedawangMoodSchema })
   .catchall(z.unknown())
   .transform(({ mood }) => ({ mood }))
-  .pipe(z.object({ mood: bedawangMoodSchema }).catch({ mood: "senang" }));
+  .pipe(z.object({ mood: bedawangMoodSchema }))
+  .catch({ mood: "senang" });
 export type BedawangConfig = z.infer<typeof bedawangConfigSchema>;
 
 export const DEFAULT_BEDAWANG: BedawangConfig = { mood: "senang" };

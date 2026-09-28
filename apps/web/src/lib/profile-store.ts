@@ -1,4 +1,4 @@
-import { profileNameSchema, userProfileSchema } from "./zod/profile";
+import { DEFAULT_BEDAWANG, profileNameSchema, userProfileSchema } from "./zod/profile";
 import type { ProfileAvatar, UserProfile } from "./zod/profile";
 import { defaultAvatarUri } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
@@ -28,11 +28,29 @@ function readStored(): UserProfile | null {
   if (!storage) return null;
   const raw = storage.getItem(STORAGE_KEY);
   if (!raw) return null;
+  let json: unknown;
   try {
-    return userProfileSchema.parse(JSON.parse(raw));
+    json = JSON.parse(raw);
   } catch {
     return null;
   }
+  const direct = userProfileSchema.safeParse(json);
+  if (direct.success) return direct.data;
+  // Avatar korup (mis. bedawang lama) tidak boleh me-null-kan seluruh profil:
+  // bila semua issue di jalur avatar, pertahankan profil dengan avatar default.
+  if (typeof json !== "object" || json === null) return null;
+  const avatarOnly =
+    direct.error.issues.length > 0 &&
+    direct.error.issues.every((issue) => issue.path[0] === "avatar");
+  if (!avatarOnly) return null;
+  const rest = { ...(json as Record<string, unknown>) };
+  delete rest.avatar;
+  const repaired = userProfileSchema.safeParse({
+    ...rest,
+    avatar: { kind: "bedawang", value: DEFAULT_BEDAWANG },
+  });
+  if (!repaired.success) return null;
+  return repaired.data;
 }
 
 const WITA_OFFSET_MS = 8 * 3600 * 1000;

@@ -90,7 +90,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
       </div>
 
       {passed && (
-        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent animate-card-pop">
+        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent-foreground dark:text-accent animate-card-pop">
           <Sparkles className="size-4" /> +<AnimatedNumber value={xpGained} /> XP
         </div>
       )}
