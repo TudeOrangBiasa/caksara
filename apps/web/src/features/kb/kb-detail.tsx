@@ -75,6 +75,9 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
               </li>
             ))}
           </ul>
+          <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+            Audio pelafalan: Mendeley CC BY 4.0 · Latin sementara bila belum terkurasi.
+          </p>
         </div>
 
         <div className="mt-4 flex items-start gap-2 rounded-2xl bg-success/10 px-3 py-2.5 text-xs leading-relaxed text-success">

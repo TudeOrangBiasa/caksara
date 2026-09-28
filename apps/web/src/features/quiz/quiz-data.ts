@@ -394,6 +394,8 @@ export interface PickOptions {
   level?: number;
   count?: number;
   seed?: number;
+  /** Batas tipe berbeda per sesi (default 3 dari 5 agar sesi fokus). */
+  maxTypes?: number;
 }
 
 const TYPE_ORDER: Question["type"][] = [
@@ -406,13 +408,15 @@ const TYPE_ORDER: Question["type"][] = [
 
 /**
  * Pilih soal sesi: selalu sertakan dengar_pilih bila bank punya, jaga
- * 2+ tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
- * agar pengulangan tidak monoton. Deterministik — aman untuk resume.
+ * 2+ tipe berbeda (batas atas default 3 dari 5 agar sesi fokus),
+ * utamakan level target (±1), lalu putar urutan per seed agar
+ * pengulangan tidak monoton. Deterministik — aman untuk resume.
  */
 export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptions): Question[] {
   const level = Math.min(3, Math.max(1, Math.round(opts?.level ?? 1)));
   const count = Math.min(8, Math.max(3, Math.round(opts?.count ?? SESSION_COUNT)));
   const seed = Math.max(0, Math.round(opts?.seed ?? 0));
+  const maxTypes = Math.min(5, Math.max(MIN_TYPES, Math.round(opts?.maxTypes ?? 3)));
   if (bank.length === 0) return [];
 
   const byLevel = [...bank]
@@ -424,6 +428,34 @@ export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptio
     })
     .map((x) => x.q);
 
+  // Pilih maxTypes dari 5 tipe via shuffle seed-tetap per level (selalu
+  // sertakan dengar_pilih bila ada). Seed sesi hanya memutar urutan, bukan
+  // mengganti himpunan soal — pengulangan tetap sehimpunan (aman resume).
+  const bankTypes = new Set(byLevel.map((q) => q.type));
+  const shuffledTypes = [...TYPE_ORDER];
+  let s = (0x9e3779b9 ^ Math.imul(level, 0x9e3779b1)) >>> 0;
+  const rand = (): number => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 2 ** 32;
+  };
+  for (let i = shuffledTypes.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = shuffledTypes[i] as Question["type"];
+    shuffledTypes[i] = shuffledTypes[j] as Question["type"];
+    shuffledTypes[j] = tmp;
+  }
+  let allowed: Question["type"][] = shuffledTypes.slice(
+    0,
+    Math.min(maxTypes, shuffledTypes.length),
+  );
+  if (bankTypes.has("dengar_pilih") && !allowed.includes("dengar_pilih")) {
+    allowed[allowed.length - 1] = "dengar_pilih";
+  }
+  const filtered = allowed.filter((t) => bankTypes.has(t));
+  allowed = (
+    filtered.length > 0 ? filtered : [...bankTypes].slice(0, maxTypes)
+  ) as Question["type"][];
+
   const picked: Question[] = [];
   const used = new Set<Question>();
   const takeOfType = (type: Question["type"]): boolean => {
@@ -434,13 +466,15 @@ export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptio
     return true;
   };
 
-  takeOfType("dengar_pilih");
-  for (const t of TYPE_ORDER) {
+  const order: Question["type"][] = [
+    ...(allowed.includes("dengar_pilih") ? (["dengar_pilih"] as const) : []),
+    ...allowed.filter((t) => t !== "dengar_pilih"),
+  ];
+  for (const t of order) {
     if (picked.length >= count) break;
-    if (t === "dengar_pilih") continue;
     takeOfType(t);
   }
-  for (const t of TYPE_ORDER) {
+  for (const t of order) {
     if (picked.length >= count) break;
     while (picked.length < count && takeOfType(t)) {
       // Lanjut sampai tipe ini habis atau kuota penuh.
@@ -452,6 +486,18 @@ export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptio
   return picked.slice(rot).concat(picked.slice(0, rot));
 }
 
+export function buildMixedQuiz(moduleIds: string[]): Quiz {
+  const questions = moduleIds.flatMap((id) => QUIZ_BANK[id] ?? []);
+  const shuffled = questions
+    .map((q) => ({ q, r: Math.random() }))
+    .toSorted((a, b) => a.r - b.r)
+    .map((x) => x.q)
+    .slice(0, 8);
+  // Debt #43: Math.random tanpa seed — rotasi acak tiap render; stabilkan
+  // dengan PRNG seed sesi bila blok ini disentuh lagi.
+  return quizSchema.parse({ moduleId: "latihan", questions: shuffled });
+}
+
 /** Sesi kuis modul: 3-8 soal bervariasi, tervalidasi Zod di batas. */
 export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
   const bank = QUIZ_BANK[moduleId] ?? QUIZ_BANK.mod_01;
@@ -460,14 +506,4 @@ export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
     moduleId,
     questions: pickSessionQuestions(bank, { ...opts, level }),
   });
-}
-
-export function buildMixedQuiz(moduleIds: string[]): Quiz {
-  const questions = moduleIds.flatMap((id) => QUIZ_BANK[id] ?? []);
-  const shuffled = questions
-    .map((q) => ({ q, r: Math.random() }))
-    .toSorted((a, b) => a.r - b.r)
-    .map((x) => x.q)
-    .slice(0, 8);
-  return { moduleId: "latihan", questions: shuffled };
 }

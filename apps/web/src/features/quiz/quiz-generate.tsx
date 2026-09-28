@@ -9,7 +9,8 @@ import { getAdaptiveLevel } from "./quiz-data";
 export type QuizSource = "gemini" | "fallback" | "offline" | "cache";
 
 export interface GeneratedQuiz {
-  quiz: Quiz;
+  /** null bila fallback lokal kosong/invalid — pemanggil tampilkan EmptyState + Coba Lagi. */
+  quiz: Quiz | null;
   source: QuizSource;
   offline: boolean;
 }
@@ -72,32 +73,54 @@ function storeCachedQuiz(moduleId: string, level: number, quiz: Quiz, source: Qu
  */
 export async function fetchGeneratedQuiz(
   moduleId: string,
-  opts?: { count?: number; wrongTopics?: string[]; localFallback: () => Quiz },
+  opts?: {
+    count?: number;
+    wrongTopics?: string[];
+    localFallback: () => Quiz;
+    /** Resume terbuka: jangan fetch Gemini baru, pakai set tersimpan/cache saja. */
+    deferRemote?: boolean;
+  },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
   const count = Math.min(8, Math.max(3, opts?.count ?? 5));
+  // Array kosong (<3 soal) tidak di-parse paksa — kembalikan null agar
+  // QuizLaunchView menampilkan EmptyState + tombol Coba Lagi.
   const buildOffline = (): GeneratedQuiz => {
-    const fallback = opts?.localFallback() ?? { moduleId, questions: [] as Question[] };
-    const parsed = quizSchema.safeParse({ moduleId, questions: fallback.questions });
+    let fallback: Quiz | null = null;
+    try {
+      fallback = opts?.localFallback() ?? null;
+    } catch {
+      fallback = null;
+    }
+    const parsed = fallback
+      ? quizSchema.safeParse({ moduleId, questions: fallback.questions })
+      : { success: false as const };
     if (parsed.success) return { quiz: parsed.data, source: "offline", offline: true };
-    return {
-      quiz: quizSchema.parse({ moduleId, questions: [] }),
-      source: "offline",
-      offline: true,
-    };
+    return { quiz: null, source: "offline", offline: true };
   };
 
-  if (typeof navigator !== "undefined" && !navigator.onLine) return buildOffline();
-
   try {
+    if (typeof navigator !== "undefined" && !navigator.onLine) return buildOffline();
+    if (opts?.deferRemote) {
+      const cached = readCachedQuiz(moduleId, level);
+      return cached ?? buildOffline();
+    }
     const supabase = getSupabase();
     if (!supabase) return buildOffline();
     const cached = readCachedQuiz(moduleId, level);
-    if (cached && cached.quiz.questions.length >= 3) return cached;
+    if (cached?.quiz && cached.quiz.questions.length >= 3) return cached;
     await ensureAnonSession();
-    const { data, error } = await supabase.functions.invoke<GenerateQuizResponse>("generate-quiz", {
-      body: { moduleId, level, count, wrongTopics: opts?.wrongTopics ?? [] },
-    });
+    // Retry ringan 1x (bukan 3x seperti Edge) sebelum menyerah ke offline.
+    let data: GenerateQuizResponse | null = null;
+    let error: unknown = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await supabase.functions.invoke<GenerateQuizResponse>("generate-quiz", {
+        body: { moduleId, level, count, wrongTopics: opts?.wrongTopics ?? [] },
+      });
+      data = res.data;
+      error = res.error;
+      if (!error && data) break;
+    }
     if (error || !data) return buildOffline();
     const parsed = quizSchema.safeParse({ moduleId: data.moduleId, questions: data.questions });
     if (!parsed.success) return buildOffline();
@@ -122,7 +145,13 @@ export interface QuizLaunchState {
  */
 export function useQuizLaunch(
   moduleId: string,
-  opts?: { count?: number; wrongTopics?: string[]; localFallback: () => Quiz },
+  opts?: {
+    count?: number;
+    wrongTopics?: string[];
+    localFallback: () => Quiz;
+    deferRemote?: boolean;
+    reloadToken?: number;
+  },
 ): QuizLaunchState {
   const [state, setState] = useState<QuizLaunchState>({
     status: "loading",
@@ -132,6 +161,7 @@ export function useQuizLaunch(
   });
   useEffect(() => {
     let alive = true;
+    setState({ status: "loading", quiz: null, source: "fallback", offline: false });
     void fetchGeneratedQuiz(moduleId, opts).then((g) => {
       if (!alive) return;
       if (g.offline) notifyQuizFallback();
@@ -141,7 +171,7 @@ export function useQuizLaunch(
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleId]);
+  }, [moduleId, opts?.deferRemote, opts?.count, opts?.reloadToken]);
 
   return state;
 }

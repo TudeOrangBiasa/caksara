@@ -397,6 +397,7 @@ function AboutSection() {
         <p className="mt-1 text-xs text-muted-foreground">
           Web edukasi aksara Bali — pola Duo, rasa Caksara.
         </p>
+        <p className="mt-1 text-xs text-muted-foreground">Audio pelafalan: Mendeley CC BY 4.0.</p>
       </div>
       {(
         [

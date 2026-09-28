@@ -75,6 +75,138 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       level: 1,
     },
   ],
+  // Disalin minimal dari apps/web/src/features/quiz/quiz-data.ts (QUIZ_BANK)
+  // agar fallback Edge relevan per modul. Sumber tunggal tetap QUIZ_BANK FE
+  // (debt: bank ganda FE/Edge) — bila bank FE berubah, salin ulang ke sini.
+  mod_02: [
+    {
+      type: "dengar_pilih",
+      prompt: "Dengarkan bunyi aksara ini, lalu pilih huruf Latin yang tepat.",
+      latinText: "ha",
+      audioType: "latin",
+      choices: [
+        { text: "ha", isCorrect: true },
+        { text: "na", isCorrect: false },
+        { text: "ca", isCorrect: false },
+        { text: "ka", isCorrect: false },
+      ],
+      explanation: "Bunyinya 'ha', aksara pembuka urutan Ha Na Ca Ra Ka.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Lima aksara dasar pertama dalam urutan yang benar adalah...",
+      choices: [
+        { text: "Ha, Na, Ca, Ra, Ka", isCorrect: true },
+        { text: "Ka, Na, Ca, Ra, Ha", isCorrect: false },
+        { text: "Ha, Ma, Ga, Ba, Nga", isCorrect: false },
+        { text: "Da, Ta, Sa, Wa, La", isCorrect: false },
+      ],
+      explanation: "Aksara dasar dimulai dari Ha, Na, Ca, Ra, Ka.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Apa yang melatarbelakangi urutan aksara dasar Bali?",
+      choices: [
+        { text: "Urutan abjad biasa", isCorrect: false },
+        { text: "Kisah Aji Saka yang penuh filosofi", isCorrect: true },
+        { text: "Urutan tanggal lahir", isCorrect: false },
+        { text: "Hanya kebetulan", isCorrect: false },
+      ],
+      explanation: "Urutannya dibawa Aji Saka dan sarat makna filosofis.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+  ],
+  mod_03: [
+    {
+      type: "dengar_pilih",
+      prompt: "Dengarkan kata ini, lalu pilih arti yang tepat.",
+      latinText: "Ngajeng",
+      audioType: "latin",
+      choices: [
+        { text: "Makan — bentuk halus", isCorrect: true },
+        { text: "Tidur — bentuk halus", isCorrect: false },
+        { text: "Saya — bentuk halus", isCorrect: false },
+        { text: "Maaf — bentuk halus", isCorrect: false },
+      ],
+      explanation: "Ngajeng adalah bentuk Alus dari 'makan'.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Basa Alus digunakan saat berbicara dengan...",
+      choices: [
+        { text: "Teman akrab", isCorrect: false },
+        { text: "Orang tua, guru, atau pemuka agama", isCorrect: true },
+        { text: "Adik kandung", isCorrect: false },
+        { text: "Teman sebaya", isCorrect: false },
+      ],
+      explanation: "Basa Alus dipakai untuk orang yang dihormati.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Kata 'makan' dalam Basa Alus adalah...",
+      choices: [
+        { text: "Madaar", isCorrect: false },
+        { text: "Ngajeng", isCorrect: true },
+        { text: "Pules", isCorrect: false },
+        { text: "Sirep", isCorrect: false },
+      ],
+      explanation: "Ngajeng adalah bentuk Alus dari 'makan', sedangkan madaar adalah Andap.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+  ],
+  mod_04: [
+    {
+      type: "dengar_pilih",
+      prompt: "Dengarkan nama hari raya ini, lalu pilih yang benar.",
+      latinText: "Galungan",
+      audioType: "latin",
+      choices: [
+        { text: "Galungan", isCorrect: true },
+        { text: "Kuningan", isCorrect: false },
+        { text: "Nyepi", isCorrect: false },
+        { text: "Canang Sari", isCorrect: false },
+      ],
+      explanation: "Terdengar 'Galungan', hari kemenangan dharma atas adharma.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Hari kemenangan dharma (kebaikan) atas adharma disebut...",
+      choices: [
+        { text: "Nyepi", isCorrect: false },
+        { text: "Galungan", isCorrect: true },
+        { text: "Kuningan", isCorrect: false },
+        { text: "Kajeng Kliwon", isCorrect: false },
+      ],
+      explanation: "Galungan adalah hari kemenangan kebaikan atas keburukan.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Kuningan dirayakan berapa hari setelah Galungan?",
+      choices: [
+        { text: "5 hari", isCorrect: false },
+        { text: "10 hari", isCorrect: true },
+        { text: "15 hari", isCorrect: false },
+        { text: "Sekaligus bersamaan", isCorrect: false },
+      ],
+      explanation: "Kuningan datang 10 hari setelah Galungan menandai akhir rangkaian.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
+  ],
 };
 
 const GENERATE_MODEL = "gemini-3.1-flash-lite";
@@ -119,10 +251,16 @@ function clampCount(v: unknown): number {
   const n = typeof v === "number" ? Math.round(v) : 5;
   return Math.min(8, Math.max(3, n));
 }
-
 function pickFallback(moduleId: string, count: number): Question[] {
   const bank = FALLBACK_BANK[moduleId] ?? FALLBACK_BANK.mod_01 ?? [];
-  return bank.slice(0, Math.min(count, Math.max(3, bank.length)));
+  const sliced = bank.slice(0, Math.min(count, Math.max(3, bank.length)));
+  const parsed = quizSchema.safeParse({ moduleId, questions: sliced });
+  if (parsed.success) return parsed.data.questions;
+  const first = quizSchema.safeParse({ moduleId, questions: FALLBACK_BANK.mod_01 ?? [] });
+  if (first.success) {
+    return first.data.questions.slice(0, Math.min(count, first.data.questions.length));
+  }
+  return [];
 }
 
 function responseSchema(): Record<string, unknown> {
@@ -242,24 +380,42 @@ async function queryKb(
 ): Promise<KbRow[]> {
   const hit = cache.get(moduleId);
   if (hit && Date.now() - hit.at < KB_CACHE_TTL_MS) return hit.rows;
+  // Debt: kb_entries tak punya kolom module_id — filter kategori di memori.
+  // Tambah kolom module_id + filter server bila KB diskalakan.
+  const categoryByModule: Record<string, string> = {
+    mod_01: "kosakata",
+    mod_02: "wresastra",
+    mod_03: "kosakata",
+    mod_04: "budaya",
+  };
   const params = new URLSearchParams({
     select: "id,category,title,body,source,level",
     level: `eq.${level}`,
     order: "id.asc",
-    limit: "12",
+    limit: "24",
   });
   const res = await fetch(`${supabaseUrl}/rest/v1/kb_entries?${params}`, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
   });
   if (!res.ok) return [];
   const rows = (await res.json()) as KbRow[];
-  cache.set(moduleId, { at: Date.now(), rows });
-  return rows;
+  const want = categoryByModule[moduleId];
+  const filtered = want ? rows.filter((r) => r.category === want) : rows;
+  const out = (filtered.length > 0 ? filtered : rows).slice(0, 12);
+  cache.set(moduleId, { at: Date.now(), rows: out });
+  return out;
 }
 
+// Debt: quiz_calls tak punya kolom jam — counter 50/jam butuh kolom baru
+// (mis. window_hour). Untuk kini hitung di memori dari called_at 60 menit
+// terakhir di samping batas 10/menit. Migrasi kolom bila rate dinaikkan.
+const RATE_LIMIT_PER_HOUR = 50;
+
 function rateLimited(calledAts: string[]): boolean {
-  const cutoff = Date.now() - 60_000;
-  return calledAts.filter((iso) => Date.parse(iso) >= cutoff).length >= RATE_LIMIT_PER_MINUTE;
+  const now = Date.now();
+  const lastMinute = calledAts.filter((iso) => Date.parse(iso) >= now - 60_000).length;
+  const lastHour = calledAts.filter((iso) => Date.parse(iso) >= now - 3_600_000).length;
+  return lastMinute >= RATE_LIMIT_PER_MINUTE || lastHour >= RATE_LIMIT_PER_HOUR;
 }
 
 async function checkRateLimit(
@@ -271,7 +427,7 @@ async function checkRateLimit(
     select: "called_at",
     profile_id: `eq.${profileId}`,
     order: "called_at.desc",
-    limit: String(RATE_LIMIT_PER_MINUTE),
+    limit: String(RATE_LIMIT_PER_HOUR),
   });
   const res = await fetch(`${supabaseUrl}/rest/v1/quiz_calls?${params}`, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
