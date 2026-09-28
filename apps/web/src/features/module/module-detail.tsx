@@ -96,7 +96,8 @@ export function ModuleDetail({
         <button
           type="button"
           onClick={onStart}
-          className="flex w-full cursor-pointer items-center gap-3 rounded-pill border-2 border-transparent bg-cta p-2 pr-5 text-left text-primary-foreground uppercase shadow-duo transition-all duration-150 ease-out hover:brightness-105 active:translate-y-0.5 active:shadow-none"
+          aria-label="Mulai belajar"
+          className="hidden w-full cursor-pointer items-center gap-3 rounded-pill border-2 border-transparent bg-cta p-2 pr-5 text-left text-primary-foreground uppercase shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:flex"
         >
           <span className="flex size-14 shrink-0 items-center justify-center rounded-3xl bg-white/20 shadow-inner">
             <Play className="size-6 fill-current translate-x-0.5" />
@@ -113,6 +114,23 @@ export function ModuleDetail({
           className="hidden lg:block mt-2 text-center text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
         >
           Kembali ke Kurikulum
+        </button>
+      </div>
+      {/* Mobile sticky CTA (Duo pattern). Desktop unchanged: sidebar CTA above. */}
+      <div className="sticky bottom-0 -mx-4 mt-6 border-t border-border/60 bg-background/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+        <button
+          type="button"
+          onClick={onStart}
+          aria-label="Mulai belajar"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-pill border-2 border-transparent bg-cta p-2 pr-5 text-left text-primary-foreground uppercase shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none"
+        >
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-3xl bg-white/20 shadow-inner">
+            <Play className="size-6 fill-current translate-x-0.5" />
+          </span>
+          <span className="flex-1 text-center text-base font-bold tracking-wide">
+            Mulai Belajar
+          </span>
+          <ChevronsRight className="size-6 shrink-0 opacity-70" />
         </button>
       </div>
     </div>

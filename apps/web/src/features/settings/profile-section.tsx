@@ -157,11 +157,18 @@ export function ProfileSection() {
                   setAvatar({ kind: "photo", value: uri });
                 }}
                 className={cn(
-                  "flex aspect-square items-center justify-center overflow-hidden rounded-2xl transition-transform active:scale-95",
-                  active && "ring-2 ring-foreground ring-offset-2 ring-offset-card",
+                  "relative flex aspect-square items-center justify-center overflow-hidden rounded-2xl transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95",
+                  active
+                    ? "ring-2 ring-cta ring-offset-2 ring-offset-card"
+                    : "ring-1 ring-border/60",
                 )}
               >
                 <img src={uri} alt="" aria-hidden className="size-full object-cover" />
+                {active && (
+                  <span className="absolute inset-x-1 bottom-1 inline-flex items-center justify-center gap-0.5 rounded-full bg-cta px-1 py-0.5 text-[9px] font-bold text-primary-foreground">
+                    <Check className="size-2.5" aria-hidden /> Terpilih
+                  </span>
+                )}
               </button>
             );
           })}

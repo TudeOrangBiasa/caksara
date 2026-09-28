@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { CSSProperties } from "react";
+import { Check } from "lucide-react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
@@ -42,12 +44,15 @@ function OptionRow<T extends string>({
               onClick={() => onPick(o.id)}
               style={renderSwatch?.(o.id)}
               className={cn(
-                "flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-xs font-semibold transition-transform active:scale-95",
+                "flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95",
                 renderSwatch ? "text-transparent" : "bg-muted text-muted-foreground",
-                active && "ring-2 ring-foreground ring-offset-2 ring-offset-card",
+                active &&
+                  "bg-cta/10 text-foreground ring-2 ring-cta ring-offset-2 ring-offset-card",
               )}
+              aria-label={active ? `${o.label}, terpilih` : o.label}
             >
               {o.label}
+              {active && <Check className="size-3.5" aria-hidden />}
             </button>
           );
         })}

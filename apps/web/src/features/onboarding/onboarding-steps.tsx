@@ -1,4 +1,4 @@
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import type { RefObject } from "react";
 import { useEffect } from "react";
 
@@ -53,9 +53,9 @@ export function OptionPicker({
             aria-checked={isSelected}
             onClick={() => onSelect(opt.id)}
             className={cn(
-              "flex w-full items-center gap-3.5 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.99]",
+              "flex w-full items-center gap-3.5 rounded-2xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]",
               isSelected
-                ? "border-primary bg-primary/8 text-foreground ring-1 ring-primary"
+                ? "border-cta bg-cta/10 text-foreground ring-2 ring-cta/60 shadow-duo"
                 : "border-border bg-card/70 hover:border-border/90 hover:bg-card text-foreground",
             )}
           >
@@ -71,6 +71,11 @@ export function OptionPicker({
               <p className="text-sm font-semibold">{opt.label}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">{opt.desc}</p>
             </div>
+            {isSelected && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cta px-2.5 py-1 text-[11px] font-bold text-primary-foreground">
+                <Check className="size-3.5" aria-hidden /> Dipilih
+              </span>
+            )}
           </button>
         );
       })}

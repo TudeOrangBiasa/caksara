@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   ChevronRight,
+  Info,
   Monitor,
   Moon,
   RotateCcw,
@@ -61,7 +62,7 @@ function Swing({ checked, onChecked }: { checked: boolean; onChecked: (v: boolea
   );
 }
 
-type SettingsSection = "profil" | "tampilan" | "aksara" | "suara" | "data";
+type SettingsSection = "profil" | "tampilan" | "aksara" | "suara" | "data" | "tentang";
 
 const SECTION_META: Record<SettingsSection, { title: string; desc: string; icon: typeof Sun }> = {
   profil: { title: "Profil", desc: "Foto, warna avatar, nama", icon: User },
@@ -69,9 +70,17 @@ const SECTION_META: Record<SettingsSection, { title: string; desc: string; icon:
   aksara: { title: "Ukuran Aksara", desc: "Besar huruf Wresastra", icon: Type },
   suara: { title: "Suara", desc: "Efek bunyi jawaban", icon: Volume2 },
   data: { title: "Data & Reset", desc: "Hapus progres", icon: Trash2 },
+  tentang: { title: "Tentang", desc: "Versi app, bantuan", icon: Info },
 };
 
-const SECTION_ORDER: SettingsSection[] = ["profil", "tampilan", "aksara", "suara", "data"];
+const SECTION_ORDER: SettingsSection[] = [
+  "profil",
+  "tampilan",
+  "aksara",
+  "suara",
+  "data",
+  "tentang",
+];
 
 function MenuList({
   onSelect,
@@ -141,6 +150,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
     aksara: String(settings.wresastraFontSize),
     suara: settings.soundEnabled ? "Aktif" : "Mati",
     data: "",
+    tentang: "v0.1.0",
   };
 
   return (
@@ -166,6 +176,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
         {section === "aksara" && <AksaraSection fontSize={settings.wresastraFontSize} />}
         {section === "suara" && <SoundSection enabled={settings.soundEnabled} />}
         {section === "data" && <DataSection />}
+        {section === "tentang" && <AboutSection />}
       </div>
     </div>
   );
@@ -204,7 +215,7 @@ function ThemeSection({
               aria-checked={active}
               onClick={() => pickTheme(opt.value)}
               className={cn(
-                "flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-all",
+                "flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 active
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -351,6 +362,93 @@ function DataSection() {
           </button>
         }
       />
+    </section>
+  );
+}
+function AboutSection() {
+  const [open, setOpen] = React.useState<"bantuan" | "privasi" | "ketentuan" | null>(null);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, open !== null);
+
+  const copy: Record<string, { title: string; body: string }> = {
+    bantuan: {
+      title: "Bantuan",
+      body: "Butuh bantuan? Tanya Bedawang Nala di tab Guru, atau ulangi modul dari awal lewat pohon modul. Semua progres tersimpan otomatis di perangkat ini.",
+    },
+    privasi: {
+      title: "Privasi",
+      body: "CAKSARA menyimpan profil, XP, dan progres belajar hanya di perangkatmu (local storage). Tidak ada data pribadi yang dikirim tanpa persetujuanmu.",
+    },
+    ketentuan: {
+      title: "Ketentuan",
+      body: "Konten belajar aksara Bali untuk tujuan edukasi. Audio pelafalan saat ini memakai label Latin sementara; audio Bali asli di luar scope MVP.",
+    },
+  };
+
+  return (
+    <section aria-labelledby="tentang-heading" className="space-y-3">
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Tentang
+        </p>
+        <h2 id="tentang-heading" className="text-base font-bold tracking-tight">
+          CAKSARA · v0.1.0
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Web edukasi aksara Bali — pola Duo, rasa Caksara.
+        </p>
+      </div>
+      {(
+        [
+          ["bantuan", "Bantuan"],
+          ["privasi", "Privasi"],
+          ["ketentuan", "Ketentuan"],
+        ] as const
+      ).map(([id, label]) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => setOpen(id)}
+          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <Info className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1 text-sm font-semibold">{label}</span>
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        </button>
+      ))}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+          onClick={() => setOpen(null)}
+        >
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tentang-dialog-title"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpen(null);
+            }}
+            className="w-full max-w-sm animate-modal-in rounded-3xl border bg-card p-5 shadow-lg"
+          >
+            <h2 id="tentang-dialog-title" className="text-lg font-semibold">
+              {copy[open].title}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{copy[open].body}</p>
+            <button
+              type="button"
+              onClick={() => setOpen(null)}
+              autoFocus
+              className="mt-5 w-full rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Mengerti
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

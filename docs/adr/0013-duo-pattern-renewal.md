@@ -77,3 +77,68 @@ Konsekuensi: setelah approve, mirror token ke SSOT lalu ubah komponen;
 `bun run check` 0 error, `bun run build` exit 0, tanpa hex di komponen
 (`grep`), proof agent-browser light/dark 390+1280 ke
 `docs/proof/duo-renewal/`. Tanpa fitur baru.
+
+## Amend 2026-09-28 — checklist-design best-pick (tanpa token baru)
+
+Tanpa token baru: semua fix memakai token existing (`--cta`, `--success`,
+`--destructive`, `--accent`, `--accent-foreground`, `--primary-foreground`,
+`--ring`, dsb). Tidak ada mirror `globals.css`/`tokens.ts`.
+
+Aksesibilitas teks-di-atas-warna (FAKTA, komputasi oklch→sRGB + rasio
+luminance WCAG 2, metode sama dengan §3):
+
+- `text-success` di atas `bg-success/10` (light) = 3.08:1 FAIL →
+  dipakai `text-cta` (4.64:1 PASS). Berlaku: judul feedback benar
+  (`quiz-feedback.tsx`), pil "Online" guru (`teacher.tsx`, dark tetap
+  `text-success` karena di atas card gelap = 6.57:1 PASS).
+- `text-accent` di atas `bg-accent/20` (light) = 2.43:1 FAIL → dipakai
+  `text-accent-foreground` (15.40:1 PASS), dark override `dark:text-accent`
+  (di atas card gelap = terang-vs-gelap PASS). Berlaku: badge +XP
+  (`quiz-feedback.tsx`).
+- `text-destructive` di atas `bg-destructive/10` (light) = 4.09:1 —
+  di bawah 4.5 teks kecil (FAIL ketat) tapi pola Duo mensyaratkan merah
+  sebagai sinyal salah + ikon/label non-warna menyertai, jadi DIPERTAHANKAN
+  (judgement, dicatat eksplisit).
+- Putih di atas `--cta`/`--destructive` solid (badge A/B, pil "Dipilih",
+  CTA feedback): 4.95–5.17:1 PASS (light). Dark: teks CTA memakai
+  `--primary-foreground` near-black = 7.26:1 PASS.
+- Hero overlay `text-white/80` di atas gradient zinc-950 = ~13:1 PASS;
+  `text-white` penuh = ~20.9:1 PASS — tidak diubah.
+- Bubble cokelat (`--card-ink` di atas `--card-bg` = 12.27:1;
+  `--card-muted` di atas `--card-bg` = 5.03:1; `--card-primary` di atas
+  `--card-cream` = 4.57:1) — semua PASS, tidak diubah (ilustrasi/SVG
+  memakai `var(--...)`, bukan literal).
+- Tile dark: `foreground` near-white di atas `--card` gelap = 17.16:1
+  PASS — tidak diubah.
+
+Perubahan komponen (semua `focus-visible:ring-2 ring-ring`, tanpa
+`prefers-reduced-motion` baru — animasi existing sudah dihormati di
+`globals.css:400-429`):
+
+1. Onboarding `OptionPicker`: selected = `border-cta` + `ring-2 ring-cta/60`
+   - `shadow-duo` + pil "✓ Dipilih" (`bg-cta text-primary-foreground`).
+2. Module detail: CTA sidebar jadi `hidden lg:flex`; CTA sticky mobile
+   (`sticky bottom-0 lg:hidden`, safe-area) di bawah kolom.
+3. Kuis: `QuizChoice` selected = `border-cta ring-2 ring-cta/60 shadow-duo`
+   - badge "Dipilih" + `aria-pressed`; feedback benar/salah dapat ring
+     senada; `Cocokkan` kiri selected pola sama; `SusunAksara` pool
+     `hover:border-cta/60` + focus ring.
+4. Feedback: benar = `text-cta` + ikon `CheckCircle2`; salah =
+   `text-destructive` + ikon `AlertCircle` + copy "Belum tepat — baca dulu
+   ya"; CTA satu-satunya jalan lanjut DIPERTAHANKAN (verifikasi di
+   `quiz-shell.tsx:323-330` — tidak ada skip; tanpa duplikasi CTA).
+   Banner full-bleed merah + CTA + penjelasan sudah pola benar — sama.
+5. Guru: `ThinkingBubble` dapat `role=status aria-live=polite`; indikator
+   "Bedawang sedang mengetik…" (titik shimmer + teks, `role=status`)
+   saat `streaming && !thinking`; `scrollTo latest` existing
+   (`teacher.tsx:36-38`, deps `[messages, thinking]`) DIPERTAHANKAN, bubble
+   styling tidak diubah.
+6. Settings: section baru "Tentang" (menu + `AboutSection`): versi
+   `CAKSARA · v0.1.0` + dialog internal Bantuan/Privasi/Ketentuan
+   (focus-trap existing, tidak ada link external); mood picker `OptionRow`
+   = `ring-2 ring-cta` + ikon Check + `aria-label "..., terpilih"`;
+   avatar satwa = `ring-cta` + badge "✓ Terpilih"; theme picker + focus ring.
+
+Tipe global baru: nihil. Zod baru: nihil (tidak ada input baru; versi
+sebagai teks statis — judgement: versi dinamis dari package.json butuh
+plumbing build-time, tidak sebanding untuk MVP).

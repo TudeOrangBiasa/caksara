@@ -129,8 +129,8 @@ export function TeacherChat() {
               Guru virtual
             </p>
             <p className="text-base font-bold tracking-tight">Bedawang Nala</p>
-            <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
-              <span className="size-1.5 rounded-full bg-success" />
+            <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-cta dark:text-success">
+              <span className="size-1.5 rounded-full bg-cta dark:bg-success" />
               Online · jawab pakai sumber
             </p>
           </div>
@@ -147,9 +147,26 @@ export function TeacherChat() {
           {messages.map((msg, idx) => (
             <Bubble key={msg.id} msg={msg} index={idx} onSuggest={(s) => send(s)} />
           ))}
-
           {thinking && <ThinkingBubble />}
-
+          {messages.some((m) => m.streaming) && !thinking && (
+            <div className="flex items-center gap-2 px-1" role="status" aria-live="polite">
+              <span className="flex items-center gap-1" aria-hidden>
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "300ms" }}
+                />
+              </span>
+              <span className="text-xs text-muted-foreground">Bedawang sedang mengetik…</span>
+            </div>
+          )}
           {/* Mobile-only welcome & quick replies */}
           {messages.length <= 1 && (
             <div className="animate-in fade-in zoom-in-95 duration-700 delay-100 flex flex-col gap-6 py-2 lg:hidden">
@@ -298,9 +315,17 @@ function Bubble({
 
 function ThinkingBubble() {
   return (
-    <div className="flex justify-start">
+    <div
+      className="flex justify-start"
+      role="status"
+      aria-live="polite"
+      aria-label="Bedawang sedang mengetik"
+    >
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
-      <div className="flex items-center gap-1 rounded-xl border-2 border-border bg-card px-4 py-3">
+      <div
+        className="flex items-center gap-1 rounded-xl border-2 border-border bg-card px-4 py-3"
+        aria-hidden
+      >
         <span
           className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
           style={{ animationDelay: "0ms" }}

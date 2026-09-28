@@ -20,12 +20,12 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
         let stateClass = "border-border bg-card hover:bg-muted/50";
         if (showFeedback && isSelected) {
           stateClass = isCorrect
-            ? "border-success bg-success/10"
-            : "border-destructive bg-destructive/10";
+            ? "border-success bg-success/10 ring-2 ring-success/60"
+            : "border-destructive bg-destructive/10 ring-2 ring-destructive/60";
         } else if (showFeedback && isCorrect) {
           stateClass = "border-success bg-success/5";
         } else if (isSelected) {
-          stateClass = "border-cta bg-cta/10";
+          stateClass = "border-cta bg-cta/10 ring-2 ring-cta/60 shadow-duo";
         }
 
         return (
@@ -34,8 +34,9 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
             type="button"
             disabled={showFeedback}
             onClick={() => onSelect(i)}
+            aria-pressed={isSelected}
             className={cn(
-              "tile-duo flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-150 ease-out active:scale-[0.98]",
+              "tile-duo flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
               stateClass,
               showFeedback && "cursor-default",
             )}
@@ -45,14 +46,19 @@ export function QuizChoice({ question, selectedIndex, showFeedback, onSelect }: 
                 "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-medium",
                 showFeedback && isSelected
                   ? isCorrect
-                    ? "border-success bg-success text-white"
-                    : "border-destructive bg-destructive text-white"
+                    ? "border-cta bg-cta text-primary-foreground"
+                    : "border-destructive bg-destructive text-primary-foreground"
                   : "border-border",
               )}
             >
               {String.fromCodePoint(65 + i)}
             </span>
             <span className="flex-1 text-sm">{choice.text}</span>
+            {isSelected && !showFeedback && (
+              <span className="inline-flex shrink-0 items-center rounded-full bg-cta px-2 py-0.5 text-[11px] font-bold text-primary-foreground">
+                Dipilih
+              </span>
+            )}
           </button>
         );
       })}
