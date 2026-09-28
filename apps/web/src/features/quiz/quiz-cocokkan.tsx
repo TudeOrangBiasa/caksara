@@ -33,9 +33,12 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
             disabled={disabled}
             onClick={() => setSelectedLeft(p.left)}
             className={cn(
-              "font-balinese w-full rounded-lg border p-3 text-2xl transition-colors",
-              selectedLeft === p.left ? "border-primary bg-primary/10" : "border-border bg-card",
+              "tile-duo font-balinese w-full rounded-xl border-2 p-3 text-2xl transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
+              selectedLeft === p.left
+                ? "border-cta bg-cta/10 ring-2 ring-cta/60 shadow-duo"
+                : "border-border bg-card hover:bg-muted/50",
             )}
+            aria-pressed={selectedLeft === p.left}
           >
             {p.left}
           </button>
@@ -48,7 +51,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
             type="button"
             disabled={disabled || selectedLeft === null}
             onClick={() => handleRight(right)}
-            className="w-full rounded-lg border border-border bg-card p-3 text-sm transition-colors hover:bg-muted/50"
+            className="tile-duo w-full rounded-xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
           >
             {right}
           </button>

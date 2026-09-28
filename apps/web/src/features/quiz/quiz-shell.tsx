@@ -129,7 +129,11 @@ function ResumeDialog({
         Terakhir sampai soal ke-{resume.currentIndex + 1} dari {total} ({tanggal}).
       </p>
       <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
-        <Button className="h-12 w-full text-base font-semibold" onClick={onResume}>
+        <Button
+          variant="cta"
+          className="h-12 w-full text-base font-bold tracking-wide"
+          onClick={onResume}
+        >
           Lanjut dari soal ke-{resume.currentIndex + 1}
         </Button>
         <Button variant="outline" className="h-12 w-full" onClick={onRestart}>
@@ -152,7 +156,11 @@ function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void
         Nggak apa-apa, salah itu bagian dari belajar. Hati sudah pulih penuh, yuk coba lagi!
       </p>
       <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
-        <Button className="h-12 w-full gap-2 text-base" onClick={onRetry}>
+        <Button
+          variant="cta"
+          className="h-12 w-full gap-2 text-base font-bold tracking-wide"
+          onClick={onRetry}
+        >
           <RotateCcw className="size-4" /> Coba Lagi
         </Button>
         <Button variant="outline" className="h-12 w-full" onClick={onBack}>

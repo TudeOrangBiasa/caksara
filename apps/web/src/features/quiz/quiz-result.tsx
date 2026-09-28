@@ -90,7 +90,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
       </div>
 
       {passed && (
-        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent animate-card-pop">
+        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent-foreground dark:text-accent animate-card-pop">
           <Sparkles className="size-4" /> +<AnimatedNumber value={xpGained} /> XP
         </div>
       )}
@@ -105,7 +105,7 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
         </div>
       )}
 
-      <div className="mt-auto flex w-full gap-2 border-t border-border/60 pt-6">
+      <div className="mt-auto flex w-full gap-2 border-t-2 border-border pt-6">
         {passed ? (
           <>
             <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onRetry}>
@@ -113,7 +113,8 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
               Ulangi
             </Button>
             <Button
-              className="h-12 flex-1 gap-2 rounded-full text-base font-semibold"
+              variant="cta"
+              className="h-12 flex-1 gap-2 text-base font-bold tracking-wide"
               onClick={onBack}
             >
               Kembali
@@ -125,7 +126,8 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
               Kembali
             </Button>
             <Button
-              className="h-12 flex-1 gap-2 rounded-full text-base font-semibold"
+              variant="cta"
+              className="h-12 flex-1 gap-2 text-base font-bold tracking-wide"
               onClick={onRetry}
             >
               <RotateCcw className="size-4" />

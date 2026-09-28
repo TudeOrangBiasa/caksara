@@ -1,4 +1,4 @@
-import { BookOpenCheck, Sparkles } from "lucide-react";
+import { AlertCircle, BookOpenCheck, CheckCircle2, Sparkles } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
@@ -28,12 +28,22 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
         <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-12 shrink-0" />
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <p className={cn("font-bold", isCorrect ? "text-success" : "text-destructive")}>
-              {isCorrect ? "Bener banget!" : "Belum tepat"}
+            <p
+              className={cn(
+                "flex items-center gap-1.5 font-bold",
+                isCorrect ? "text-cta" : "text-destructive",
+              )}
+            >
+              {isCorrect ? (
+                <CheckCircle2 className="size-5 shrink-0" aria-hidden />
+              ) : (
+                <AlertCircle className="size-5 shrink-0" aria-hidden />
+              )}
+              {isCorrect ? "Bener banget!" : "Belum tepat — baca dulu ya"}
             </p>
             {isCorrect && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent">
-                <Sparkles className="size-3" /> +{XP_PER_CORRECT} XP
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground dark:text-accent">
+                <Sparkles className="size-3" aria-hidden /> +{XP_PER_CORRECT} XP
               </span>
             )}
           </div>
@@ -47,13 +57,10 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
         </div>
       </div>
       <Button
+        variant="cta"
         onClick={onNext}
-        className={cn(
-          "mt-3 h-12 w-full rounded-full text-base font-semibold",
-          isCorrect
-            ? "bg-success text-white hover:bg-success/90"
-            : "bg-destructive text-white hover:bg-destructive/90",
-        )}
+        aria-label={isLast ? "Lihat hasil" : "Lanjut ke soal berikutnya"}
+        className="mt-3 h-12 w-full text-base font-bold tracking-wide"
       >
         {isLast ? "Lihat Hasil" : "Lanjut"}
       </Button>
