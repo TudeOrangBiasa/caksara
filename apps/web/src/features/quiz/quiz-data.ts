@@ -1,3 +1,4 @@
+import { quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
 
 export const QUIZ_BANK: Record<string, Question[]> = {
@@ -207,6 +208,57 @@ export const QUIZ_BANK: Record<string, Question[]> = {
     },
   ],
 };
+/**
+ * V3 tracer (#22): 3 soal kenali_visual mock dari KB (belum Gemini).
+ * Tiap soal membawa explanation + sourceRef KB agar panel feedback bisa
+ * menampilkan penjelasan berikon + teks sumber. Zod parse di batas.
+ */
+const TRACER_QUESTIONS: Question[] = [
+  {
+    type: "kenali_visual",
+    prompt: "ᬒᬁᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ",
+    choices: [
+      { text: "Selamat pagi", isCorrect: false },
+      { text: "Semoga selamat atas karunia Hyang Widhi", isCorrect: true },
+      { text: "Terima kasih", isCorrect: false },
+      { text: "Sampai jumpa", isCorrect: false },
+    ],
+    explanation: "Om Swastiastu berarti semoga dalam keadaan selamat atas karunia-Nya (kb_sapaan).",
+    sourceRef: "kb_sapaan · Basis Pengetahuan",
+    level: 1,
+  },
+  {
+    type: "kenali_visual",
+    prompt: "ᬳ",
+    choices: [
+      { text: "ha", isCorrect: true },
+      { text: "na", isCorrect: false },
+      { text: "ca", isCorrect: false },
+      { text: "ka", isCorrect: false },
+    ],
+    explanation: "Bentuknya adalah aksara wresastra ha, pembuka urutan Ha Na Ca Ra Ka.",
+    sourceRef: "kb_wre_01 · Basis Pengetahuan",
+    aksaraId: "wre_01",
+    level: 1,
+  },
+  {
+    type: "kenali_visual",
+    prompt: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬲ᭄ᬫ",
+    choices: [
+      { text: "Mohon maaf", isCorrect: false },
+      { text: "Selamat tinggal", isCorrect: false },
+      { text: "Terima kasih", isCorrect: true },
+      { text: "Permisi lewat", isCorrect: false },
+    ],
+    explanation: "Matur suksma berarti terima kasih, bentuk halus dari suksma.",
+    sourceRef: "kb_matur_suksma · Basis Pengetahuan",
+    level: 1,
+  },
+];
+
+export function buildTracerQuiz(moduleId: string): Quiz {
+  return quizSchema.parse({ moduleId, questions: TRACER_QUESTIONS });
+}
 
 export function buildQuiz(moduleId: string): Quiz {
   const questions = QUIZ_BANK[moduleId] ?? QUIZ_BANK.mod_01;

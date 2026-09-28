@@ -8,6 +8,11 @@ const MOOD_SRC: Record<BedawangMood, string> = {
   sedih: "/assets/bedawang-standing.png",
 };
 
+// HACK(debt): pakai SATU set nama saja (bedawang-*). Varian mascot-* identik
+// byte-for-byte (md5 sama) — duplikasi ~1,1MB, lihat debt issue. JPG lama
+// (new-hero-mascot.jpg) tak lagi dirujuk kode; dibiarkan agar tidak break
+// pemakai tak terduga, hapus terpisah.
+
 export interface BedawangProps {
   mood?: BedawangMood;
   className?: string;
@@ -15,6 +20,8 @@ export interface BedawangProps {
   animate?: boolean;
   onClick?: () => void;
 }
+
+const DEFAULT_SRC = "/assets/bedawang-standing.png";
 
 export function Bedawang({
   mood = "senang",
@@ -30,7 +37,7 @@ export function Bedawang({
       style={{ cursor: interactive ? "pointer" : "default" }}
     >
       <img
-        src={MOOD_SRC[mood]}
+        src={mood ? MOOD_SRC[mood] : DEFAULT_SRC}
         alt="Maskot Bedawang Nala"
         className={cn("h-full w-full object-cover", animate && "animate-pulse")}
       />
