@@ -45,4 +45,20 @@ describe("parseSupabaseKbRows — kb_entries → KbEntry lokal", () => {
     assert.deepEqual(parseSupabaseKbRows([]), []);
     assert.deepEqual(parseSupabaseKbRows(null), []);
   });
+
+  test("glyph diekstrak dari body seed agar kartu remote tetap beraksara (V11b)", () => {
+    const out = parseSupabaseKbRows([
+      {
+        ...validRow,
+        body: "Aksara: ᬳ (Latin: ha)\n\nAksara wresastra ha.",
+      },
+    ]);
+    assert.equal(out[0]?.glyph, "ᬳ");
+  });
+
+  test("kolom glyph/latin Supabase dipakai langsung bila ada (V11b)", () => {
+    const out = parseSupabaseKbRows([{ ...validRow, glyph: "ᬓ", latin: "ka" }]);
+    assert.equal(out[0]?.glyph, "ᬓ");
+    assert.equal(out[0]?.latin, "ka");
+  });
 });

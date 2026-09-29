@@ -241,7 +241,7 @@ export function useQuizLaunch(
 export function AudioSourceNote() {
   return (
     <p className="mt-1 text-center text-[11px] text-muted-foreground">
-      Audio: Mendeley CC BY 4.0 · Latin sementara bila belum terkurasi
+      Audio: Mendeley Data CC BY 4.0 · Latin sementara bila belum terkurasi
     </p>
   );
 }

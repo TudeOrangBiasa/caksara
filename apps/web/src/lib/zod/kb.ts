@@ -12,6 +12,8 @@ export const kbRemoteRowSchema = z.object({
   body: z.string().trim().min(1),
   source: z.string().trim().min(1),
   level: z.coerce.number().int().min(1).max(3),
+  glyph: z.string().trim().min(1).nullish(),
+  latin: z.string().trim().min(1).nullish(),
 });
 
 export type KbRemoteRow = z.infer<typeof kbRemoteRowSchema>;

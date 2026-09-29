@@ -124,9 +124,20 @@ async function queryKbEntriesRemote(): Promise<SupabaseKbRow[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from("kb_entries")
-    .select("id,category,title,body,source,level")
+    .select("id,category,title,body,source,level,glyph,latin")
     .order("id", { ascending: true })
     .limit(200);
+  // Tabel lama tanpa kolom glyph/latin: PostgREST 42703 (undefined_column) —
+  // fallback ke select lama agar daftar tetap jalan (glyph diekstrak dari body).
+  if (error && /glyph|latin|42703|column/iu.test(error.message)) {
+    const retry = await supabase
+      .from("kb_entries")
+      .select("id,category,title,body,source,level")
+      .order("id", { ascending: true })
+      .limit(200);
+    if (retry.error || !Array.isArray(retry.data)) return [];
+    return retry.data as SupabaseKbRow[];
+  }
   if (error || !Array.isArray(data)) return [];
   return data as SupabaseKbRow[];
 }

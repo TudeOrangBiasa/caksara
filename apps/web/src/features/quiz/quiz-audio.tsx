@@ -70,7 +70,7 @@ export function QuizAudio({ audioUrl, label, audioType, latinText }: QuizAudioPr
         </span>
       )}
       <span className="text-center text-[11px] text-muted-foreground">
-        Audio: Mendeley CC BY 4.0 · Latin sementara bila belum terkurasi
+        Audio: Mendeley Data CC BY 4.0 · Latin sementara bila belum terkurasi
       </span>
     </div>
   );

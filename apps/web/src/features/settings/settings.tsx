@@ -431,7 +431,20 @@ function AboutSection() {
         <p className="mt-1 text-xs text-muted-foreground">
           Web edukasi aksara Bali — pola Duo, rasa Caksara.
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">Audio pelafalan: Mendeley CC BY 4.0.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Audio pelafalan: subset terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
+          (Mendeley Data, CC BY 4.0) —{" "}
+          <a
+            href="https://data.mendeley.com/datasets/6syjwz24v5/2"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            data.mendeley.com/datasets/6syjwz24v5/2
+          </a>
+          . Selama belum terkurasi, soal dengar_pilih memakai badge Audio Latin (sementara); audio
+          Bali asli di luar scope MVP.
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Avatar IP oleh s1dashu (MIT) via ipaslogo.com —{" "}
           <a href="/assets/ip-as-logo-LICENSE" className="underline underline-offset-2">
