@@ -26,6 +26,7 @@ import type { CourseModule } from "../features/module/module-data";
 import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
+import { saveAksaraProgress } from "../features/quiz/quiz-progress";
 import { enqueuePendingSession } from "../features/quiz/quiz-pending-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
