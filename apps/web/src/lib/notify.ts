@@ -2,14 +2,14 @@ import { toast } from "sonner";
 
 /**
  * Toast sistem untuk kondisi backend (429, Gemini down, kembali online).
- * Sonner bawaan: slide-in + swipe-to-dismiss. Action retry diserahkan ke pemanggil
- * karena pemicu 429/Gemini berasal dari Edge Function (#30).
+ * Sonner bawaan: slide-in + swipe-to-dismiss + fade-out via duration.
+ * Retry diserahkan ke pemanggil: pemicu 429/Gemini berasal dari Edge (#29 V8c).
  */
 export function notifyRateLimited(onRetry?: () => void) {
   toast.warning("Terlalu banyak permintaan (429)", {
     description: "Tunggu sebentar lalu coba lagi.",
     action: onRetry ? { label: "Coba lagi", onClick: onRetry } : undefined,
-    duration: 4000,
+    duration: 3000,
   });
 }
 

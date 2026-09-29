@@ -208,7 +208,8 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
             body="Coba kata lain atau bersihkan filter biar hasilnya keluar semua."
             action={
               <Button
-                className="h-11 w-full rounded-full font-semibold max-w-[200px] mt-2"
+                variant="cta"
+                className="mx-auto mt-2 h-11 w-full max-w-[200px] text-sm font-bold tracking-wide"
                 onClick={() => {
                   setQuery("");
                   setCategory("semua");
@@ -226,7 +227,8 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
             body="Belum ada entri untuk filter ini. Coba buka semua kategori."
             action={
               <Button
-                className="h-11 w-full rounded-full font-semibold max-w-[200px] mt-2"
+                variant="cta"
+                className="mx-auto mt-2 h-11 w-full max-w-[200px] text-sm font-bold tracking-wide"
                 onClick={() => setCategory("semua")}
               >
                 Buka Semua

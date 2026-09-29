@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BookX, RotateCcw } from "lucide-react";
 
 import type { Route } from "./+types/_index";
 import { BottomNav } from "../components/bottom-nav";
 import type { NavTab } from "../components/bottom-nav";
+import { EmptyState } from "../components/empty-state";
 import { OfflineBanner } from "../components/offline-banner";
 import { TopNav } from "../components/top-nav";
 import Header from "../components/header";
@@ -28,8 +30,9 @@ import { saveAksaraProgress } from "../features/quiz/quiz-progress";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
+import type { QuizNotice } from "../features/quiz/quiz-generate";
 import { loadResume } from "../features/quiz/quiz-resume";
-import type { Quiz } from "../lib/zod/question";
+import { Button } from "@caksara/ui/components/button";
 import {
   buildMixedQuiz,
   buildSessionQuiz,
@@ -46,7 +49,7 @@ import {
   WRESASTRA_IDS,
 } from "../lib/profile-store";
 import { MAX_HEARTS } from "../lib/game-rules";
-import { notifyStreakReset } from "../lib/notify";
+import { notifyQuizFallback, notifyRateLimited, notifyStreakReset } from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
@@ -88,45 +91,61 @@ function QuizLaunchView({
   // Kunci resume-vs-Gemini: bila ada currentIndex tersimpan, jangan fetch
   // Gemini baru — pakai set tersimpan (cache/fallback lokal saja).
   const hasResume = useMemo(() => loadResume(mod.id) !== null, [mod.id]);
-  const [retryKey, setRetryKey] = useState(0);
+  // Toast cukup sekali per pembuka sesi: flag di-reset tiap retryKey berubah.
+  const noticeKey = useRef<QuizNotice | null>(null);
   const fallback = useMemo(
-    () =>
-      ({
-        localFallback: () => deriveQuizForMod(mod),
-        deferRemote: hasResume,
-        reloadToken: retryKey,
-      }) as const,
+    () => ({
+      localFallback: () => deriveQuizForMod(mod),
+      deferRemote: hasResume,
+      reloadToken: retryKey,
+      onNotice: (notice: QuizNotice) => {
+        if (noticeKey.current === notice) return;
+        noticeKey.current = notice;
+        if (notice === "quiz-ratelimit") notifyRateLimited(() => setRetryKey((k) => k + 1));
+        else notifyQuizFallback();
+      },
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [mod.id, hasResume, retryKey],
   );
   const launch = useQuizLaunch(mod.id, fallback);
   useEffect(() => {
+    noticeKey.current = null;
+  }, [retryKey]);
+  useEffect(() => {
     if (launch.status === "ready" && launch.quiz) onReady(launch.quiz);
   }, [launch, onReady]);
   if (launch.status === "ready" && !launch.quiz) {
+    const rateLimited = launch.failure === "rate-limited";
+    const offline = launch.failure === "offline";
     return (
-      <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center md:max-w-xl">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Menyiapkan Sesi Kuis · Level {getAdaptiveLevel(mod.id)}
-        </p>
-        <p className="mt-2 text-lg font-bold tracking-tight">Kuis belum tersedia</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Sambungan atau bank soal modul ini sedang bermasalah. Coba lagi ya.
-        </p>
-        <button
-          type="button"
-          onClick={() => setRetryKey((k) => k + 1)}
-          className="mt-6 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
-        >
-          Coba Lagi
-        </button>
-        <button
-          type="button"
-          onClick={onBack}
-          className="mt-2 text-sm font-semibold text-muted-foreground"
-        >
-          Kembali
-        </button>
+      <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 md:max-w-xl">
+        <EmptyState
+          illustration={<BookX className="size-7" />}
+          title="Kuis belum tersedia"
+          body={
+            rateLimited
+              ? "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi."
+              : offline
+                ? "Kamu sedang offline. Sambungkan internet lalu coba lagi — bank soal lokal tetap siap."
+                : "Sambungan atau bank soal modul ini sedang bermasalah. Coba lagi ya."
+          }
+          tone={rateLimited || offline ? "danger" : "default"}
+          action={
+            <div className="flex w-full flex-col gap-2">
+              <Button
+                variant="cta"
+                className="h-12 w-full text-base font-bold tracking-wide"
+                onClick={() => setRetryKey((k) => k + 1)}
+              >
+                <RotateCcw className="size-4" aria-hidden /> Coba Lagi
+              </Button>
+              <Button variant="outline" className="h-12 w-full rounded-full" onClick={onBack}>
+                Kembali
+              </Button>
+            </div>
+          }
+        />
       </div>
     );
   }

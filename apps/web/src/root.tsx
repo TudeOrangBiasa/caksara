@@ -1,16 +1,19 @@
-import { Toaster } from "@caksara/ui/components/sonner";
+import { MapPinOff, RefreshCw } from "lucide-react";
 import {
-  isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
 } from "react-router";
+import { Toaster } from "@caksara/ui/components/sonner";
 
 // oxlint-disable-next-line import/no-unassigned-import
 import "./index.css";
 import type { Route } from "./+types/root";
+import { EmptyState } from "./components/empty-state";
 import { ThemeProvider } from "./components/theme-provider";
 
 export const links: Route.LinksFunction = () => [
@@ -57,23 +60,56 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
+  const status = isRouteErrorResponse(error) ? error.status : null;
+  const rateLimited = status === 429;
+  const notFound = status === 404;
+  let details = "Terjadi galat tak terduga. Muat ulang lalu coba lagi.";
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404 ? "The requested page could not be found." : error.statusText || details;
+    details = rateLimited
+      ? "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi."
+      : notFound
+        ? "Alamat yang kamu tuju tidak ada atau sudah dipindah."
+        : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
-    stack = error.stack;
   }
+  const stack = import.meta.env.DEV && error instanceof Error ? error.stack : undefined;
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <main className="mx-auto flex min-h-svh w-full max-w-lg flex-col items-center justify-center px-4 py-10 md:max-w-2xl">
+      <EmptyState
+        illustration={
+          rateLimited ? <RefreshCw className="size-7" /> : <MapPinOff className="size-7" />
+        }
+        title={
+          rateLimited
+            ? "Terlalu banyak permintaan (429)"
+            : notFound
+              ? "Halaman tidak ketemu (404)"
+              : "Ada yang salah"
+        }
+        body={details}
+        tone={rateLimited ? "danger" : "default"}
+        action={
+          rateLimited ? (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
+            >
+              Coba lagi
+            </button>
+          ) : (
+            <Link
+              to="/"
+              className="flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
+            >
+              Kembali ke Beranda
+            </Link>
+          )
+        }
+      />
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
+        <pre className="mt-6 w-full overflow-x-auto rounded-2xl bg-muted p-4 text-xs">
           <code>{stack}</code>
         </pre>
       )}
