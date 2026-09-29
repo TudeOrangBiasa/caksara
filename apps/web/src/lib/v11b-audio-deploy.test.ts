@@ -43,8 +43,19 @@ describe("v11b font: Noto Sans Balinese self-host tanpa tofu (ADR-0009)", () => 
 });
 
 describe("v11b edge: 429 sebelum Gemini, bulk 3-8 Zod, kunci server-only", () => {
-  test("rate-limit 429 dicek sebelum panggil Gemini", () => {
-    assert.ok(edge.indexOf("checkRateLimit") < edge.indexOf("callGemini"));
+  test("rate-limit 429 early-return sebelum efek samping (record/query/Gemini)", () => {
+    // Kontrak perilaku: limit terlampaui → 429 tanpa recordCall/queryKb/callGemini.
+    // Diverifikasi di level sumber (pola rls-policy.test.ts, jalan di CI tanpa
+    // kredensial); harness mock-fetch Deno penuh = debt (Edge pakai Deno.serve +
+    // Deno.env, CI hanya bun — jangan over-engineer di sini).
+    const guard = edge.indexOf("if (await checkRateLimit(");
+    assert.ok(guard >= 0, "tanpa guard checkRateLimit");
+    const ret429 = edge.indexOf("return json(429", guard);
+    assert.ok(ret429 > guard, "guard tanpa early-return 429");
+    for (const sideEffect of ["await recordCall(", "await queryKb(", "await callGemini("]) {
+      const at = edge.indexOf(sideEffect);
+      assert.ok(at > ret429, `${sideEffect} sebelum early-return 429`);
+    }
     assert.ok(edge.includes("429"));
   });
 

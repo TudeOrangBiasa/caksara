@@ -10,7 +10,7 @@ export interface SupabaseKbRow {
   source: string;
   level: number | string;
   /** Kolom glyph Supabase (opsional) — bila ada dipakai langsung; bila absen
-   * diekstrak dari body seed "Aksara: <glyph> (Latin: …)". */
+   * diekstrak dari pola "Aksara: <glyph> (Latin: …)" di mana pun dalam body. */
   glyph?: string | null;
   latin?: string | null;
 }
@@ -46,7 +46,7 @@ export function parseSupabaseKbRows(rows: SupabaseKbRow[] | null | undefined): K
     if (!kbCategorySchema.safeParse(parsed.data.category).success) continue;
     const sources = splitSources(parsed.data.source);
     const glyph = parsed.data.glyph?.trim() || extractGlyph(parsed.data.body);
-    const latin = parsed.data.latin?.trim() || undefined;
+    const latin = parsed.data.latin?.trim() || extractLatin(parsed.data.body);
     const entry = kbEntrySchema.safeParse({
       id: String(parsed.data.id),
       category: parsed.data.category,
@@ -63,10 +63,16 @@ export function parseSupabaseKbRows(rows: SupabaseKbRow[] | null | undefined): K
 }
 
 /**
- * Ekstrak glyph dari body seed ("Aksara: ᬳ (Latin: ha)\n\n…") agar daftar
- * remote tetap menampilkan aksara tanpa kolom glyph terpisah.
+ * Ekstrak glyph dari pola "Aksara: ᬳ (Latin: ha)" di posisi mana pun dalam
+ * body — seed menaruhnya di awal, tapi body remote bisa berawalan lain.
  */
 function extractGlyph(body: string): string | undefined {
-  const m = body.match(/^Aksara:\s*([ᬀ-᭿]+)\s*\(Latin:/u);
+  const m = body.match(/Aksara:\s*([ᬀ-᭿]+)/iu);
   return m?.[1];
+}
+
+/** Ekstrak "(Latin: xxx)" dari body bila kolom latin absen. */
+function extractLatin(body: string): string | undefined {
+  const m = body.match(/\(Latin\s*:\s*([^)]+?)\)/iu);
+  return m?.[1]?.trim() || undefined;
 }
