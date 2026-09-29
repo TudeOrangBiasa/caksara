@@ -6,11 +6,20 @@ import { XP_PER_CORRECT } from "../../lib/game-rules";
 interface QuizFeedbackProps {
   isCorrect: boolean;
   explanation?: string;
+  /** sourceRef mentah soal ("kb_x · Basis Pengetahuan") — tautan balik kecil opsional. */
+  sourceRef?: string;
+  onOpenKbEntry?: (entryId: string) => void;
   onNext: () => void;
   isLast: boolean;
 }
-
-export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFeedbackProps) {
+export function QuizFeedback({
+  isCorrect,
+  explanation,
+  sourceRef,
+  onOpenKbEntry,
+  onNext,
+  isLast,
+}: QuizFeedbackProps) {
   return (
     <div
       role="status"
@@ -44,6 +53,15 @@ export function QuizFeedback({ isCorrect, explanation, onNext, isLast }: QuizFee
             )}
           </div>
           {explanation && <p className="mt-1 text-sm text-muted-foreground">{explanation}</p>}
+          {sourceRef && onOpenKbEntry && (
+            <button
+              type="button"
+              onClick={() => onOpenKbEntry(sourceRef.split("·")[0]?.trim() ?? sourceRef)}
+              className="mt-1 text-[11px] font-semibold text-primary underline-offset-2 hover:underline"
+            >
+              Buka di Basis Pengetahuan →
+            </button>
+          )}
           {!isCorrect && (
             <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">
               <BookOpenCheck className="size-3.5 shrink-0 text-primary" />

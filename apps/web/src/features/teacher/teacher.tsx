@@ -15,17 +15,16 @@ interface Message {
   sources?: TeacherReply["sources"];
   title?: string;
   glyph?: string;
+  entryId?: string;
   suggestions?: string[];
   streaming?: boolean;
 }
-
 let msgId = 0;
 const nextId = () => ++msgId;
 
 const GREETING =
   "Rahajeng! Aku Bedawang Nala, guru virtual CAKSARA. Tanya apa aja seputar aksara, bahasa, atau budaya Bali, jawabanmu selalu kutunjukkan sumbernya biar tidak asal.";
-
-export function TeacherChat() {
+export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) => void } = {}) {
   const [messages, setMessages] = useState<Message[]>([
     { id: nextId(), role: "guru", content: GREETING, full: GREETING },
   ]);
@@ -58,7 +57,7 @@ export function TeacherChat() {
           sources: reply.sources,
           title: reply.title,
           glyph: reply.glyph,
-          suggestions: reply.outside ? reply.suggestions : undefined,
+          entryId: reply.entryId,
           streaming: true,
         },
       ]);
@@ -145,7 +144,13 @@ export function TeacherChat() {
           className="mx-auto w-full flex-1 space-y-3 overflow-y-auto px-4 py-4 lg:px-6"
         >
           {messages.map((msg, idx) => (
-            <Bubble key={msg.id} msg={msg} index={idx} onSuggest={(s) => send(s)} />
+            <Bubble
+              key={msg.id}
+              msg={msg}
+              index={idx}
+              onSuggest={(s) => send(s)}
+              onOpenEntry={onOpenEntry}
+            />
           ))}
           {thinking && <ThinkingBubble />}
           {messages.some((m) => m.streaming) && !thinking && (
@@ -242,10 +247,12 @@ function Bubble({
   msg,
   index,
   onSuggest,
+  onOpenEntry,
 }: {
   msg: Message;
   index: number;
   onSuggest: (s: string) => void;
+  onOpenEntry?: (entryId: string) => void;
 }) {
   const isUser = msg.role === "user";
   const isDone = !msg.streaming;
@@ -291,6 +298,15 @@ function Bubble({
                 </li>
               ))}
             </ul>
+            {msg.entryId && onOpenEntry && (
+              <button
+                type="button"
+                onClick={() => onOpenEntry(msg.entryId as string)}
+                className="mt-1.5 text-[11px] font-semibold text-primary underline-offset-2 hover:underline"
+              >
+                Buka di Basis Pengetahuan →
+              </button>
+            )}
           </div>
         )}
 

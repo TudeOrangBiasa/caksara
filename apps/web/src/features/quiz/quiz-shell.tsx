@@ -38,6 +38,8 @@ interface QuizShellProps {
   initialHearts: number;
   onFinish: (score: { correct: number; total: number }, detail: QuizFinishDetail[]) => void;
   onBack: () => void;
+  /** Tautan balik kecil sourceRef → entri KB (deep-link /kb/:id bila rute ada). */
+  onOpenKbEntry?: (entryId: string) => void;
 }
 
 function QuestionBody({
@@ -178,7 +180,14 @@ function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void
   );
 }
 
-export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: QuizShellProps) {
+export function QuizShell({
+  quiz,
+  moduleId,
+  initialHearts,
+  onFinish,
+  onBack,
+  onOpenKbEntry,
+}: QuizShellProps) {
   const [session, dispatch] = useReducer(quizReducer, quiz, createSession);
   const [hearts, setHeartsState] = useState(initialHearts);
   const [gameOver, setGameOver] = useState(initialHearts <= 0);
@@ -385,6 +394,8 @@ export function QuizShell({ quiz, moduleId, initialHearts, onFinish, onBack }: Q
               current.explanation ??
               (current.sourceRef ? `Sumber: ${current.sourceRef}` : undefined)
             }
+            sourceRef={current.sourceRef}
+            onOpenKbEntry={onOpenKbEntry}
             onNext={handleNext}
             isLast={session.currentIndex === quiz.questions.length - 1}
           />
