@@ -29,9 +29,9 @@ const LEVEL_CHIP: Record<KbLevel, { active: string; dot: string; badge: string }
     badge: "bg-primary/10 text-primary",
   },
   "2": {
-    active: "bg-accent/15 text-accent border-accent/40",
+    active: "bg-accent/15 text-accent-foreground dark:text-accent border-accent/40",
     dot: "bg-accent",
-    badge: "bg-accent/15 text-accent",
+    badge: "bg-accent/15 text-accent-foreground dark:text-accent",
   },
   "3": {
     active: "bg-muted/80 text-muted-foreground border-border",
@@ -43,7 +43,7 @@ const LEVEL_CHIP: Record<KbLevel, { active: string; dot: string; badge: string }
 const CATEGORY_CHIP: Record<CategoryFilter, string> = {
   semua: "bg-primary/10 text-primary border-primary/30",
   wresastra: "bg-primary/10 text-primary border-primary/30",
-  kosakata: "bg-accent/15 text-accent border-accent/40",
+  kosakata: "bg-accent/15 text-accent-foreground dark:text-accent border-accent/40",
   budaya: "bg-success/10 text-success border-success/30",
 };
 

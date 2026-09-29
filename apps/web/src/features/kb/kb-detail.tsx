@@ -80,8 +80,18 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
             ))}
           </ul>
           <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-            Audio pelafalan: Mendeley Data CC BY 4.0 · teks Latin sementara bila audio belum
-            terkurasi (bukan TTS aksara).
+            Audio pelafalan: subset terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
+            (Mendeley Data, CC BY 4.0) —{" "}
+            <a
+              href="https://data.mendeley.com/datasets/6syjwz24v5/2"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              data.mendeley.com/datasets/6syjwz24v5/2
+            </a>{" "}
+            · teks Latin sementara bila audio belum terkurasi (bukan TTS aksara; audio Bali asli di
+            luar scope MVP).
           </p>
         </div>
 

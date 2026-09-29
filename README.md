@@ -49,3 +49,22 @@ Lihat `../CONTEXT.md` — Wresastra, Modul, Sesi Kuis, Hati, XP, Streak, KB Entr
 ## Deploy
 
 FE via Vercel (`vercel.json`), DB/Edge/Storage via Supabase. API key Gemini hanya di Edge Function.
+
+### Vercel env (FE — panduan, bukan secrets)
+
+FE hanya butuh 2 env publik (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` — anon key
+aman di bundle karena RLS mengunci per `auth.uid()`). Jangan taruh `GEMINI_API_KEY` di
+Vercel/FE — ia hanya hidup di Edge Function (`supabase functions deploy generate-quiz`
+++ `supabase secrets set GEMINI_API_KEY=...`).
+
+```bash
+cp apps/web/.env.example apps/web/.env  # isi 2 VITE_* dari Supabase Dashboard > Project Settings > API
+bunx vercel env add VITE_SUPABASE_URL preview production   # ulangi per env; production = deploy --prod
+bunx vercel env add VITE_SUPABASE_ANON_KEY preview production
+bunx vercel env ls            # verifikasi; redeploy agar env berlaku
+```
+
+E2E checklist juri (manual ≤15 mnt): Onboarding → Sesi Kuis (dengar_pilih badge Latin +
+atribusi) → Profil; 18 Wresastra tanpa tofu di 390/1280 + zoom 200%; `bun run check:secrets`
+hijau (no GEMINI di bundle); RLS A≠B via `supabase/rls/0001_rls.sql`; Edge 429 sebelum
+Gemini (lihat `x-quiz-source`); `bun run build` + Vercel preview hijau.
