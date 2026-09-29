@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Route } from "./+types/_index";
 import { BottomNav } from "../components/bottom-nav";
@@ -24,8 +24,16 @@ import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
-import { buildMixedQuiz, buildQuiz, buildTracerQuiz } from "../features/quiz/quiz-data";
+import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
+import { loadResume } from "../features/quiz/quiz-resume";
 import type { Quiz } from "../lib/zod/question";
+import {
+  buildMixedQuiz,
+  buildSessionQuiz,
+  getAdaptiveLevel,
+  nextAttemptSeed,
+  recordSessionLevel,
+} from "../features/quiz/quiz-data";
 import {
   applyOvernightReset,
   createAnonProfile,
@@ -41,6 +49,7 @@ type View =
   | { kind: "home" }
   | { kind: "detail"; mod: CourseModule }
   | { kind: "materi"; mod: CourseModule }
+  | { kind: "launch"; mod: CourseModule; isLatihan?: boolean }
   | { kind: "quiz"; mod: CourseModule; quiz: Quiz; isLatihan?: boolean }
   | { kind: "kb-detail"; entry: KbEntry }
   | { kind: "settings" }
@@ -52,9 +61,85 @@ type View =
       isLatihan?: boolean;
     };
 
+/**
+ * Sesi kuis modul (#23): 5 soal bervariasi 2+ tipe + dengar_pilih dari
+ * bank lokal. Edge generate-quiz (Gemini) diambil via useQuizLaunch saat
+ * sesi dibuka; bank lokal adalah fallback yang tidak pernah macet.
+ */
 function deriveQuizForMod(mod: CourseModule): Quiz {
-  if (mod.id === "mod_01") return buildTracerQuiz(mod.id);
-  return buildQuiz(mod.id);
+  return buildSessionQuiz(mod.id, { seed: nextAttemptSeed(mod.id) });
+}
+
+function QuizLaunchView({
+  mod,
+  onReady,
+  onBack,
+}: {
+  mod: CourseModule;
+  onReady: (quiz: Quiz) => void;
+  onBack: () => void;
+}) {
+  // Kunci resume-vs-Gemini: bila ada currentIndex tersimpan, jangan fetch
+  // Gemini baru — pakai set tersimpan (cache/fallback lokal saja).
+  const hasResume = useMemo(() => loadResume(mod.id) !== null, [mod.id]);
+  const [retryKey, setRetryKey] = useState(0);
+  const fallback = useMemo(
+    () =>
+      ({
+        localFallback: () => deriveQuizForMod(mod),
+        deferRemote: hasResume,
+        reloadToken: retryKey,
+      }) as const,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mod.id, hasResume, retryKey],
+  );
+  const launch = useQuizLaunch(mod.id, fallback);
+  useEffect(() => {
+    if (launch.status === "ready" && launch.quiz) onReady(launch.quiz);
+  }, [launch, onReady]);
+  if (launch.status === "ready" && !launch.quiz) {
+    return (
+      <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center md:max-w-xl">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Menyiapkan Sesi Kuis · Level {getAdaptiveLevel(mod.id)}
+        </p>
+        <p className="mt-2 text-lg font-bold tracking-tight">Kuis belum tersedia</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Sambungan atau bank soal modul ini sedang bermasalah. Coba lagi ya.
+        </p>
+        <button
+          type="button"
+          onClick={() => setRetryKey((k) => k + 1)}
+          className="mt-6 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+        >
+          Coba Lagi
+        </button>
+        <button
+          type="button"
+          onClick={onBack}
+          className="mt-2 text-sm font-semibold text-muted-foreground"
+        >
+          Kembali
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center md:max-w-xl">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        Menyiapkan Sesi Kuis · Level {getAdaptiveLevel(mod.id)}
+      </p>
+      <p className="mt-2 text-lg font-bold tracking-tight">Menyusun soal buat kamu…</p>
+      <AudioSourceNote />
+      <button
+        type="button"
+        onClick={onBack}
+        className="mt-6 rounded-full bg-card px-5 py-2.5 text-sm font-semibold"
+      >
+        Kembali
+      </button>
+    </div>
+  );
 }
 
 const MOD_LATIHAN: CourseModule = {
@@ -140,6 +225,7 @@ export default function Home() {
         onFinish={(score, detail) => {
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
+            recordSessionLevel(view.mod.id, score.correct, score.total);
           }
           void saveQuizSession(view.mod.id, detail, score);
           setView({ kind: "result", mod: view.mod, score, isLatihan: view.isLatihan });
@@ -174,7 +260,19 @@ export default function Home() {
       <ModuleMateri
         mod={view.mod}
         onBack={() => setView({ kind: "detail", mod: view.mod })}
-        onStart={() => setView({ kind: "quiz", mod: view.mod, quiz: deriveQuizForMod(view.mod) })}
+        onStart={() => setView({ kind: "launch", mod: view.mod })}
+      />
+    );
+  } else if (view.kind === "launch") {
+    content = (
+      <QuizLaunchView
+        mod={view.mod}
+        onReady={(quiz) =>
+          setView({ kind: "quiz", mod: view.mod, quiz, isLatihan: view.isLatihan })
+        }
+        onBack={() =>
+          view.isLatihan ? setView({ kind: "home" }) : setView({ kind: "detail", mod: view.mod })
+        }
       />
     );
   } else if (navTab === "beranda") {

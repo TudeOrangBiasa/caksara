@@ -51,3 +51,10 @@ export function notifyModuleLocked() {
     duration: 3500,
   });
 }
+/** #23: Edge/Gemini gagal → sesi jalan dari bank statis lokal + cache. */
+export function notifyQuizFallback() {
+  toast.info("Mode offline kuis", {
+    description: "Soal dari bank lokal + cache. Coba lagi nanti untuk soal Gemini baru.",
+    duration: 4000,
+  });
+}

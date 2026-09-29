@@ -29,9 +29,16 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
     });
   }
 
+  // Debt: drag-and-drop sesungguhnya belum ada — tap-to-place ini jalur
+  // utama (tap usable, aria jelas). Jangan implementasi drag di sini.
   return (
     <div className="space-y-4">
-      <div className="min-h-20 rounded-lg border border-dashed p-3">
+      <div
+        className="min-h-20 rounded-lg border border-dashed p-3"
+        role="status"
+        aria-live="polite"
+        aria-label="Susunan jawaban sementara"
+      >
         {draft.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground">
             Susun aksara sesuai urutan yang benar
@@ -50,13 +57,18 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
         )}
       </div>
 
-      <div className="flex flex-wrap justify-center gap-2">
+      <div
+        className="flex flex-wrap justify-center gap-2"
+        role="group"
+        aria-label="Pilihan ubin aksara"
+      >
         {pool.map((tile, i) => (
           <button
             key={`${tile}-${i}`}
             type="button"
             disabled={disabled}
             onClick={() => take(i)}
+            aria-label={`Pilih ubin ${tile}`}
             className="tile-duo font-balinese rounded-xl border-2 border-border bg-card px-3 py-2 text-2xl transition-all duration-150 ease-out hover:border-cta/60 hover:bg-muted/50 focus-visible:border-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
           >
             {tile}
