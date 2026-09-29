@@ -79,6 +79,24 @@ export function enqueuePendingSession(input: {
   return true;
 }
 
+/**
+ * Keputusan buffer seusai kuis: entri hanya diantre bila ada bagian yang
+ * belum terkirim. Sukses penuh (sesi + progres terkirim) tidak di-buffer —
+ * entri yatim semacam itu langsung di-drop saat flush dan memicu toast
+ * offline palsu. Skor inkonsisten (bug pemanggil, bukan offline) juga tidak
+ * di-buffer. Kembalikan false bila pemanggil harus return awal (tak perlu
+ * enqueue + notify).
+ */
+export function shouldBufferAfterFinish(input: {
+  sessionOk: boolean;
+  progressOk: boolean;
+  sessionValidationError: boolean;
+}): boolean {
+  if (input.sessionOk && input.progressOk) return false;
+  if (input.sessionValidationError) return false;
+  return true;
+}
+
 export function readPendingSessions(): PendingSession[] {
   return prune(readAll());
 }

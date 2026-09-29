@@ -296,3 +296,49 @@ describe("syncOnBackOnline — KB independen dari buffer", () => {
     expect(out).toEqual({ attempted: 1, sent: 1, remaining: 0 });
   });
 });
+
+describe("shouldBufferAfterFinish — guard antrean seusai kuis", () => {
+  test("sukses penuh (sesi + progres terkirim) → tanpa enqueue, tanpa notify", () => {
+    let notified = false;
+    const should = pending.shouldBufferAfterFinish({
+      sessionOk: true,
+      progressOk: true,
+      sessionValidationError: false,
+    });
+    // Cerminkan jalur pemanggil di route: hanya enqueue + notify bila guard lolos.
+    if (should) {
+      if (
+        pending.enqueuePendingSession({
+          moduleId: "mod_01",
+          answers,
+          score,
+          sessionSent: true,
+          progressSent: true,
+        })
+      ) {
+        notified = true;
+      }
+    }
+    expect(should).toBe(false);
+    expect(pending.pendingSessionCount()).toBe(0);
+    expect(notified).toBe(false);
+  });
+
+  test("parsial (salah satu gagal) → buffer dengan flag terkirim", () => {
+    const should = pending.shouldBufferAfterFinish({
+      sessionOk: true,
+      progressOk: false,
+      sessionValidationError: false,
+    });
+    expect(should).toBe(true);
+  });
+
+  test("skor inkonsisten (validation) → jangan buffer", () => {
+    const should = pending.shouldBufferAfterFinish({
+      sessionOk: true,
+      progressOk: false,
+      sessionValidationError: true,
+    });
+    expect(should).toBe(false);
+  });
+});

@@ -27,7 +27,7 @@ import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { saveAksaraProgress } from "../features/quiz/quiz-progress";
-import { enqueuePendingSession } from "../features/quiz/quiz-pending-sync";
+import { enqueuePendingSession, shouldBufferAfterFinish } from "../features/quiz/quiz-pending-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
@@ -279,10 +279,14 @@ export default function Home() {
               sessionRes.status === "fulfilled" &&
               (sessionRes.value.saved || sessionRes.value.reason === "validation");
             const progressOk = progressRes.status === "fulfilled" && progressRes.value.saved;
+            const sessionValidationError =
+              sessionRes.status === "fulfilled" &&
+              !sessionRes.value.saved &&
+              sessionRes.value.reason === "validation";
+            // Sukses penuh = tak ada yang perlu di-buffer: jangan antre,
+            // jangan toast offline (entri yatim langsung di-drop saat flush).
             // Skor inkonsisten = bug pemanggil, bukan offline: jangan antre.
-            if (sessionRes.status === "fulfilled" && !sessionRes.value.saved) {
-              if (sessionRes.value.reason === "validation") return;
-            }
+            if (!shouldBufferAfterFinish({ sessionOk, progressOk, sessionValidationError })) return;
             if (
               enqueuePendingSession({
                 moduleId: view.mod.id,
