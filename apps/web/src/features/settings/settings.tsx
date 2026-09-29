@@ -398,6 +398,13 @@ function AboutSection() {
           Web edukasi aksara Bali — pola Duo, rasa Caksara.
         </p>
         <p className="mt-1 text-xs text-muted-foreground">Audio pelafalan: Mendeley CC BY 4.0.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Avatar IP oleh s1dashu (MIT) via ipaslogo.com —{" "}
+          <a href="/assets/ip-as-logo-LICENSE" className="underline underline-offset-2">
+            lihat lisensi
+          </a>
+          .
+        </p>
       </div>
       {(
         [
