@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MAX_HEARTS } from "../game-rules";
+
 export const profileNameSchema = z
   .string()
   .trim()
@@ -31,17 +33,40 @@ export const profileAvatarSchema = z.union([
 
 export type ProfileAvatar = z.infer<typeof profileAvatarSchema>;
 
+export const aksaraStatsSchema = z
+  .record(
+    z.string(),
+    z.object({
+      correct: z.number().int().nonnegative(),
+      total: z.number().int().nonnegative(),
+    }),
+  )
+  .superRefine((stats, ctx) => {
+    for (const [aksaraId, s] of Object.entries(stats)) {
+      if (s.correct > s.total) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Hitungan ${aksaraId} tidak sah: benar melebihi total.`,
+          path: [aksaraId, "correct"],
+        });
+      }
+    }
+  });
+
 export const userProfileSchema = z.object({
   id: z.string().min(1),
   isAnon: z.boolean(),
   name: z.string().min(1).max(20),
   xp: z.number().int().nonnegative(),
   streak: z.number().int().nonnegative(),
-  hearts: z.number().int().min(0).max(5),
+  hearts: z.number().int().min(0).max(MAX_HEARTS),
   lastActiveDate: z.string().optional(),
   heartsRefilledAt: z.string().optional(),
   mastery: z.record(z.string(), z.enum(["belum", "dipahami", "ahli"])).optional(),
+  aksaraStats: aksaraStatsSchema.optional(),
   avatar: profileAvatarSchema.optional(),
 });
+
+export type AksaraStats = z.infer<typeof aksaraStatsSchema>;
 
 export type UserProfile = z.infer<typeof userProfileSchema>;

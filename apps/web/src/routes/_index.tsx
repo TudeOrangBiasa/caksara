@@ -23,7 +23,9 @@ import type { CourseModule } from "../features/module/module-data";
 import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
+import { saveAksaraProgress } from "../features/quiz/quiz-progress";
 import { QuizResult } from "../features/quiz/quiz-result";
+import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
 import { loadResume } from "../features/quiz/quiz-resume";
 import type { Quiz } from "../lib/zod/question";
@@ -38,8 +40,11 @@ import {
   applyOvernightReset,
   createAnonProfile,
   loadProfile,
+  recordAnswerStats,
   reconcileProfileId,
+  WRESASTRA_IDS,
 } from "../lib/profile-store";
+import { MAX_HEARTS } from "../lib/game-rules";
 import { notifyStreakReset } from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
@@ -59,8 +64,8 @@ type View =
       mod: CourseModule;
       score: { correct: number; total: number };
       isLatihan?: boolean;
+      tidbit: string;
     };
-
 /**
  * Sesi kuis modul (#23): 5 soal bervariasi 2+ tipe + dengar_pilih dari
  * bank lokal. Edge generate-quiz (Gemini) diambil via useQuizLaunch saat
@@ -196,8 +201,6 @@ export default function Home() {
     return <OnboardingGate onComplete={handleComplete} />;
   }
 
-  const overlay = view.kind !== "home";
-
   let content: React.ReactNode;
   if (view.kind === "result") {
     content = (
@@ -205,6 +208,7 @@ export default function Home() {
         mod={view.mod}
         score={view.score}
         isLatihan={view.isLatihan}
+        tidbit={view.tidbit}
         onRetry={() =>
           setView({
             kind: "quiz",
@@ -221,14 +225,22 @@ export default function Home() {
       <QuizShell
         quiz={view.quiz}
         moduleId={view.mod.id}
-        initialHearts={loadProfile()?.hearts ?? 5}
+        initialHearts={loadProfile()?.hearts ?? MAX_HEARTS}
         onFinish={(score, detail) => {
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
             recordSessionLevel(view.mod.id, score.correct, score.total);
           }
+          recordAnswerStats(detail);
           void saveQuizSession(view.mod.id, detail, score);
-          setView({ kind: "result", mod: view.mod, score, isLatihan: view.isLatihan });
+          void saveAksaraProgress(detail, WRESASTRA_IDS);
+          setView({
+            kind: "result",
+            mod: view.mod,
+            score,
+            isLatihan: view.isLatihan,
+            tidbit: pickTidbit(),
+          });
         }}
         onBack={() =>
           view.isLatihan ? setView({ kind: "home" }) : setView({ kind: "detail", mod: view.mod })
@@ -332,9 +344,10 @@ export default function Home() {
     );
   }
 
+  const overlay = view.kind !== "home";
+
   return <HomeShell overlay={overlay} navTab={navTab} onSelect={setNavTab} content={content} />;
 }
-
 function HomeShell({
   overlay,
   navTab,

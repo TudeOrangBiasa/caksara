@@ -4,11 +4,13 @@ import { ensureAnonSession, getSupabase } from "../../lib/supabase";
 export interface QuizAnswerDetail {
   questionIndex: number;
   correct: boolean;
+  aksaraId?: string;
 }
 
 const quizAnswerDetailSchema = z.object({
   questionIndex: z.number().int().nonnegative(),
   correct: z.boolean(),
+  aksaraId: z.string().min(1).optional(),
 });
 
 const saveQuizSessionInputSchema = z.object({
@@ -26,7 +28,6 @@ export type SaveQuizSessionReason =
   | "no-backend"
   | "no-session"
   | "server";
-
 export type SaveQuizSessionResult =
   | { saved: true }
   | { saved: false; reason: SaveQuizSessionReason };
@@ -75,6 +76,7 @@ export async function saveQuizSession(
       validAnswers.map((a) => ({
         session_id: sessionId,
         question_idx: a.questionIndex,
+        aksara_id: a.aksaraId ?? null,
         correct: a.correct,
       })),
     );
