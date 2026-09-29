@@ -22,6 +22,7 @@ async function pushNow(profile: UserProfile): Promise<void> {
       streak: profile.streak,
       last_active_date: profile.lastActiveDate ?? null,
       hearts: profile.hearts,
+      hearts_refilled_at: profile.heartsRefilledAt ?? null,
     },
     { onConflict: "id" },
   );

@@ -157,11 +157,24 @@ describe("applyOvernightReset + updateStreak (V9)", () => {
 });
 
 describe("debounce tulis (V9, anti-banjir)", () => {
-  test("tulis ditunda 500ms lalu flush menulis sekaligus", () => {
+  test("tulis XP/Hati beruntun didebounce, flush menulis sekaligus", () => {
     store.createAnonProfile("Debounce");
+    store.flushProfileWrites();
+    fakeStorage.store.clear();
+    for (let i = 0; i < 5; i += 1) store.addXp(10);
     expect(fakeStorage.store.has(STORAGE_KEY)).toBe(false);
     store.flushProfileWrites();
     expect(fakeStorage.store.has(STORAGE_KEY)).toBe(true);
+    expect(store.loadProfile()?.xp).toBe(50);
+  });
+
+  test("refill cap tanggal walau Hati sudah penuh", () => {
+    const today = store.witaTodayStr();
+    const yesterdayMs = Date.parse(`${today}T00:00:00Z`) - 24 * 3600 * 1000 + 8 * 3600 * 1000;
+    const yesterday = store.witaTodayStr(yesterdayMs);
+    seed(baseProfile({ hearts: 5, heartsRefilledAt: yesterday }));
+    expect(store.refillHearts()).toBe(false);
+    expect(store.loadProfile()?.heartsRefilledAt).toBe(today);
   });
 });
 

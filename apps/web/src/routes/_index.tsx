@@ -47,10 +47,16 @@ import {
   loadProfile,
   recordAnswerStats,
   reconcileProfileId,
+  refillHearts,
   WRESASTRA_IDS,
 } from "../lib/profile-store";
 import { MAX_HEARTS } from "../lib/game-rules";
-import { notifyQuizFallback, notifyRateLimited, notifyStreakReset } from "../lib/notify";
+import {
+  notifyHeartsRefilled,
+  notifyQuizFallback,
+  notifyRateLimited,
+  notifyStreakReset,
+} from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
@@ -392,9 +398,9 @@ function HomeShell({
   content: React.ReactNode;
 }) {
   const isDesktop = useIsDesktop();
-
   useEffect(() => {
     if (applyOvernightReset()) notifyStreakReset();
+    if (refillHearts()) notifyHeartsRefilled();
   }, []);
 
   return (
