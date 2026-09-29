@@ -20,6 +20,7 @@
 .font-balinese {
   font-family: "Noto Sans Balinese", var(--font-balinese), sans-serif;
 }
+
 :root {
   --wresastra-size: 24px;
 }

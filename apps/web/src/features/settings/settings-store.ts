@@ -11,7 +11,7 @@ export const WRESASTRA_FONT_SIZES = [20, 24, 32] as const;
 export type WresastraFontSize = (typeof WRESASTRA_FONT_SIZES)[number];
 
 export const appSettingsSchema = z.object({
-  wresastraFontSize: z.union([z.literal(20), z.literal(24), z.literal(32)]).default(24),
+  wresastraFontSize: z.enum(WRESASTRA_FONT_SIZES).default(WRESASTRA_FONT_SIZES[1]),
   soundEnabled: z.boolean().default(true),
 });
 export type AppSettings = z.infer<typeof appSettingsSchema>;
@@ -19,7 +19,7 @@ export type AppSettings = z.infer<typeof appSettingsSchema>;
 const STORAGE_KEY = "caksara.settings.v1";
 
 const DEFAULT_SETTINGS: AppSettings = {
-  wresastraFontSize: 24,
+  wresastraFontSize: WRESASTRA_FONT_SIZES[1],
   soundEnabled: true,
 };
 
@@ -70,7 +70,7 @@ export function subscribeSettings(listener: () => void): () => void {
 }
 
 /** Terapkan ukuran ke variabel CSS global agar permukaan baca ikut membesar. */
-export function applyWresastraFontSize(size: number): void {
+export function applyWresastraFontSize(size: WresastraFontSize): void {
   if (typeof document === "undefined") return;
   document.documentElement.style.setProperty("--wresastra-size", `${size}px`);
 }

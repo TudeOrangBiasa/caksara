@@ -18,7 +18,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { useTheme } from "../../components/theme-provider";
-import { playCue } from "../../lib/sound";
+import { playPreview } from "../../lib/sound";
 import { notifyProgressReset } from "../../lib/notify";
 import {
   initSettings,
@@ -127,7 +127,7 @@ function MenuList({
 }
 
 export function SettingsPage({ onBack }: { onBack: () => void }) {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, theme: themeSetting, resolvedTheme } = useTheme();
   const [settings, setSettingsState] = React.useState(loadSettings);
   const [section, setSection] = React.useState<SettingsSection | null>(null);
 
@@ -137,8 +137,10 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
     return subscribeSettings(() => setSettingsState(loadSettings()));
   }, []);
 
+  // Radio mencerminkan setting ("system" tetap "system"); preview memakai hasil resolved.
   const theme: ThemeMode =
-    resolvedTheme === "light" || resolvedTheme === "dark" ? resolvedTheme : "system";
+    themeSetting === "light" || themeSetting === "dark" ? themeSetting : "system";
+  const preview: "light" | "dark" = resolvedTheme === "dark" ? "dark" : "light";
 
   function pickTheme(next: ThemeMode) {
     if (next === "system") setTheme("system");
@@ -174,7 +176,9 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto px-4 py-5 lg:[&>*]:mx-auto lg:[&>*]:w-full lg:[&>*]:max-w-3xl">
         {section === null && <MenuList onSelect={setSection} summary={summary} />}
         {section === "profil" && <ProfileSection />}
-        {section === "tampilan" && <ThemeSection theme={theme} pickTheme={pickTheme} />}
+        {section === "tampilan" && (
+          <ThemeSection theme={theme} preview={preview} pickTheme={pickTheme} />
+        )}
         {section === "aksara" && <AksaraSection fontSize={settings.wresastraFontSize} />}
         {section === "suara" && <SoundSection enabled={settings.soundEnabled} />}
         {section === "data" && <DataSection />}
@@ -186,9 +190,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
 function ThemeSection({
   theme,
+  preview,
   pickTheme,
 }: {
   theme: ThemeMode;
+  preview: "light" | "dark";
   pickTheme: (next: ThemeMode) => void;
 }) {
   return (
@@ -237,7 +243,7 @@ function ThemeSection({
           <Bedawang mood="senang" className="size-10 shrink-0" />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold">Bedawang Nala</p>
-            <p className="text-xs opacity-80">Pratinjau langsung tema {theme}</p>
+            <p className="text-xs opacity-80">Pratinjau langsung tema {preview}</p>
           </div>
         </div>
         <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -348,7 +354,7 @@ function SoundSection({ enabled }: { enabled: boolean }) {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => playCue("success")}
+          onClick={() => playPreview("success")}
           className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground"
         >
           Coba

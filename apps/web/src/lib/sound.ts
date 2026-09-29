@@ -28,6 +28,19 @@ export function playCue(cue: SoundCue): void {
   }
 }
 
+/**
+ * Pratinjau bunyi tombol Coba di Pengaturan: sengaja bypass toggle suara
+ * agar user dengar contoh walau efek sedang off.
+ */
+export function playPreview(cue: SoundCue): void {
+  if (typeof window === "undefined") return;
+  try {
+    play(cue);
+  } catch {
+    // Audio tidak tersedia/diblokir: diam, jangan ganggu belajar.
+  }
+}
+
 /** Fanfare lulus kuis: 3 lapis nada (tiap lapis cek toggle lagi). */
 export function playFanfare(): void {
   if (typeof window === "undefined") return;
