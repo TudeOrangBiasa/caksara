@@ -50,6 +50,16 @@ export function QuizResult({
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
         Hasil Kuis
       </p>
+      <h1 className="mt-1 text-center text-[28px] leading-tight font-extrabold tracking-tight md:text-[32px]">
+        {isLatihan
+          ? passed
+            ? "Mantap, latihan beres!"
+            : "Belum lulus, semangat ya"
+          : passed
+            ? "Mantap, modul beres!"
+            : "Belum lulus, semangat ya"}
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">{mod.title}</p>
       {level !== undefined && (
         <p
           role="status"
