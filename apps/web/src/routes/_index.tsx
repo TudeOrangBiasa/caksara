@@ -32,6 +32,7 @@ import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
 import type { QuizNotice } from "../features/quiz/quiz-generate";
 import { loadResume } from "../features/quiz/quiz-resume";
+import type { Quiz } from "../lib/zod/question";
 import { Button } from "@caksara/ui/components/button";
 import {
   buildMixedQuiz,
@@ -91,7 +92,7 @@ function QuizLaunchView({
   // Kunci resume-vs-Gemini: bila ada currentIndex tersimpan, jangan fetch
   // Gemini baru — pakai set tersimpan (cache/fallback lokal saja).
   const hasResume = useMemo(() => loadResume(mod.id) !== null, [mod.id]);
-  // Toast cukup sekali per pembuka sesi: flag di-reset tiap retryKey berubah.
+  const [retryKey, setRetryKey] = useState(0);
   const noticeKey = useRef<QuizNotice | null>(null);
   const fallback = useMemo(
     () => ({
