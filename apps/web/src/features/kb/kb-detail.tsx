@@ -33,7 +33,9 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
 
       <div className="hero-texture surface-raised rounded-3xl bg-primary px-5 py-8 text-center text-primary-foreground">
         {entry.glyph ? (
-          <p className="font-balinese text-6xl leading-none">{entry.glyph}</p>
+          <p lang="ban" className="font-balinese text-6xl leading-none">
+            {entry.glyph}
+          </p>
         ) : (
           <p className="text-5xl font-bold leading-none">{entry.title.slice(0, 1)}</p>
         )}
@@ -41,6 +43,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
           {entry.title}
         </h1>
         {entry.latin && <p className="mt-1 text-sm text-white/80">{entry.latin}</p>}
+        <p className="mt-2 text-[11px] font-medium text-white/70">ID {entry.id}</p>
       </div>
 
       <div className="space-y-6 lg:max-w-3xl">
@@ -57,7 +60,8 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
             Sumber rujukan
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Isi ini dipakai sebagai dasar soal kuis dan jawaban Guru Virtual, jadi bisa ditelusuri.
+            Entri {entry.id} · dipakai sebagai dasar soal kuis dan jawaban Guru Virtual, jadi bisa
+            ditelusuri balik dari Sesi & Guru ke entri ini.
           </p>
           <ul className="mt-3 space-y-2">
             {entry.sources.map((s, i) => (
@@ -76,11 +80,12 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
             ))}
           </ul>
           <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-            Audio pelafalan: Mendeley CC BY 4.0 · Latin sementara bila belum terkurasi.
+            Audio pelafalan: Mendeley Data CC BY 4.0 · teks Latin sementara bila audio belum
+            terkurasi (bukan TTS aksara).
           </p>
         </div>
 
-        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-success/10 px-3 py-2.5 text-xs leading-relaxed text-success">
+        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-success/10 px-3 py-2.5 text-xs leading-relaxed text-cta">
           <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
           Soal tidak diracik sembarangan. Semua konten dirujuk ke sumber resmi biar akurat &amp;
           bisa dipercaya.

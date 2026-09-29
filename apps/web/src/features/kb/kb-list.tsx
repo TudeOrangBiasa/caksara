@@ -1,4 +1,4 @@
-import { BookOpen, FilterX, Search } from "lucide-react";
+import { BookOpen, FilterX, RefreshCw, Search, WifiOff } from "lucide-react";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
@@ -6,8 +6,11 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { EmptyState } from "../../components/empty-state";
-import { KB_CATEGORY_META, KB_ENTRIES, kbLevelSchema } from "./kb-data";
+import { useOnlineStatus } from "../../lib/use-online-status";
+import { kbLevelSchema, KB_CATEGORY_META } from "./kb-data";
 import type { KbCategory, KbEntry, KbLevel } from "./kb-data";
+import { kbMatchesFilter } from "./kb-filter";
+import { fetchKbEntries } from "./kb-source";
 
 type CategoryFilter = "semua" | KbCategory;
 type LevelFilter = "semua" | KbLevel;
@@ -48,26 +51,38 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
   const [query, setQuery] = useState(initialQuery ?? "");
   const [category, setCategory] = useState<CategoryFilter>("semua");
   const [level, setLevel] = useState<LevelFilter>("semua");
+  const [entries, setEntries] = useState<KbEntry[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+  const online = useOnlineStatus();
   const deferred = useDeferredValue(query.trim().toLowerCase());
 
   useEffect(() => {
     if (initialQuery !== undefined) setQuery(initialQuery);
   }, [initialQuery]);
 
-  const filtered = KB_ENTRIES.filter((e) => {
-    if (category !== "semua" && e.category !== category) return false;
-    if (level !== "semua" && e.level !== level) return false;
-    if (deferred) {
-      const hay = `${e.title} ${e.latin ?? ""} ${e.body}`.toLowerCase();
-      if (!hay.includes(deferred)) return false;
-    }
-    return true;
-  });
+  useEffect(() => {
+    let cancelled = false;
+    setEntries(null);
+    setLoadError(false);
+    void fetchKbEntries({}).then((res) => {
+      if (cancelled) return;
+      setEntries(res.entries);
+      setLoadError(res.loadError);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryKey]);
+
+  const list = entries ?? [];
+  const filtered = list.filter((e) => kbMatchesFilter(e, { category, level, query: deferred }));
 
   const hasActiveFilter = category !== "semua" || level !== "semua" || deferred !== "";
 
-  const showNoResults = filtered.length === 0 && hasActiveFilter;
-  const showEmpty = filtered.length === 0 && !hasActiveFilter;
+  const showNoResults = entries !== null && filtered.length === 0 && hasActiveFilter;
+  const showEmpty = entries !== null && filtered.length === 0 && !hasActiveFilter;
+  const loading = entries === null;
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 py-5 md:max-w-2xl lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-[320px_1fr] lg:gap-10 lg:items-start">
@@ -87,7 +102,7 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
                 Kamus & Pustaka
               </p>
               <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-md">
-                {KB_ENTRIES.length} Entri
+                {loading ? "Memuat…" : `${list.length} Entri`}
               </span>
             </div>
             <h1 className="text-[28px] font-extrabold tracking-tight text-white md:text-[32px] leading-tight">
@@ -138,18 +153,19 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
                 Tingkat Kesulitan
               </p>
               <div className="flex flex-wrap gap-2">
-                <LevelChipFilter active={level === "semua"} onClick={() => setLevel("semua")}>
+                <Chip active={level === "semua"} onClick={() => setLevel("semua")}>
                   Semua Level
-                </LevelChipFilter>
+                </Chip>
                 {kbLevelSchema.options.map((l) => (
-                  <LevelChipFilter
+                  <Chip
                     key={l}
                     active={level === l}
                     onClick={() => setLevel(l)}
-                    level={l}
+                    activeClass={LEVEL_CHIP[l].active}
+                    dotClass={LEVEL_CHIP[l].dot}
                   >
                     {LEVEL_LABEL[l]}
-                  </LevelChipFilter>
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -159,7 +175,33 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
 
       {/* Right Column (Grid of Items) */}
       <div className="lg:min-h-[80vh] lg:pb-12 mt-6 lg:mt-0">
-        {showNoResults ? (
+        {!loading && (loadError || !online) && (
+          <KbNotice
+            tone={!online ? "offline" : "server"}
+            onRetry={() => setRetryKey((k) => k + 1)}
+          />
+        )}
+        {loading ? (
+          <div className="space-y-10" aria-busy="true" aria-label="Memuat Basis Pengetahuan">
+            {(Object.keys(KB_CATEGORY_META) as KbCategory[]).slice(0, 2).map((cat) => (
+              <section key={cat} aria-hidden="true">
+                <div className="mb-4 h-6 w-40 animate-pulse rounded-full bg-muted" />
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center gap-1.5 rounded-3xl bg-card px-2 py-3.5"
+                    >
+                      <div className="size-10 animate-pulse rounded-2xl bg-muted" />
+                      <div className="h-3 w-16 animate-pulse rounded-full bg-muted" />
+                      <div className="h-3 w-10 animate-pulse rounded-full bg-muted" />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        ) : showNoResults ? (
           <EmptyState
             illustration={<FilterX className="size-7" />}
             title="Tidak ketemu"
@@ -235,15 +277,25 @@ function KbCard({ entry, onOpen }: { entry: KbEntry; onOpen: (e: KbEntry) => voi
     <button
       type="button"
       onClick={() => onOpen(entry)}
-      className="flex flex-col items-center gap-1.5 rounded-3xl bg-card px-2 py-3.5 text-center shadow-sm transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring"
+      aria-label={`${entry.title}, ${LEVEL_LABEL[entry.level]}`}
+      className="relative flex flex-col items-center gap-1.5 rounded-3xl bg-card px-2 py-3.5 text-center shadow-sm transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring"
     >
+      <span className="absolute top-2 right-2">
+        <LevelBadge level={entry.level} />
+      </span>
       {entry.glyph ? (
         entry.category === "wresastra" ? (
-          <span className="flex size-10 items-center justify-center font-balinese text-2xl leading-none text-primary">
+          <span
+            lang="ban"
+            className="flex size-10 items-center justify-center font-balinese text-2xl leading-none text-primary"
+          >
             {entry.glyph}
           </span>
         ) : (
-          <span className="flex min-h-10 w-full items-center justify-center px-1 text-center font-balinese text-base leading-snug text-primary line-clamp-2">
+          <span
+            lang="ban"
+            className="flex min-h-10 w-full items-center justify-center px-1 text-center font-balinese text-base leading-snug text-primary line-clamp-2"
+          >
             {entry.glyph}
           </span>
         )
@@ -254,7 +306,7 @@ function KbCard({ entry, onOpen }: { entry: KbEntry; onOpen: (e: KbEntry) => voi
       )}
       <span className="truncate text-xs font-medium">{entry.title}</span>
       <span className="text-[11px] text-muted-foreground">
-        {entry.category === "wresastra" ? entry.latin : `Level ${entry.level}`}
+        {entry.category === "wresastra" ? entry.latin : KB_CATEGORY_META[entry.category].label}
       </span>
     </button>
   );
@@ -273,44 +325,60 @@ export function LevelBadge({ level }: { level: KbLevel }) {
   );
 }
 
+function KbNotice({ tone, onRetry }: { tone: "offline" | "server"; onRetry: () => void }) {
+  const offline = tone === "offline";
+  const Icon = offline ? WifiOff : RefreshCw;
+  return (
+    <div
+      role="alert"
+      className={
+        offline
+          ? "mb-4 flex items-center gap-3 rounded-3xl bg-destructive/10 px-4 py-3"
+          : "mb-4 flex items-center gap-3 rounded-3xl bg-warning/15 px-4 py-3"
+      }
+    >
+      <span
+        className={
+          offline
+            ? "flex size-9 shrink-0 items-center justify-center rounded-full bg-destructive text-white"
+            : "flex size-9 shrink-0 items-center justify-center rounded-full bg-warning text-white"
+        }
+      >
+        <Icon className="size-4" />
+      </span>
+      <p className="min-w-0 flex-1 text-xs leading-relaxed">
+        <span className="block font-bold">
+          {offline ? "Kamu sedang offline" : "KB server belum bisa dimuat"}
+        </span>
+        <span className="text-muted-foreground">
+          {offline
+            ? "Menampilkan materi tersimpan. Sambungkan internet lalu muat ulang."
+            : "Menampilkan materi tersimpan di perangkat. Coba muat ulang."}
+        </span>
+      </p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="shrink-0 rounded-full bg-card px-3 py-1.5 text-xs font-semibold transition-transform active:scale-95"
+      >
+        Coba lagi
+      </button>
+    </div>
+  );
+}
+
 function Chip({
   children,
   active,
   onClick,
   activeClass,
+  dotClass,
 }: {
   children: React.ReactNode;
   active: boolean;
   onClick: () => void;
   activeClass?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn(
-        "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-        active
-          ? (activeClass ?? "bg-primary/10 text-primary border-primary/30")
-          : "border-border bg-card text-muted-foreground",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function LevelChipFilter({
-  children,
-  active,
-  onClick,
-  level,
-}: {
-  children: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-  level?: KbLevel;
+  dotClass?: string;
 }) {
   return (
     <button
@@ -320,13 +388,11 @@ function LevelChipFilter({
       className={cn(
         "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
         active
-          ? level
-            ? LEVEL_CHIP[level].active
-            : "bg-primary/10 text-primary border-primary/30"
+          ? (activeClass ?? "bg-primary/10 text-primary border-primary/30")
           : "border-border bg-card text-muted-foreground",
       )}
     >
-      {level && <span className={cn("size-1.5 rounded-full", LEVEL_CHIP[level].dot)} />}
+      {dotClass && <span className={cn("size-1.5 rounded-full", dotClass)} />}
       {children}
     </button>
   );
