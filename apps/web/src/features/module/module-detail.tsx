@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronsRight, Clock, ListChecks, Play } from "lucide-react";
 
 import type { CourseModule } from "./module-data";
+import { ModuleLevelBadge } from "./module-level-badge";
 
 export function ModuleDetail({
   mod,
@@ -78,6 +79,7 @@ export function ModuleDetail({
 
       {/* Right Column (Sticky Sidebar on Desktop) */}
       <div className="mt-8 lg:mt-0 lg:sticky lg:top-24 flex flex-col gap-5 bg-card lg:p-6 lg:rounded-[1.75rem] lg:shadow-sm lg:ring-1 lg:ring-border/50">
+        <ModuleLevelBadge moduleId={mod.id} />
         <div className="flex flex-col gap-3 mb-2">
           <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
             <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">

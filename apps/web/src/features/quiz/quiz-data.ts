@@ -385,11 +385,21 @@ export function getAdaptiveLevel(moduleId: string): number {
   return Math.min(3, Math.max(1, Math.round(stored)));
 }
 
-export function recordSessionLevel(moduleId: string, correct: number, total: number): void {
+export function recordSessionLevel(
+  moduleId: string,
+  correct: number,
+  total: number,
+  wrongTopics: readonly string[] = [],
+): void {
   if (total <= 0) return;
   const rate = correct / total;
   const prev = getAdaptiveLevel(moduleId);
-  const next = rate < 0.4 ? Math.max(1, prev - 1) : rate >= 0.8 ? Math.min(3, prev + 1) : prev;
+  // #33 V11a: salah terus di aksara X menurunkan level walau skor sedang.
+  // Skor lancar (≥0.8) selalu naik; di bawah itu topik salah memperlebar
+  // zona turun (bukan sekadar anjlok <0.4). Skor 5/5 tak punya topik salah.
+  const hasWrong = wrongTopics.length > 0;
+  const next =
+    rate >= 0.8 ? Math.min(3, prev + 1) : rate < 0.4 || hasWrong ? Math.max(1, prev - 1) : prev;
   writeNum(LEVEL_KEY, moduleId, next);
 }
 

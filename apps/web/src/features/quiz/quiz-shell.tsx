@@ -6,6 +6,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { EmptyState } from "../../components/empty-state";
 import { Bedawang } from "../../components/bedawang";
+import { SessionLevelBadge } from "./quiz-level-badge";
 import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { MAX_HEARTS, XP_PER_CORRECT } from "../../lib/game-rules";
 import { notifyHeartsRefilled } from "../../lib/notify";
@@ -35,6 +36,8 @@ export interface QuizFinishDetail {
 interface QuizShellProps {
   quiz: Quiz;
   moduleId: string;
+  /** Level adaptif sesi ini (#33 V11a) — tampil sebagai badge di header. */
+  level?: number;
   initialHearts: number;
   onFinish: (score: { correct: number; total: number }, detail: QuizFinishDetail[]) => void;
   onBack: () => void;
@@ -183,6 +186,7 @@ function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void
 export function QuizShell({
   quiz,
   moduleId,
+  level,
   initialHearts,
   onFinish,
   onBack,
@@ -377,9 +381,12 @@ export function QuizShell({
       </div>
 
       <div className="flex-1">
-        <p className="mb-1 text-xs text-muted-foreground">
-          Soal {session.currentIndex + 1} / {quiz.questions.length}
-        </p>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <p className="text-xs text-muted-foreground">
+            Soal {session.currentIndex + 1} / {quiz.questions.length}
+          </p>
+          <SessionLevelBadge level={level} />
+        </div>
         {current.type !== "kenali_visual" && (
           <h2 className="mb-4 text-lg font-medium">{current.prompt}</h2>
         )}

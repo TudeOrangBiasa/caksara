@@ -64,4 +64,16 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     recordSessionLevel(mod, 0, 5);
     assert.equal(getAdaptiveLevel(mod), 2);
   });
+
+  test("salah terus (wrongTopics) di skor sedang → turun, lancar → naik", () => {
+    const mod = "mod_test_wrongtopics";
+    recordSessionLevel(mod, 5, 5);
+    assert.equal(getAdaptiveLevel(mod), 2);
+    recordSessionLevel(mod, 2, 5, ["wre_01", "wre_02"]);
+    assert.equal(getAdaptiveLevel(mod), 1);
+    recordSessionLevel(mod, 5, 5);
+    assert.equal(getAdaptiveLevel(mod), 2);
+    recordSessionLevel(mod, 4, 5);
+    assert.equal(getAdaptiveLevel(mod), 3);
+  });
 });

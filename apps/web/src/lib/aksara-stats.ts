@@ -73,3 +73,27 @@ export function mergeProgressStats(
   }
   return Object.values(merged);
 }
+
+/**
+ * Topik salah-terus (#33 V11a): aksara Wresastra dengan rate benar < 50%
+ * dari ≥3 jawaban (riwayat + sesi ini). Murni agar bisa diuji tanpa storage.
+ */
+export function deriveWrongTopics(stats: AksaraStats, answers: readonly AksaraAnswer[]): string[] {
+  const merged: AksaraStats = {};
+  for (const [id, s] of Object.entries(stats)) {
+    if (!WRESASTRA_AKSARA.some((x) => x.id === id)) continue;
+    merged[id] = { ...s };
+  }
+  for (const a of answers) {
+    if (!WRESASTRA_AKSARA.some((x) => x.id === a.aksaraId)) continue;
+    const prev = merged[a.aksaraId] ?? { correct: 0, total: 0 };
+    merged[a.aksaraId] = {
+      correct: prev.correct + (a.correct ? 1 : 0),
+      total: prev.total + 1,
+    };
+  }
+  return Object.entries(merged)
+    .filter(([, s]) => s.total >= 3 && s.correct / s.total < 0.5)
+    .map(([id]) => id)
+    .toSorted();
+}
