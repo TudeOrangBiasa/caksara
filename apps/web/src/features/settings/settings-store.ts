@@ -6,6 +6,7 @@ import { clearSelesai } from "../module/module-store";
 import { clearQuizProgress } from "../quiz/quiz-data";
 import { clearQuizCache } from "../quiz/quiz-generate";
 import { clearAllQuizResumes } from "../quiz/quiz-resume";
+import { clearPendingSessions } from "../quiz/quiz-pending-sync";
 
 export const WRESASTRA_FONT_SIZES = [20, 24, 32] as const;
 export type WresastraFontSize = (typeof WRESASTRA_FONT_SIZES)[number];
@@ -101,6 +102,7 @@ export function resetAllProgress(): void {
   resetProfile();
   clearSelesai();
   clearAllQuizResumes();
+  clearPendingSessions();
   clearQuizProgress();
   clearQuizCache();
   clearKbCache();

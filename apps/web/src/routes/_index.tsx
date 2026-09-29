@@ -26,7 +26,7 @@ import type { CourseModule } from "../features/module/module-data";
 import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
-import { saveAksaraProgress } from "../features/quiz/quiz-progress";
+import { enqueuePendingSession } from "../features/quiz/quiz-pending-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
@@ -53,6 +53,7 @@ import {
 import { MAX_HEARTS } from "../lib/game-rules";
 import {
   notifyHeartsRefilled,
+  notifyQueuedOffline,
   notifyQuizFallback,
   notifyRateLimited,
   notifyStreakReset,
@@ -266,7 +267,13 @@ export default function Home() {
             recordSessionLevel(view.mod.id, score.correct, score.total);
           }
           recordAnswerStats(detail);
-          void saveQuizSession(view.mod.id, detail, score);
+          // V10 offline-buffer: sesi gagal terkirim → antre lokal, sync saat online.
+          void saveQuizSession(view.mod.id, detail, score).then((res) => {
+            if (!res.saved && res.reason !== "validation") {
+              enqueuePendingSession({ moduleId: view.mod.id, answers: detail, score });
+              notifyQueuedOffline();
+            }
+          });
           void saveAksaraProgress(detail, WRESASTRA_IDS);
           setView({
             kind: "result",
