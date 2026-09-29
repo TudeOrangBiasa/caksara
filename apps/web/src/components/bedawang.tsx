@@ -38,6 +38,7 @@ export function Bedawang({
     >
       <img
         src={mood ? BEDAWANG_MOOD_SRC[mood] : DEFAULT_SRC}
+        alt="Maskot Bedawang Nala"
         className={cn("h-full w-full object-cover", animate && "animate-pulse")}
       />
     </div>

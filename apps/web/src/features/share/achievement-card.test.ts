@@ -1,12 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import {
-  CARD_H,
-  CARD_PNG_MAX_BYTES,
-  CARD_W,
-  exportPng,
-  resolveAvatarSrc,
-} from "./achievement-card";
+import { CARD_H, CARD_W, exportPng, resolveAvatarSrc } from "./achievement-card";
 
 describe("resolveAvatarSrc", () => {
   test("foto data:image dipakai langsung", () => {
@@ -48,6 +42,21 @@ describe("resolveAvatarSrc", () => {
   test("exportPng menolak kanvas berdimensi salah", () => {
     const canvas = { width: 100, height: 100, toDataURL: () => "x" } as HTMLCanvasElement;
     expect(exportPng(canvas)).toBeNull();
-    expect(CARD_PNG_MAX_BYTES).toBe(450_000);
+  });
+
+  test("exportPng menerima PNG dalam bujet dan menolak blob oversize", () => {
+    const prefix = "data:image/png;base64,";
+    const okCanvas = {
+      width: 1080,
+      height: 1350,
+      toDataURL: () => `${prefix}AAAA`,
+    } as HTMLCanvasElement;
+    expect(exportPng(okCanvas)?.startsWith(prefix)).toBe(true);
+    const bigCanvas = {
+      width: 1080,
+      height: 1350,
+      toDataURL: () => prefix + "A".repeat(600_001),
+    } as HTMLCanvasElement;
+    expect(exportPng(bigCanvas)).toBeNull();
   });
 });

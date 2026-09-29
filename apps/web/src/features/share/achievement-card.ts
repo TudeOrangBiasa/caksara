@@ -211,7 +211,7 @@ function drawHeader(ctx: CanvasRenderingContext2D, g: SceneGeom, data: Achieveme
   ctx.font = "600 24px Inter, sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
-  ctx.fillText(`${data.modulSelesai} modul selesai`, CARD_W - g.pad, 66);
+  ctx.fillText(`${data.modulSelesai}/${data.modulTotal} modul selesai`, CARD_W - g.pad, 66);
   ctx.restore();
 }
 
