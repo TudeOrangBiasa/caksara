@@ -394,12 +394,21 @@ export function recordSessionLevel(
   if (total <= 0) return;
   const rate = correct / total;
   const prev = getAdaptiveLevel(moduleId);
-  // #33 V11a: salah terus di aksara X menurunkan level walau skor sedang.
-  // Skor lancar (≥0.8) selalu naik; di bawah itu topik salah memperlebar
-  // zona turun (bukan sekadar anjlok <0.4). Skor 5/5 tak punya topik salah.
+  // #33 V11a: salah terus menahan laju naik. Skor anjlok (<0.4) selalu
+  // turun; di bawah lancar, topik salah memperlebar zona turun; skor
+  // lancar (≥0.8) hanya naik bila bersih — ada topik salah berarti pola
+  // salah berulang di materi itu, jadi tahan walau skor sesi tinggi.
+  // Skor 5/5 murni tak punya topik salah (bukan temuan).
   const hasWrong = wrongTopics.length > 0;
-  const next =
-    rate >= 0.8 ? Math.min(3, prev + 1) : rate < 0.4 || hasWrong ? Math.max(1, prev - 1) : prev;
+  const next = hasWrong
+    ? rate >= 0.8
+      ? prev
+      : Math.max(1, prev - 1)
+    : rate < 0.4
+      ? Math.max(1, prev - 1)
+      : rate >= 0.8
+        ? Math.min(3, prev + 1)
+        : prev;
   writeNum(LEVEL_KEY, moduleId, next);
 }
 

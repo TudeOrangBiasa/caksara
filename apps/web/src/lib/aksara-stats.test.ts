@@ -78,7 +78,7 @@ describe("deriveWrongTopics #33", () => {
       {
         wre_01: { correct: 1, total: 4 },
         wre_02: { correct: 4, total: 4 },
-        asing: { correct: 0, total: 9 },
+        "?": { correct: 0, total: 9 },
       },
       [
         { aksaraId: "wre_01", correct: false },
@@ -88,7 +88,18 @@ describe("deriveWrongTopics #33", () => {
     );
     expect(topics).toContain("wre_01");
     expect(topics).not.toContain("wre_02");
-    expect(topics).not.toContain("asing");
+    expect(topics).not.toContain("?");
+  });
+
+  test("id materi non-Wresastra yang stabil ikut jadi topik", () => {
+    const topics = deriveWrongTopics({ kb_sapaan: { correct: 0, total: 3 } }, [
+      { aksaraId: "kb_sapaan", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+    ]);
+    expect(topics).toContain("kb_sapaan");
+    expect(topics).toContain("kb_madaar_ngajeng");
   });
 
   test("sesi lancar tanpa salah ber-aksara → topik kosong", () => {
