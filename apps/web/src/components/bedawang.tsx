@@ -2,7 +2,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import type { BedawangMood } from "../lib/zod/profile";
 
-const MOOD_SRC: Record<BedawangMood, string> = {
+export const BEDAWANG_MOOD_SRC: Record<BedawangMood, string> = {
   senang: "/assets/bedawang-happy.png",
   semangat: "/assets/bedawang-waving.png",
   sedih: "/assets/bedawang-standing.png",
@@ -37,7 +37,7 @@ export function Bedawang({
       style={{ cursor: interactive ? "pointer" : "default" }}
     >
       <img
-        src={mood ? MOOD_SRC[mood] : DEFAULT_SRC}
+        src={mood ? BEDAWANG_MOOD_SRC[mood] : DEFAULT_SRC}
         alt="Maskot Bedawang Nala"
         className={cn("h-full w-full object-cover", animate && "animate-pulse")}
       />

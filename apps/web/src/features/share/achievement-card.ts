@@ -1,7 +1,11 @@
+import { BEDAWANG_MOOD_SRC } from "../../components/bedawang";
+import { defaultAvatarUri, ipAvatarUriForName } from "../../lib/default-avatar";
+import type { ProfileAvatar } from "../../lib/zod/profile";
 import { WRESASTRA_AKSARA } from "../module/aksara-data";
 
 export interface AchievementCardData {
   name: string;
+  avatar: ProfileAvatar | undefined;
   xp: number;
   streak: number;
   hearts: number;
@@ -13,6 +17,8 @@ export interface AchievementCardData {
 
 export const CARD_W = 1080;
 export const CARD_H = 1350;
+/** Batas ukuran PNG kartu agar lolos kriteria <500kb dengan margin aman. */
+export const CARD_PNG_MAX_BYTES = 450_000;
 
 /**
  * Palet kartu dari token global (ADR-0011). Canvas tidak bisa memakai
@@ -67,7 +73,6 @@ function rr(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: n
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-
 function drawCircleAvatar(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -91,22 +96,101 @@ function drawCircleAvatar(
   ctx.restore();
 }
 
+/**
+ * Sumber gambar avatar untuk kartu, mengikuti prioritas ProfileAvatar:
+ * foto upload (data:image) / IP webp lokal / Bedawang PNG / SVG default.
+ * Kembalikan null bila hanya inisial yang tersedia (kantong color).
+ */
+export function resolveAvatarSrc(avatar: ProfileAvatar | undefined, name: string): string | null {
+  if (avatar?.kind === "photo" && avatar.value.startsWith("data:image")) return avatar.value;
+  if (avatar?.kind === "photo" && avatar.value.startsWith("/assets/avatar-")) return avatar.value;
+  if (avatar?.kind === "bedawang") return BEDAWANG_MOOD_SRC[avatar.value.mood];
+  if (avatar?.kind === "color") return null;
+  const seed = name.trim() || "C";
+  try {
+    return ipAvatarUriForName(seed);
+  } catch {
+    return defaultAvatarUri(seed);
+  }
+}
+
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img), { once: true });
+    img.addEventListener("error", () => resolve(null), { once: true });
+    img.src = src;
+  });
+}
+
+function drawAvatarImage(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  cx: number,
+  cy: number,
+  r: number,
+) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.clip();
+  const side = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height) || 1;
+  const sx = ((img.naturalWidth || img.width) - side) / 2;
+  const sy = ((img.naturalHeight || img.height) - side) / 2;
+  ctx.drawImage(img, sx, sy, side, side, cx - r, cy - r, r * 2, r * 2);
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = PALETTE.gold;
+  ctx.stroke();
+  ctx.restore();
+}
 export function renderAchievementCard(
   canvas: HTMLCanvasElement,
   data: AchievementCardData,
 ): HTMLCanvasElement {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return canvas;
-  canvas.width = CARD_W;
-  canvas.height = CARD_H;
+  renderCardScene(canvas.getContext("2d"), canvas, data, null);
+  return canvas;
+}
 
-  ctx.fillStyle = PALETTE.bg;
-  ctx.fillRect(0, 0, CARD_W, CARD_H);
+/**
+ * Render kartu + avatar nyata (IP/Bedawang/foto). Async hanya menunggu
+ * gambar avatar; seluruh scene digambar ulang setelah gambar siap agar
+ * tidak ada lingkaran inisial tertinggal di bawah foto.
+ */
+export async function renderAchievementCardWithAvatar(
+  canvas: HTMLCanvasElement,
+  data: AchievementCardData,
+): Promise<HTMLCanvasElement> {
+  renderCardScene(canvas.getContext("2d"), canvas, data, null);
+  const src = resolveAvatarSrc(data.avatar, data.name);
+  if (!src) return canvas;
+  const img = await loadImage(src).catch(() => null);
+  if (img) renderCardScene(canvas.getContext("2d"), canvas, data, img);
+  return canvas;
+}
 
-  const pad = 64;
-  const w = CARD_W - pad * 2;
+/**
+ * Ekspor PNG 1080x1350 dari kanvas kartu. Paksa dimensi standar lalu
+ * kembalikan dataURL hanya bila ukurannya di bawah batas; null bila
+ * kanvas kosong atau PNG melebihi batas (pemanggil tampilkan error).
+ */
+export function exportPng(canvas: HTMLCanvasElement): string | null {
+  if (canvas.width !== CARD_W || canvas.height !== CARD_H) return null;
+  const url = canvas.toDataURL("image/png");
+  const bytes = Math.ceil(((url.length - "data:image/png;base64,".length) * 3) / 4);
+  if (bytes <= 0 || bytes > CARD_PNG_MAX_BYTES) return null;
+  return url;
+}
 
-  // Header
+interface SceneGeom {
+  pad: number;
+  w: number;
+}
+
+function drawHeader(ctx: CanvasRenderingContext2D, g: SceneGeom, data: AchievementCardData): void {
   ctx.save();
   ctx.fillStyle = PALETTE.primaryDark;
   ctx.globalAlpha = 0.08;
@@ -119,37 +203,66 @@ export function renderAchievementCard(
   ctx.fillStyle = PALETTE.ink;
   ctx.font = "800 40px Inter, sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText("CAKSARA", pad, 96);
+  ctx.fillText("CAKSARA", g.pad, 96);
   ctx.restore();
 
-  const tip = `${data.modulSelesai} modul selesai`;
   ctx.save();
   ctx.fillStyle = PALETTE.primary;
   ctx.font = "600 24px Inter, sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "top";
-  ctx.fillText(tip, CARD_W - pad, 66);
+  ctx.fillText(`${data.modulSelesai}/${data.modulTotal} modul selesai`, CARD_W - g.pad, 66);
   ctx.restore();
+}
 
-  // Profile row
+function renderCardScene(
+  ctx: CanvasRenderingContext2D | null,
+  canvas: HTMLCanvasElement,
+  data: AchievementCardData,
+  avatarImg: HTMLImageElement | null,
+): void {
+  if (!ctx) return;
+  canvas.width = CARD_W;
+  canvas.height = CARD_H;
+
+  ctx.fillStyle = PALETTE.bg;
+  ctx.fillRect(0, 0, CARD_W, CARD_H);
+
+  const g: SceneGeom = { pad: 64, w: CARD_W - 64 * 2 };
+  drawHeader(ctx, g, data);
+  drawProfileRow(ctx, g, data, avatarImg);
+  drawTidbit(ctx, g, data, drawMastery(ctx, g, data, drawStats(ctx, g, data)));
+  drawFooter(ctx);
+}
+
+function drawProfileRow(
+  ctx: CanvasRenderingContext2D,
+  g: SceneGeom,
+  data: AchievementCardData,
+  avatarImg: HTMLImageElement | null,
+): void {
   const avatarR = 76;
-  const avatarCX = pad + avatarR;
+  const avatarCX = g.pad + avatarR;
   const avatarCY = 200;
-  drawCircleAvatar(ctx, avatarCX, avatarCY, avatarR, data.name.charAt(0) || "?");
-
+  if (avatarImg) {
+    drawAvatarImage(ctx, avatarImg, avatarCX, avatarCY, avatarR);
+  } else {
+    drawCircleAvatar(ctx, avatarCX, avatarCY, avatarR, data.name.charAt(0) || "?");
+  }
   ctx.save();
   ctx.fillStyle = PALETTE.ink;
   ctx.font = "800 54px Inter, sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText(data.name, pad + avatarR * 2 + 28, avatarCY - 32);
+  ctx.fillText(data.name, g.pad + avatarR * 2 + 28, avatarCY - 32);
   ctx.restore();
   ctx.save();
   ctx.fillStyle = PALETTE.muted;
   ctx.font = "500 28px Inter, sans-serif";
-  ctx.fillText("Petualang Aksara Bali", pad + avatarR * 2 + 28, avatarCY + 18);
+  ctx.fillText("Petualang Aksara Bali", g.pad + avatarR * 2 + 28, avatarCY + 18);
   ctx.restore();
+}
 
-  // Stat card
+function drawStats(ctx: CanvasRenderingContext2D, g: SceneGeom, data: AchievementCardData): number {
   const stats = [
     { label: "XP", value: String(data.xp) },
     { label: "Streak", value: data.streak > 0 ? `${data.streak} hari` : "0" },
@@ -158,9 +271,9 @@ export function renderAchievementCard(
   const statY = 350;
   const statCardH = 150;
   const gap = 24;
-  const statW = (w - gap * 2) / 3;
+  const statW = (g.w - gap * 2) / 3;
   stats.forEach((s, i) => {
-    const sx = pad + i * (statW + gap);
+    const sx = g.pad + i * (statW + gap);
     ctx.save();
     rr(ctx, sx, statY, statW, statCardH, 28);
     ctx.fillStyle = i === 0 ? PALETTE.primary : PALETTE.bgDeep;
@@ -174,25 +287,31 @@ export function renderAchievementCard(
     ctx.fillText(s.label, sx + statW / 2, statY + statCardH - 26);
     ctx.restore();
   });
+  return statY + statCardH;
+}
 
-  // Mastery section
-  const sectionTop = statY + statCardH + 48;
+function drawMastery(
+  ctx: CanvasRenderingContext2D,
+  g: SceneGeom,
+  data: AchievementCardData,
+  statsBottom: number,
+): number {
+  const sectionTop = statsBottom + 48;
   ctx.save();
   ctx.font = "700 30px Inter, sans-serif";
   ctx.textAlign = "left";
   ctx.fillStyle = PALETTE.ink;
-  ctx.fillText("Mastery 18 Wresastra", pad, sectionTop);
+  ctx.fillText("Mastery 18 Wresastra", g.pad, sectionTop);
   ctx.restore();
 
   const legend = [
-    { label: "Belum", color: PALETTE.mastery.belum, text: PALETTE.mastery.belum },
-    { label: "Dipahami", color: PALETTE.mastery.dipahami, text: PALETTE.mastery.dipahami },
-    { label: "Ahli", color: PALETTE.mastery.ahli, text: PALETTE.mastery.ahli },
+    { label: "Belum", color: PALETTE.mastery.belum },
+    { label: "Dipahami", color: PALETTE.mastery.dipahami },
+    { label: "Ahli", color: PALETTE.mastery.ahli },
   ];
-  let lx = pad;
+  let lx = g.pad;
   legend.forEach((l) => {
-    const lw =
-      ctx.measureText(l.label.toUpperCase()).width + 34 + (l.label === "Dipahami" ? 26 : 26);
+    const lw = ctx.measureText(l.label.toUpperCase()).width + 60;
     ctx.save();
     rr(ctx, lx, sectionTop + 12, lw, 34, 17);
     ctx.fillStyle = PALETTE.bgDeep;
@@ -213,42 +332,46 @@ export function renderAchievementCard(
   const cols = 6;
   const rows = 3;
   const cellGap = 14;
-  const gridW = w;
-  const cellW = (gridW - cellGap * (cols - 1)) / cols;
+  const cellW = (g.w - cellGap * (cols - 1)) / cols;
   const cellH = 118;
 
   WRESASTRA_AKSARA.forEach((a, idx) => {
     const col = idx % cols;
     const row = Math.floor(idx / cols);
     const status = data.mastery?.[a.id] ?? "belum";
-    const cx2 = pad + col * (cellW + cellGap);
+    const cx2 = g.pad + col * (cellW + cellGap);
     const cy2 = gridTop + row * (cellH + cellGap);
-    const color = PALETTE.mastery[status];
-    const tcolor = PALETTE.statusText[status];
 
     ctx.save();
     rr(ctx, cx2, cy2, cellW, cellH, 20);
-    ctx.fillStyle = color;
+    ctx.fillStyle = PALETTE.mastery[status];
     ctx.fill();
     ctx.textAlign = "center";
-    ctx.fillStyle = tcolor;
+    ctx.fillStyle = PALETTE.statusText[status];
     ctx.font = `48px "Noto Sans Balinese", sans-serif`;
     ctx.fillText(a.glyph, cx2 + cellW / 2, cy2 + 52);
     ctx.font = "700 17px Inter, sans-serif";
     ctx.fillText(status.toUpperCase(), cx2 + cellW / 2, cy2 + cellH - 18);
     ctx.restore();
   });
+  return gridTop + rows * (cellH + cellGap);
+}
 
-  // Tidbit
-  const tidbitTop = gridTop + rows * (cellH + cellGap) + 36;
+function drawTidbit(
+  ctx: CanvasRenderingContext2D,
+  g: SceneGeom,
+  data: AchievementCardData,
+  gridBottom: number,
+): void {
+  const tidbitTop = gridBottom + 36;
   ctx.save();
-  rr(ctx, pad, tidbitTop, w, 132, 28);
+  rr(ctx, g.pad, tidbitTop, g.w, 132, 28);
   ctx.fillStyle = PALETTE.bgDeep;
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(pad + 40, tidbitTop + 66);
-  ctx.lineTo(pad + 60, tidbitTop + 40);
-  ctx.lineTo(pad + 60, tidbitTop + 92);
+  ctx.moveTo(g.pad + 40, tidbitTop + 66);
+  ctx.lineTo(g.pad + 60, tidbitTop + 40);
+  ctx.lineTo(g.pad + 60, tidbitTop + 92);
   ctx.closePath();
   ctx.fillStyle = PALETTE.gold;
   ctx.fill();
@@ -258,7 +381,7 @@ export function renderAchievementCard(
   ctx.textBaseline = "middle";
   ctx.fillStyle = PALETTE.ink;
 
-  const maxTextW = w - 96;
+  const maxTextW = g.w - 128;
   const words = data.tidbit.split(" ");
   const lines: string[] = [];
   let cur = "";
@@ -272,24 +395,24 @@ export function renderAchievementCard(
     }
   }
   if (cur) lines.push(cur);
-  const tidy = lines.slice(0, 2).join("\n");
-  ctx.fillText(tidy, pad + 44, tidbitTop + 66);
-
   ctx.fillStyle = PALETTE.muted;
   ctx.font = "600 18px Inter, sans-serif";
-  ctx.fillText("TAHUKAH KAMU?", pad + 44, tidbitTop + 26);
+  ctx.fillText("TAHUKAH KAMU?", g.pad + 76, tidbitTop + 34);
+  ctx.font = "500 24px Inter, sans-serif";
+  ctx.fillStyle = PALETTE.ink;
+  lines.slice(0, 2).forEach((line, i) => {
+    ctx.fillText(line, g.pad + 76, tidbitTop + 72 + i * 32);
+  });
   ctx.restore();
+}
 
-  // Footer
-  const footY = CARD_H - 60;
+function drawFooter(ctx: CanvasRenderingContext2D): void {
   ctx.save();
   ctx.font = "500 26px Inter, sans-serif";
   ctx.textAlign = "center";
   ctx.fillStyle = PALETTE.muted;
-  ctx.fillText("CAKSARA • Web Edukasi Aksara Bali", CARD_W / 2, footY);
+  ctx.fillText("CAKSARA • Web Edukasi Aksara Bali", CARD_W / 2, CARD_H - 60);
   ctx.restore();
-
-  return canvas;
 }
 
 export function pickTidbit(): string {
