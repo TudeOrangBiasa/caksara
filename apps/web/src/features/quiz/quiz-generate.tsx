@@ -6,6 +6,10 @@ import { ensureAnonSession, getSupabase } from "../../lib/supabase";
 import { notifyQuizFallback } from "../../lib/notify";
 import { getAdaptiveLevel } from "./quiz-data";
 
+export type QuizFailureReason = "offline" | "rate-limited" | "server-down";
+
+export type QuizNotice = "quiz-fallback" | "quiz-ratelimit";
+
 export type QuizSource = "gemini" | "fallback" | "offline" | "cache";
 
 export interface GeneratedQuiz {
@@ -13,6 +17,12 @@ export interface GeneratedQuiz {
   quiz: Quiz | null;
   source: QuizSource;
   offline: boolean;
+  /**
+   * Penyebab kegagalan Edge yang bisa ditindak user (#29 V8c):
+   * offline = perangkat tanpa koneksi, rate-limited = 429 dari Edge/Gemini,
+   * server-down = 5xx/Gemini down/invalid. Absen bila kuis Gemini/cache valid.
+   */
+  failure?: QuizFailureReason;
 }
 
 interface GenerateQuizResponse {
@@ -88,13 +98,13 @@ export async function fetchGeneratedQuiz(
     localFallback: () => Quiz;
     /** Resume terbuka: jangan fetch Gemini baru, pakai set tersimpan/cache saja. */
     deferRemote?: boolean;
+    /** Suntik pemanggil Edge untuk uji 429/non-429 tanpa Supabase (#29 V8c). */
+    invokeRemote?: () => Promise<{ data: GenerateQuizResponse | null; error: unknown }>;
   },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
   const count = Math.min(8, Math.max(3, opts?.count ?? 5));
-  // Array kosong (<3 soal) tidak di-parse paksa — kembalikan null agar
-  // QuizLaunchView menampilkan EmptyState + tombol Coba Lagi.
-  const buildOffline = (): GeneratedQuiz => {
+  const buildFallback = (failure: QuizFailureReason): GeneratedQuiz => {
     let fallback: Quiz | null = null;
     try {
       fallback = opts?.localFallback() ?? null;
@@ -104,48 +114,81 @@ export async function fetchGeneratedQuiz(
     const parsed = fallback
       ? quizSchema.safeParse({ moduleId, questions: fallback.questions })
       : { success: false as const };
-    if (parsed.success) return { quiz: parsed.data, source: "offline", offline: true };
-    return { quiz: null, source: "offline", offline: true };
+    if (parsed.success) return { quiz: parsed.data, source: "offline", offline: true, failure };
+    return { quiz: null, source: "offline", offline: true, failure };
   };
 
   try {
-    if (typeof navigator !== "undefined" && !navigator.onLine) return buildOffline();
+    if (typeof navigator !== "undefined" && navigator.onLine === false)
+      return buildFallback("offline");
     if (opts?.deferRemote) {
       const cached = readCachedQuiz(moduleId, level);
-      return cached ?? buildOffline();
+      return cached ?? buildFallback("offline");
     }
     const supabase = getSupabase();
-    if (!supabase) return buildOffline();
+    if (!supabase && !opts?.invokeRemote) return buildFallback("offline");
     const cached = readCachedQuiz(moduleId, level);
     if (cached?.quiz && cached.quiz.questions.length >= 3) return cached;
-    await ensureAnonSession();
-    // Retry ringan 1x (bukan 3x seperti Edge) sebelum menyerah ke offline.
+    // Seam uji: invokeRemote menyuntik hasil Edge tanpa sesi jaringan.
+    if (!opts?.invokeRemote) await ensureAnonSession();
+    const body = { moduleId, level, count, wrongTopics: opts?.wrongTopics ?? [] };
+    const invoke =
+      opts?.invokeRemote ??
+      (() => supabase?.functions.invoke<GenerateQuizResponse>("generate-quiz", { body }));
+    // Retry ringan 1x (bukan 3x seperti Edge) sebelum menyerah ke fallback.
+    // 429 tidak di-retry: Edge rate-limit per menit, ulangi langsung pasti gagal lagi.
     let data: GenerateQuizResponse | null = null;
     let error: unknown = null;
     for (let attempt = 0; attempt < 2; attempt++) {
-      const res = await supabase.functions.invoke<GenerateQuizResponse>("generate-quiz", {
-        body: { moduleId, level, count, wrongTopics: opts?.wrongTopics ?? [] },
-      });
-      data = res.data;
-      error = res.error;
+      const res = await invoke();
+      data = res?.data ?? null;
+      error = res?.error ?? new Error("generate-quiz tanpa respons");
       if (!error && data) break;
+      if (isRateLimitedError(error)) break;
     }
-    if (error || !data) return buildOffline();
+    if (error || !data) {
+      return buildFallback(isRateLimitedError(error) ? "rate-limited" : "server-down");
+    }
     const parsed = quizSchema.safeParse({ moduleId: data.moduleId, questions: data.questions });
-    if (!parsed.success) return buildOffline();
+    if (!parsed.success) return buildFallback("server-down");
     const source: QuizSource = data.offline ? "offline" : data.cached ? "cache" : "gemini";
     storeCachedQuiz(moduleId, level, parsed.data, source);
     return { quiz: parsed.data, source, offline: source === "offline" };
   } catch {
-    return buildOffline();
+    return buildFallback("server-down");
   }
 }
+
+/**
+ * 429 dari supabase functions-js: FunctionsHttpError membawa Response asli
+ * di context (bukan di error.status). Cek status Response + pola pesan 429.
+ */
+export function isRateLimitedError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  if ("context" in error) {
+    const ctx: unknown = error.context;
+    if (ctx instanceof Response && ctx.status === 429) return true;
+    if (ctx && typeof ctx === "object" && "status" in ctx && ctx.status === 429) return true;
+    if (ctx && typeof ctx === "object") {
+      if ("message" in ctx && typeof ctx.message === "string" && RATE_LIMIT_RE.test(ctx.message))
+        return true;
+      if ("error" in ctx && typeof ctx.error === "string" && RATE_LIMIT_RE.test(ctx.error))
+        return true;
+    }
+  }
+  if ("message" in error && typeof error.message === "string" && RATE_LIMIT_RE.test(error.message))
+    return true;
+  return false;
+}
+
+const RATE_LIMIT_RE = /\b429\b|terlalu banyak permintaan/i;
 
 export interface QuizLaunchState {
   status: "loading" | "ready";
   quiz: Quiz | null;
   source: QuizSource;
   offline: boolean;
+  failure?: QuizFailureReason;
 }
 
 /**
@@ -160,6 +203,7 @@ export function useQuizLaunch(
     localFallback: () => Quiz;
     deferRemote?: boolean;
     reloadToken?: number;
+    onNotice?: (notice: QuizNotice) => void;
   },
 ): QuizLaunchState {
   const [state, setState] = useState<QuizLaunchState>({
@@ -173,8 +217,16 @@ export function useQuizLaunch(
     setState({ status: "loading", quiz: null, source: "fallback", offline: false });
     void fetchGeneratedQuiz(moduleId, opts).then((g) => {
       if (!alive) return;
-      if (g.offline) notifyQuizFallback();
-      setState({ status: "ready", quiz: g.quiz, source: g.source, offline: g.offline });
+      if (g.failure === "rate-limited") opts?.onNotice?.("quiz-ratelimit");
+      else if (g.offline) opts?.onNotice?.("quiz-fallback");
+      if (g.offline && !opts?.onNotice) notifyQuizFallback();
+      setState({
+        status: "ready",
+        quiz: g.quiz,
+        source: g.source,
+        offline: g.offline,
+        failure: g.failure,
+      });
     });
     return () => {
       alive = false;

@@ -300,7 +300,11 @@ export function QuizShell({
         title="Belum ada soal"
         body="Modul ini belum punya soal. Balik dulu, kami siapkan materinya."
         action={
-          <Button className="h-11 w-full rounded-full font-semibold" onClick={onBack}>
+          <Button
+            variant="cta"
+            className="h-12 w-full text-base font-bold tracking-wide"
+            onClick={onBack}
+          >
             Kembali
           </Button>
         }
