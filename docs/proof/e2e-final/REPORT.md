@@ -52,7 +52,10 @@ jawaban + SUMBER RUJUKAN + deep-link KB; fallback "xyzqwe naga terbang" →
 
 ## Sisa (timebox 30 mnt tercapai, tidak dikerjakan)
 
-1. After-shot KB grid + kartu prestasi render ulang (butuh re-run browser ±5 mnt).
+1. **SELESAI via `261be8d`** — after-shot KB grid + kartu prestasi 390px
+   sudah ada: `after-kb-grid-390.png` (kartu terakhir utuh di atas
+   bottom-nav, clearance ~132px) + `after-prestasi-390.png` (tidbit
+   terpanjang muat 2 baris + elipsis, tidak meluap).
 2. Level adaptif hasil 2/3 → tetap Level 1 (keputusan produk #33, bukan bug E2E).
 3. Warning oxlint `shadcn(no-arbitrary-values)` pre-existing di `kb-list.tsx`
    (`text-[11px]`, `max-w-[…]`) — di luar scope kecil, 0 error tetap terpenuhi.
