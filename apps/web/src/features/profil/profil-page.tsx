@@ -8,14 +8,12 @@ import {
   Sparkles,
   Trophy,
 } from "lucide-react";
-
 import { useSyncExternalStore } from "react";
-
 import { ProfileAvatar } from "../../components/profile-avatar";
 import { AnimatedNumber } from "../../components/animated-number";
-import { loadProfile, subscribeProfile } from "../../lib/profile-store";
+import { MasteryGrid } from "../../components/mastery-grid";
+import { loadProfile, subscribeProfile, witaTodayStr } from "../../lib/profile-store";
 import { courseModules } from "../module/module-data";
-
 interface Badge {
   icon: React.ReactNode;
   title: string;
@@ -174,6 +172,7 @@ export function ProfilPage({
 
       {/* Right Column (Main content) */}
       <div className="mt-8 lg:mt-0 flex flex-col gap-6">
+        <StreakCard streak={profile?.streak ?? 0} lastActive={profile?.lastActiveDate} />
         <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
@@ -251,6 +250,13 @@ export function ProfilPage({
             ))}
           </div>
         </div>
+        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+          <MasteryGrid mastery={profile?.mastery} />
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+            Status dihitung dari riwayat jawabanmu: 3+ percobaan jadi Dipahami, 5+ dengan akurasi
+            80% jadi Ahli.
+          </p>
+        </div>
 
         {/* Mobile-only share & settings (hidden on desktop) */}
         <div className="grid gap-3 pt-2 sm:grid-cols-2 lg:hidden">
@@ -300,6 +306,60 @@ function StatMini({ label, value, color }: { label: string; value: number; color
         <AnimatedNumber value={value} />
       </p>
       <p className="mt-1 text-[11px] font-bold opacity-90">{label}</p>
+    </div>
+  );
+}
+function StreakCard({ streak, lastActive }: { streak: number; lastActive?: string }) {
+  const today = witaTodayStr();
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(`${today}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - (6 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  const activeCount = Math.min(7, streak);
+  return (
+    <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex size-10 items-center justify-center rounded-2xl bg-warning/15 text-warning">
+          <Flame className="size-5" />
+        </div>
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            Streak Harian
+          </p>
+          <h2 className="text-lg font-extrabold tracking-tight">
+            <AnimatedNumber value={streak} /> hari beruntun
+          </h2>
+        </div>
+      </div>
+      <div
+        className="grid grid-cols-7 gap-1.5"
+        role="img"
+        aria-label={`Streak ${streak} hari${lastActive === today ? ", sudah belajar hari ini" : ""}`}
+      >
+        {days.map((day, i) => {
+          const lit = i >= 7 - activeCount;
+          const isToday = day === today;
+          return (
+            <div
+              key={day}
+              title={day}
+              className={`flex h-9 items-center justify-center rounded-xl text-xs font-bold tabular-nums transition-colors ${
+                lit
+                  ? "bg-warning text-warning-foreground shadow-sm"
+                  : "bg-muted/60 text-muted-foreground"
+              } ${isToday ? "ring-2 ring-warning/60 ring-offset-2 ring-offset-card" : ""}`}
+            >
+              {lit ? <Flame className="size-4" aria-hidden /> : i + 1}
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-xs font-medium text-muted-foreground">
+        {lastActive === today
+          ? "Sudah belajar hari ini. Balik lagi besok biar streak jalan terus."
+          : "Belum belajar hari ini. Selesaikan satu kuis untuk nyalain streak."}
+      </p>
     </div>
   );
 }

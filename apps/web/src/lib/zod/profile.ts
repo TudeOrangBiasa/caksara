@@ -31,6 +31,14 @@ export const profileAvatarSchema = z.union([
 
 export type ProfileAvatar = z.infer<typeof profileAvatarSchema>;
 
+export const aksaraStatsSchema = z.record(
+  z.string(),
+  z.object({
+    correct: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
+  }),
+);
+
 export const userProfileSchema = z.object({
   id: z.string().min(1),
   isAnon: z.boolean(),
@@ -41,7 +49,10 @@ export const userProfileSchema = z.object({
   lastActiveDate: z.string().optional(),
   heartsRefilledAt: z.string().optional(),
   mastery: z.record(z.string(), z.enum(["belum", "dipahami", "ahli"])).optional(),
+  aksaraStats: aksaraStatsSchema.optional(),
   avatar: profileAvatarSchema.optional(),
 });
+
+export type AksaraStats = z.infer<typeof aksaraStatsSchema>;
 
 export type UserProfile = z.infer<typeof userProfileSchema>;

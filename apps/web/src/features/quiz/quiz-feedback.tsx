@@ -1,12 +1,8 @@
 import { AlertCircle, BookOpenCheck, CheckCircle2, Sparkles } from "lucide-react";
-
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
-
 import { Bedawang } from "../../components/bedawang";
-
-const XP_PER_CORRECT = 10;
-
+import { XP_PER_CORRECT } from "../../lib/game-rules";
 interface QuizFeedbackProps {
   isCorrect: boolean;
   explanation?: string;

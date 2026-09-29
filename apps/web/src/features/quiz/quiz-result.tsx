@@ -1,26 +1,24 @@
 import { useEffect } from "react";
 import { RotateCcw, Sparkles } from "lucide-react";
-
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
-
 import { Bedawang } from "../../components/bedawang";
 import { AnimatedNumber } from "../../components/animated-number";
 import { Confetti } from "../../components/confetti";
 import { playCue, playFanfare } from "../../lib/sound";
+import { XP_PER_CORRECT } from "../../lib/game-rules";
 import type { CourseModule } from "../module/module-data";
-
-const XP_PER_CORRECT = 10;
 
 interface QuizResultProps {
   mod: CourseModule;
   score: { correct: number; total: number };
   isLatihan?: boolean;
+  tidbit?: string;
   onRetry: () => void;
   onBack: () => void;
 }
 
-export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResultProps) {
+export function QuizResult({ mod, score, isLatihan, tidbit, onRetry, onBack }: QuizResultProps) {
   const percentage = Math.round((score.correct / score.total) * 100);
   const passed = percentage >= 70;
   const xpGained = score.correct * XP_PER_CORRECT;
@@ -102,6 +100,12 @@ export function QuizResult({ mod, score, isLatihan, onRetry, onBack }: QuizResul
             Seru! Kamu berhasil menuntaskan {mod.title}. Pelan-pelan aja, tanpa terasa aksara &amp;
             budaya Bali makin kamu kuasai.
           </p>
+          {tidbit && (
+            <p className="mt-3 border-t border-border/60 pt-3 text-xs leading-relaxed text-muted-foreground">
+              <span className="font-bold text-foreground">Tahukah kamu? </span>
+              {tidbit}
+            </p>
+          )}
         </div>
       )}
 

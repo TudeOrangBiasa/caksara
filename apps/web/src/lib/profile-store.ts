@@ -3,6 +3,7 @@ import type { ProfileAvatar, UserProfile } from "./zod/profile";
 import { ipAvatarUriForName } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
+import { deriveMastery } from "./game-rules";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const STORAGE_KEY = "caksara.profile.v1";
@@ -248,22 +249,23 @@ export function updateStreak(): void {
   });
 }
 
-export function markAksara(aksaraId: string, level: "belum" | "dipahami" | "ahli"): void {
+export function recordAnswerStats(
+  answers: readonly { aksaraId?: string; correct: boolean }[],
+): void {
   update((profile) => {
-    if (profile.mastery && profile.mastery[aksaraId] !== undefined) {
-      profile.mastery[aksaraId] = level;
+    const stats = { ...profile.aksaraStats };
+    const mastery = { ...profile.mastery };
+    for (const a of answers) {
+      if (!a.aksaraId) continue;
+      if (!WRESASTRA_IDS.includes(a.aksaraId)) continue;
+      const prev = stats[a.aksaraId] ?? { correct: 0, total: 0 };
+      const total = prev.total + 1;
+      const correct = prev.correct + (a.correct ? 1 : 0);
+      stats[a.aksaraId] = { correct, total };
+      mastery[a.aksaraId] = deriveMastery({ correctCount: correct, totalCount: total });
     }
-  });
-}
-
-export function markModuleMastered(moduleAksaraIds: string[]): void {
-  update((profile) => {
-    if (!profile.mastery) return;
-    for (const id of moduleAksaraIds) {
-      if (profile.mastery[id] !== undefined) {
-        profile.mastery[id] = "ahli";
-      }
-    }
+    profile.aksaraStats = stats;
+    profile.mastery = mastery;
   });
 }
 
