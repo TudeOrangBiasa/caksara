@@ -204,19 +204,20 @@ export function setHearts(hearts: number): void {
 
 /**
  * Isi hati penuh 5 bila sudah lewat 00:00 WITA sejak refill terakhir.
- * Kembalikan true bila refill terjadi (pemanggil wajib toast).
+ * Cap heartsRefilledAt tiap hari WITA baru walau Hati sudah penuh
+ * (idempoten, cermin refillHeartsForNewDay di game-rules).
+ * Kembalikan true hanya bila Hati benar-benar bertambah (pemanggil wajib toast).
  */
 export function refillHearts(): boolean {
   const today = witaTodayStr();
   let didRefill = false;
   update((profile) => {
-    if (
-      profile.hearts < MAX_HEARTS &&
-      (!profile.heartsRefilledAt || profile.heartsRefilledAt < today)
-    ) {
-      profile.hearts = MAX_HEARTS;
+    if (!profile.heartsRefilledAt || profile.heartsRefilledAt < today) {
+      if (profile.hearts < MAX_HEARTS) {
+        profile.hearts = MAX_HEARTS;
+        didRefill = true;
+      }
       profile.heartsRefilledAt = today;
-      didRefill = true;
     }
   });
   return didRefill;

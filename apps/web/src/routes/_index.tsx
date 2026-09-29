@@ -47,10 +47,16 @@ import {
   loadProfile,
   recordAnswerStats,
   reconcileProfileId,
+  refillHearts,
   WRESASTRA_IDS,
 } from "../lib/profile-store";
 import { MAX_HEARTS } from "../lib/game-rules";
-import { notifyQuizFallback, notifyRateLimited, notifyStreakReset } from "../lib/notify";
+import {
+  notifyHeartsRefilled,
+  notifyQuizFallback,
+  notifyRateLimited,
+  notifyStreakReset,
+} from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
 import { LandingHome } from "../features/landing/landing-home";
@@ -218,6 +224,13 @@ export default function Home() {
     initSoundboard();
   }, []);
 
+  // V9: refill Hati + reset Streak harian berjalan saat profil siap
+  // (onboarding gate menunda HomeShell, jadi tidak bisa di sana).
+  useEffect(() => {
+    if (!profileLoaded) return;
+    if (applyOvernightReset()) notifyStreakReset();
+    if (refillHearts()) notifyHeartsRefilled();
+  }, [profileLoaded]);
   if (!profileLoaded) {
     return <OnboardingGate onComplete={handleComplete} />;
   }
@@ -392,10 +405,7 @@ function HomeShell({
   content: React.ReactNode;
 }) {
   const isDesktop = useIsDesktop();
-
-  useEffect(() => {
-    if (applyOvernightReset()) notifyStreakReset();
-  }, []);
+  // V9 refill/reset berjalan di Home (profileLoaded), bukan di sini.
 
   return (
     <div className="flex h-full flex-col">
