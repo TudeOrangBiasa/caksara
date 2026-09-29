@@ -58,6 +58,7 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
           title: reply.title,
           glyph: reply.glyph,
           entryId: reply.entryId,
+          suggestions: reply.suggestions,
           streaming: true,
         },
       ]);
