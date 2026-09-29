@@ -10,6 +10,7 @@ import { Dashboard } from "../features/dashboard/dashboard";
 import { OnboardingGate } from "../features/onboarding/onboarding-gate";
 import { KbDetail } from "../features/kb/kb-detail";
 import { KbList } from "../features/kb/kb-list";
+import { KB_ENTRIES } from "../features/kb/kb-data";
 import type { KbEntry } from "../features/kb/kb-data";
 import { ModuleDetail } from "../features/module/module-detail";
 import { ModuleMateri } from "../features/module/module-materi";
@@ -245,6 +246,10 @@ export default function Home() {
         onBack={() =>
           view.isLatihan ? setView({ kind: "home" }) : setView({ kind: "detail", mod: view.mod })
         }
+        onOpenKbEntry={(entryId) => {
+          const entry = KB_ENTRIES.find((e) => e.id === entryId);
+          if (entry) setView({ kind: "kb-detail", entry });
+        }}
       />
     );
   } else if (view.kind === "kb-detail") {
@@ -333,7 +338,14 @@ export default function Home() {
       />
     );
   } else if (navTab === "guru") {
-    content = <TeacherChat />;
+    content = (
+      <TeacherChat
+        onOpenEntry={(entryId) => {
+          const entry = KB_ENTRIES.find((e) => e.id === entryId);
+          if (entry) setView({ kind: "kb-detail", entry });
+        }}
+      />
+    );
   } else {
     content = (
       <ProfilPage

@@ -6,6 +6,8 @@ export interface TeacherReply {
   sources: KbSource[];
   title?: string;
   glyph?: string;
+  /** ID entri KB asal jawaban — tautan balik kecil ke KbDetail (bila ada). */
+  entryId?: string;
   outside: boolean;
   suggestions?: string[];
 }
@@ -219,6 +221,7 @@ export function getTeacherReply(input: string): TeacherReply {
       title: best.title,
       glyph: best.glyph,
       sources: best.sources,
+      entryId: best.id,
       outside: false,
     };
   }

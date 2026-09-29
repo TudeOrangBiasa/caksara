@@ -1,5 +1,5 @@
 import { kbRemoteRowSchema } from "../../lib/zod/kb";
-import { kbEntrySchema } from "./kb-data";
+import { kbCategorySchema, kbEntrySchema } from "./kb-data";
 import type { KbEntry } from "./kb-data";
 
 export interface SupabaseKbRow {
@@ -26,17 +26,12 @@ function splitSources(source: string): { nama: string; ket: string }[] {
   return out.length > 0 ? out : [{ nama: source.trim() || "Rujukan KB", ket: "Rujukan KB" }];
 }
 
-const KNOWN_CATEGORIES: Record<string, boolean> = {
-  wresastra: true,
-  kosakata: true,
-  budaya: true,
-};
-
 /**
- * Ubah baris kb_entries Supabase menjadi KbEntry lokal.
- * ID dipertahankan apa adanya (tanpa prefix) supaya detail bisa ditelusuri
- * balik dari Sesi & Guru; baris tak valid atau berkategori asing dibuang
- * (bukan dipetakan diam-diam) agar daftar tidak menampilkan data semu.
+ * Ubah baris kb_entries Supabase menjadi KbEntry lokal — SSOT kategori:
+ * kbCategorySchema (kb-data.ts). ID dipertahankan apa adanya (tanpa prefix)
+ * supaya detail bisa ditelusuri balik dari Sesi & Guru; baris tak valid atau
+ * berkategori asing dibuang (bukan dipetakan diam-diam) agar daftar tidak
+ * menampilkan data semu.
  */
 export function parseSupabaseKbRows(rows: SupabaseKbRow[] | null | undefined): KbEntry[] {
   if (!rows || rows.length === 0) return [];
@@ -44,7 +39,7 @@ export function parseSupabaseKbRows(rows: SupabaseKbRow[] | null | undefined): K
   for (const row of rows) {
     const parsed = kbRemoteRowSchema.safeParse(row);
     if (!parsed.success) continue;
-    if (!KNOWN_CATEGORIES[parsed.data.category]) continue;
+    if (!kbCategorySchema.safeParse(parsed.data.category).success) continue;
     const sources = splitSources(parsed.data.source);
     const entry = kbEntrySchema.safeParse({
       id: String(parsed.data.id),

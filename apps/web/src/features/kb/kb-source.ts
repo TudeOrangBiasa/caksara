@@ -54,9 +54,11 @@ export function writeKbCache(rows: SupabaseKbRow[]): void {
 }
 
 /**
- * Ambil daftar KB #25: remote-first (kb_entries read-only publik), cache
- * 10 menit, fallback lokal KB_ENTRIES bila remote kosong/invalid/down.
- * Tidak pernah melempar — selalu kembalikan entri.
+ * Ambil daftar KB #25: cache-first 10 menit (kb_entries read-only publik),
+ * remote dicoba saat cache dingin, fallback lokal KB_ENTRIES bila remote
+ * kosong/invalid/down. Offline (ADR-0008: KB cache lokal untuk mode offline)
+ * memakai cache segar dulu sebelum lokal. Tidak pernah melempar — selalu
+ * kembalikan entri.
  */
 export async function fetchKbEntries(
   opts: { local?: KbEntry[] } & Partial<KbFetchDeps>,
@@ -66,7 +68,15 @@ export async function fetchKbEntries(
   const readCache = opts.readCache ?? readKbCache;
   const writeCache = opts.writeCache ?? writeKbCache;
 
-  if (!online) return { entries: local, source: "local", offline: true, loadError: false };
+  if (!online) {
+    const cached = readCache();
+    if (cached) {
+      const parsed = parseSupabaseKbRows(cached);
+      if (parsed.length > 0)
+        return { entries: parsed, source: "cache", offline: true, loadError: false };
+    }
+    return { entries: local, source: "local", offline: true, loadError: false };
+  }
 
   const hasBackend = opts.hasBackend ?? getSupabase() !== null;
   const queryRemote = opts.queryRemote ?? queryKbEntriesRemote;

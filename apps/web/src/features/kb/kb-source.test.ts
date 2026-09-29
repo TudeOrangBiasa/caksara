@@ -37,7 +37,7 @@ function deps(over: Partial<KbFetchDeps> = {}): KbFetchDeps {
   };
 }
 
-describe("fetchKbEntries — remote-first, local fallback #25", () => {
+describe("fetchKbEntries — cache-first, local fallback #25", () => {
   test("remote valid → pakai remote, tulis cache", async () => {
     let wrote: unknown = null;
     const out = await fetchKbEntries({
@@ -64,20 +64,31 @@ describe("fetchKbEntries — remote-first, local fallback #25", () => {
   test("remote invalid semua → fallback lokal + loadError true", async () => {
     const out = await fetchKbEntries({
       // eslint-disable-next-line require-await
-      ...deps({ queryRemote: async () => [{ id: -1 }] }),
+      ...deps({ queryRemote: async () => [{ id: -1 }] as unknown as SupabaseKbRow[] }),
       local: [localRow],
     });
     assert.equal(out.source, "local");
     assert.equal(out.loadError, true);
   });
+
+  test("remote eksplisit kosong + local dikosongkan → entries kosong (cabang empty reachable)", async () => {
+    // eslint-disable-next-line require-await
+    const out = await fetchKbEntries({
+      ...deps({ queryRemote: async () => [] }),
+      local: [],
+    });
+    assert.deepEqual(out.entries, []);
+    assert.equal(out.loadError, true);
+  });
 });
 
 describe("fetchKbEntries — offline/cache/down #25", () => {
-  test("offline → lokal + offline true tanpa query remote", async () => {
+  test("offline tanpa cache → lokal + offline true tanpa query remote", async () => {
     let queried = false;
     const out = await fetchKbEntries({
       ...deps({
         online: false,
+        readCache: () => null,
         // eslint-disable-next-line require-await
         queryRemote: async () => {
           queried = true;
@@ -89,6 +100,27 @@ describe("fetchKbEntries — offline/cache/down #25", () => {
     assert.equal(queried, false);
     assert.equal(out.offline, true);
     assert.equal(out.source, "local");
+  });
+
+  test("offline pakai cache segar dulu (ADR-0008 KB cache offline)", async () => {
+    const cached: SupabaseKbRow[] = [remoteRow];
+    let queried = false;
+    const out = await fetchKbEntries({
+      ...deps({
+        online: false,
+        readCache: () => cached,
+        // eslint-disable-next-line require-await
+        queryRemote: async () => {
+          queried = true;
+          return [];
+        },
+      }),
+      local: [localRow],
+    });
+    assert.equal(queried, false);
+    assert.equal(out.offline, true);
+    assert.equal(out.source, "cache");
+    assert.equal(out.entries[0]?.title, "Aksara ka");
   });
 
   test("tanpa backend → cache lokal bila ada", async () => {
