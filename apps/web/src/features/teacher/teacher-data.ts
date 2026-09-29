@@ -37,14 +37,14 @@ export const QUICK_REPLIES: QuickReply[] = [
   { label: "Madaar / Ngajeng", text: "Bedanya madaar sama ngajeng?" },
   { label: "Pules / Sirep", text: "Apa itu pules dan sirep?" },
   { label: "Titiang", text: "Apa arti kata titiang?" },
-  { label: "Kuningan", text: "Apa itu Kuningan?" },
+  { label: "Kapan Galungan", text: "Kapan Galungan dirayakan?" },
   { label: "Sejarah urutan aksara", text: "Kenapa aksara Bali urutannya ha na ca ra ka?" },
   { label: "Bedanya Andap & Alus", text: "Apa beda bahasa andap dan alus?" },
   { label: "Cara belajar aksara", text: "Gimana cara cepat belajar aksara Bali?" },
-  { label: "Sumber materi", text: "Dari mana sumber materi ini?" },
+  { label: "Makna canang", text: "Jelaskan makna canang sari" },
   { label: "Cara pakai kalimat halus", text: "Kapan saya pakai bahasa halus?" },
   { label: "Filosofi aksara", text: "Apa filosofi di balik aksara Bali?" },
-  { label: "Tentang CAKSARA", text: "Apa itu CAKSARA?" },
+  { label: "Kapan Nyepi", text: "Kapan Nyepi dirayakan?" },
 ];
 
 const SEMANTIC_HINTS: {
@@ -229,7 +229,7 @@ export function getTeacherReply(input: string): TeacherReply {
   const q = clean(input);
   const hint = SEMANTIC_HINTS.find((h) => h.tokens.some((t) => q.includes(t)));
   const fallback = hint
-    ? `Semua yang kubahas itu diambil dari KB (Knowledge Base) yang sumbernya jelas, jadi bisa ditelusuri. Coba tanya lebih spesifik seputar ${hint.text} ya.`
+    ? `Maaf, itu masih di luar materi yang aku pelajari. Coba tanya lebih spesifik seputar ${hint.text} ya, atau seputar aksara, bahasa, dan budaya Bali lainnya.`
     : "Maaf, itu masih di luar materi yang aku pelajari. Coba tanya seputar aksara, bahasa, atau budaya Bali ya, atau pilih pertanyaan cepat di bawah.";
 
   return {
