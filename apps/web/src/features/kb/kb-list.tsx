@@ -175,7 +175,7 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
       </div>
 
       {/* Right Column (Grid of Items) */}
-      <div className="lg:min-h-[80vh] lg:pb-12 mt-6 lg:mt-0">
+      <div className="mt-6 pb-28 lg:mt-0 lg:min-h-[80vh] lg:pb-12">
         {!loading && (loadError || !online) && (
           <KbNotice
             tone={!online ? "offline" : "server"}
