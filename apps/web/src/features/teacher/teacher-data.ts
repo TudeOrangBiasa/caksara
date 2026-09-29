@@ -229,7 +229,7 @@ export function getTeacherReply(input: string): TeacherReply {
   const q = clean(input);
   const hint = SEMANTIC_HINTS.find((h) => h.tokens.some((t) => q.includes(t)));
   const fallback = hint
-    ? `Semua yang kubahas itu diambil dari KB (Knowledge Base) yang sumbernya jelas, jadi bisa ditelusuri. Coba tanya lebih spesifik seputar ${hint.text} ya.`
+    ? `Maaf, itu masih di luar materi yang aku pelajari. Coba tanya lebih spesifik seputar ${hint.text} ya, atau seputar aksara, bahasa, dan budaya Bali lainnya.`
     : "Maaf, itu masih di luar materi yang aku pelajari. Coba tanya seputar aksara, bahasa, atau budaya Bali ya, atau pilih pertanyaan cepat di bawah.";
 
   return {

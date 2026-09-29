@@ -31,6 +31,13 @@ describe("guru virtual #26 — jawab dari KB + sourceRef", () => {
     assert.equal(reply.outside, true);
     assert.ok(reply.suggestions && reply.suggestions.length > 0);
   });
+
+  test("cabang hint (topik dikenal, jawaban tak ada) tetap berfrasa 'di luar materi'", () => {
+    const reply = getTeacherReply("penjor warna apa ya");
+    assert.equal(reply.outside, true);
+    assert.match(reply.answer.toLowerCase(), /di luar materi/);
+    assert.match(reply.answer.toLowerCase(), /aksara|bahasa|budaya/);
+  });
 });
 
 describe("guru virtual #26 — quick-reply 18 FAQ", () => {
