@@ -108,6 +108,7 @@ function QuizLaunchView({
       localFallback: () => deriveQuizForMod(mod),
       deferRemote: hasResume,
       reloadToken: retryKey,
+      wrongTopics: deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, []),
       onNotice: (notice: QuizNotice) => {
         if (noticeKey.current === notice) return;
         noticeKey.current = notice;
@@ -118,10 +119,7 @@ function QuizLaunchView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [mod.id, hasResume, retryKey],
   );
-  const launch = useQuizLaunch(mod.id, {
-    ...fallback,
-    wrongTopics: deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, []),
-  });
+  const launch = useQuizLaunch(mod.id, fallback);
   useEffect(() => {
     noticeKey.current = null;
   }, [retryKey]);
