@@ -65,3 +65,12 @@ export function clearResume(moduleId: string): void {
   delete all[moduleId];
   writeAll(all);
 }
+/** Hapus seluruh tawaran lanjut kuis (dipakai reset progres total #27). */
+export function clearAllQuizResumes(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(KEY);
+  } catch {
+    // Storage diblokir: tidak ada yang perlu dihapus.
+  }
+}

@@ -20,3 +20,11 @@
 .font-balinese {
   font-family: "Noto Sans Balinese", var(--font-balinese), sans-serif;
 }
+:root {
+  --wresastra-size: 24px;
+}
+
+/** Ukuran pilihan Pengaturan (#27): permukaan baca Wresastra ikut membesar. */
+.wresastra-flow {
+  font-size: var(--wresastra-size);
+}

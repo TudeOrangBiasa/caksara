@@ -52,6 +52,15 @@ export function writeKbCache(rows: SupabaseKbRow[]): void {
     // Storage diblokir: KB tetap jalan dari lokal.
   }
 }
+/** Hapus cache KB remote (dipakai reset progres total #27). */
+export function clearKbCache(): void {
+  try {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(CACHE_KEY);
+  } catch {
+    // Storage diblokir: tidak ada yang perlu dihapus.
+  }
+}
 
 /**
  * Ambil daftar KB #25: cache-first 10 menit (kb_entries read-only publik),

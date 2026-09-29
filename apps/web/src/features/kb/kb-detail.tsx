@@ -33,7 +33,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
 
       <div className="hero-texture surface-raised rounded-3xl bg-primary px-5 py-8 text-center text-primary-foreground">
         {entry.glyph ? (
-          <p lang="ban" className="font-balinese text-6xl leading-none">
+          <p lang="ban" className="font-balinese wresastra-flow leading-none">
             {entry.glyph}
           </p>
         ) : (
