@@ -73,3 +73,40 @@ export function mergeProgressStats(
   }
   return Object.values(merged);
 }
+
+/**
+ * Topik salah-terus (#33 V11a): id materi dengan rate benar < 50% dari ≥3
+ * jawaban (riwayat + sesi ini). Murni agar bisa diuji tanpa storage.
+ * Menerima aksaraId Wresastra maupun id materi non-Wresastra berformat
+ * stabil (huruf/angka/garis-bawah/strip); sisanya diabaikan agar bank
+ * korup tak meracuni level.
+ */
+export function deriveWrongTopics(stats: AksaraStats, answers: readonly AksaraAnswer[]): string[] {
+  const merged: AksaraStats = {};
+  for (const [id, s] of Object.entries(stats)) {
+    if (!isStableTopicId(id)) continue;
+    merged[id] = { ...s };
+  }
+  for (const a of answers) {
+    if (!isStableTopicId(a.aksaraId)) continue;
+    const prev = merged[a.aksaraId] ?? { correct: 0, total: 0 };
+    merged[a.aksaraId] = {
+      correct: prev.correct + (a.correct ? 1 : 0),
+      total: prev.total + 1,
+    };
+  }
+  return Object.entries(merged)
+    .filter(([, s]) => s.total >= 3 && s.correct / s.total < 0.5)
+    .map(([id]) => id)
+    .toSorted();
+}
+
+// Debt #33 KB-adaptif: badge KB (kb-list/kb-detail) masih statis per entri
+// dan tak mengikuti level adaptif sesi; sinkronkan bila KB disentuh lagi.
+const TOPIC_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+
+function isStableTopicId(id: string | undefined): id is string {
+  if (!id) return false;
+  if (WRESASTRA_AKSARA.some((x) => x.id === id)) return true;
+  return TOPIC_ID_RE.test(id);
+}

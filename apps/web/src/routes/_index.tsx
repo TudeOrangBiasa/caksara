@@ -32,9 +32,6 @@ import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
 import type { QuizNotice } from "../features/quiz/quiz-generate";
-import { loadResume } from "../features/quiz/quiz-resume";
-import type { Quiz } from "../lib/zod/question";
-import { Button } from "@caksara/ui/components/button";
 import {
   buildMixedQuiz,
   buildSessionQuiz,
@@ -42,6 +39,10 @@ import {
   nextAttemptSeed,
   recordSessionLevel,
 } from "../features/quiz/quiz-data";
+import { deriveWrongTopics } from "../lib/aksara-stats";
+import { loadResume } from "../features/quiz/quiz-resume";
+import type { Quiz } from "../lib/zod/question";
+import { Button } from "@caksara/ui/components/button";
 import {
   applyOvernightReset,
   createAnonProfile,
@@ -107,6 +108,7 @@ function QuizLaunchView({
       localFallback: () => deriveQuizForMod(mod),
       deferRemote: hasResume,
       reloadToken: retryKey,
+      wrongTopics: deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, []),
       onNotice: (notice: QuizNotice) => {
         if (noticeKey.current === notice) return;
         noticeKey.current = notice;
@@ -243,6 +245,7 @@ export default function Home() {
       <QuizResult
         mod={view.mod}
         score={view.score}
+        level={view.isLatihan ? undefined : getAdaptiveLevel(view.mod.id)}
         isLatihan={view.isLatihan}
         tidbit={view.tidbit}
         onRetry={() =>
@@ -257,15 +260,18 @@ export default function Home() {
       />
     );
   } else if (view.kind === "quiz") {
+    const sessionLevel = view.isLatihan ? undefined : getAdaptiveLevel(view.mod.id);
     content = (
       <QuizShell
         quiz={view.quiz}
         moduleId={view.mod.id}
+        level={sessionLevel}
         initialHearts={loadProfile()?.hearts ?? MAX_HEARTS}
         onFinish={(score, detail) => {
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
-            recordSessionLevel(view.mod.id, score.correct, score.total);
+            const wrong = deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, detail);
+            recordSessionLevel(view.mod.id, score.correct, score.total, wrong);
           }
           recordAnswerStats(detail);
           // V10 offline-buffer: enqueue bila SALAH SATU gagal (sesi ATAU

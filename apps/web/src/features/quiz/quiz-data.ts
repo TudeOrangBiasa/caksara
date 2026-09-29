@@ -385,11 +385,30 @@ export function getAdaptiveLevel(moduleId: string): number {
   return Math.min(3, Math.max(1, Math.round(stored)));
 }
 
-export function recordSessionLevel(moduleId: string, correct: number, total: number): void {
+export function recordSessionLevel(
+  moduleId: string,
+  correct: number,
+  total: number,
+  wrongTopics: readonly string[] = [],
+): void {
   if (total <= 0) return;
   const rate = correct / total;
   const prev = getAdaptiveLevel(moduleId);
-  const next = rate < 0.4 ? Math.max(1, prev - 1) : rate >= 0.8 ? Math.min(3, prev + 1) : prev;
+  // #33 V11a: salah terus menahan laju naik. Skor anjlok (<0.4) selalu
+  // turun; di bawah lancar, topik salah memperlebar zona turun; skor
+  // lancar (≥0.8) hanya naik bila bersih — ada topik salah berarti pola
+  // salah berulang di materi itu, jadi tahan walau skor sesi tinggi.
+  // Skor 5/5 murni tak punya topik salah (bukan temuan).
+  const hasWrong = wrongTopics.length > 0;
+  const next = hasWrong
+    ? rate >= 0.8
+      ? prev
+      : Math.max(1, prev - 1)
+    : rate < 0.4
+      ? Math.max(1, prev - 1)
+      : rate >= 0.8
+        ? Math.min(3, prev + 1)
+        : prev;
   writeNum(LEVEL_KEY, moduleId, next);
 }
 

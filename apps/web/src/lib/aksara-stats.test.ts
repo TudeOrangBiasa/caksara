@@ -1,4 +1,9 @@
-import { deriveMasteryMap, mergeProgressStats, recordAksaraAnswer } from "./aksara-stats";
+import {
+  deriveMasteryMap,
+  deriveWrongTopics,
+  mergeProgressStats,
+  recordAksaraAnswer,
+} from "./aksara-stats";
 import { aksaraStatsSchema } from "./zod/profile";
 import { deriveMastery } from "./game-rules";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
@@ -64,5 +69,44 @@ describe("mergeProgressStats", () => {
   test("ambang baris progres memakai game-rules yang sama", () => {
     expect(deriveMastery({ correctCount: 0, totalCount: 0 })).toBe("belum");
     expect(deriveMastery({ correctCount: 8, totalCount: 10 })).toBe("ahli");
+  });
+});
+
+describe("deriveWrongTopics #33", () => {
+  test("aksara salah-terus (rate rendah + n≥3) jadi topik, yang lancar tidak", () => {
+    const topics = deriveWrongTopics(
+      {
+        wre_01: { correct: 1, total: 4 },
+        wre_02: { correct: 4, total: 4 },
+        "?": { correct: 0, total: 9 },
+      },
+      [
+        { aksaraId: "wre_01", correct: false },
+        { aksaraId: "wre_01", correct: false },
+        { aksaraId: "wre_02", correct: true },
+      ],
+    );
+    expect(topics).toContain("wre_01");
+    expect(topics).not.toContain("wre_02");
+    expect(topics).not.toContain("?");
+  });
+
+  test("id materi non-Wresastra yang stabil ikut jadi topik", () => {
+    const topics = deriveWrongTopics({ kb_sapaan: { correct: 0, total: 3 } }, [
+      { aksaraId: "kb_sapaan", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+      { aksaraId: "kb_madaar_ngajeng", correct: false },
+    ]);
+    expect(topics).toContain("kb_sapaan");
+    expect(topics).toContain("kb_madaar_ngajeng");
+  });
+
+  test("sesi lancar tanpa salah ber-aksara → topik kosong", () => {
+    expect(
+      deriveWrongTopics({ wre_01: { correct: 8, total: 10 } }, [
+        { aksaraId: "wre_01", correct: true },
+      ]),
+    ).toEqual([]);
   });
 });

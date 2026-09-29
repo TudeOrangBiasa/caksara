@@ -12,13 +12,22 @@ import type { CourseModule } from "../module/module-data";
 interface QuizResultProps {
   mod: CourseModule;
   score: { correct: number; total: number };
+  /** Level adaptif setelah sesi direkam (#33 V11a); absen untuk Latihan. */
+  level?: number;
   isLatihan?: boolean;
   tidbit?: string;
   onRetry: () => void;
   onBack: () => void;
 }
-
-export function QuizResult({ mod, score, isLatihan, tidbit, onRetry, onBack }: QuizResultProps) {
+export function QuizResult({
+  mod,
+  score,
+  level,
+  isLatihan,
+  tidbit,
+  onRetry,
+  onBack,
+}: QuizResultProps) {
   const percentage = Math.round((score.correct / score.total) * 100);
   const passed = percentage >= 70;
   const xpGained = score.correct * XP_PER_CORRECT;
@@ -51,6 +60,15 @@ export function QuizResult({ mod, score, isLatihan, tidbit, onRetry, onBack }: Q
             : "Belum lulus, semangat ya"}
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">{mod.title}</p>
+      {level !== undefined && (
+        <p
+          role="status"
+          aria-label={`Level sesi berikut: Level ${level}`}
+          className="mt-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
+        >
+          Level {level} · Sesi berikut menyesuaikan hasilmu
+        </p>
+      )}
 
       <div className="relative mt-6">
         <svg
