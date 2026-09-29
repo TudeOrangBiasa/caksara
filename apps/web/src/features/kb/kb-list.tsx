@@ -73,7 +73,8 @@ export function KbList({ onOpenEntry, initialQuery }: KbListProps) {
     return () => {
       cancelled = true;
     };
-  }, [retryKey]);
+    // V10: muat ulang saat koneksi pulih agar cache KB tersinkron.
+  }, [retryKey, online]);
 
   const list = entries ?? [];
   const filtered = list.filter((e) => kbMatchesFilter(e, { category, level, query: deferred }));

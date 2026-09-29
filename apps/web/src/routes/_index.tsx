@@ -27,6 +27,7 @@ import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
 import { saveAksaraProgress } from "../features/quiz/quiz-progress";
+import { enqueuePendingSession } from "../features/quiz/quiz-pending-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
 import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
@@ -53,6 +54,7 @@ import {
 import { MAX_HEARTS } from "../lib/game-rules";
 import {
   notifyHeartsRefilled,
+  notifyQueuedOffline,
   notifyQuizFallback,
   notifyRateLimited,
   notifyStreakReset,
@@ -266,8 +268,33 @@ export default function Home() {
             recordSessionLevel(view.mod.id, score.correct, score.total);
           }
           recordAnswerStats(detail);
-          void saveQuizSession(view.mod.id, detail, score);
-          void saveAksaraProgress(detail, WRESASTRA_IDS);
+          // V10 offline-buffer: enqueue bila SALAH SATU gagal (sesi ATAU
+          // progres); flag menandai bagian yang sudah sukses agar flush tak
+          // kirim ulang. Coba-lagi reload keras pre-existing (di luar delta).
+          void Promise.allSettled([
+            saveQuizSession(view.mod.id, detail, score),
+            saveAksaraProgress(detail, WRESASTRA_IDS),
+          ]).then(([sessionRes, progressRes]) => {
+            const sessionOk =
+              sessionRes.status === "fulfilled" &&
+              (sessionRes.value.saved || sessionRes.value.reason === "validation");
+            const progressOk = progressRes.status === "fulfilled" && progressRes.value.saved;
+            // Skor inkonsisten = bug pemanggil, bukan offline: jangan antre.
+            if (sessionRes.status === "fulfilled" && !sessionRes.value.saved) {
+              if (sessionRes.value.reason === "validation") return;
+            }
+            if (
+              enqueuePendingSession({
+                moduleId: view.mod.id,
+                answers: detail,
+                score,
+                sessionSent: sessionOk,
+                progressSent: progressOk,
+              })
+            ) {
+              notifyQueuedOffline();
+            }
+          });
           setView({
             kind: "result",
             mod: view.mod,

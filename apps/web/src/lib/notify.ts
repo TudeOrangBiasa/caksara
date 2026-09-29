@@ -65,3 +65,19 @@ export function notifyQuizFallback() {
     duration: 4000,
   });
 }
+
+/** V10: hasil kuis gagal terkirim → antre di perangkat, sync saat online. */
+export function notifyQueuedOffline() {
+  toast.info("Tersimpan di perangkat", {
+    description: "Hasil akan dikirim otomatis saat kembali online.",
+    duration: 4000,
+  });
+}
+
+/** V10: antrean buffer terkirim setelah koneksi pulih. */
+export function notifyPendingSynced(sent: number) {
+  toast.success("Hasil terkirim", {
+    description: sent === 1 ? "1 sesi tertunda sudah masuk." : `${sent} sesi tertunda sudah masuk.`,
+    duration: 3500,
+  });
+}
