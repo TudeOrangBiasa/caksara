@@ -88,7 +88,7 @@ export function ProfilPage({
     <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-6xl lg:grid lg:grid-cols-[340px_1fr] lg:gap-8 lg:items-start animate-in fade-in duration-500">
       {/* Left Column (Sticky Sidebar on Desktop) */}
       <div className="lg:sticky lg:top-24 flex flex-col gap-6">
-        <header className="relative overflow-hidden rounded-[1.75rem] min-h-[220px] p-6 shadow-md flex flex-col justify-between group">
+        <header className="relative overflow-hidden rounded-3xl min-h-[220px] p-6 shadow-md flex flex-col justify-between group">
           <img
             src="/assets/review_family_2d_1788968477297.jpg"
             alt="Profil background"
@@ -173,7 +173,7 @@ export function ProfilPage({
       {/* Right Column (Main content) */}
       <div className="mt-8 lg:mt-0 flex flex-col gap-6">
         <StreakCard streak={profile?.streak ?? 0} lastActive={profile?.lastActiveDate} />
-        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+        <div className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
               <Trophy className="size-5" />
@@ -204,7 +204,7 @@ export function ProfilPage({
           </p>
         </div>
 
-        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+        <div className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
@@ -250,11 +250,10 @@ export function ProfilPage({
             ))}
           </div>
         </div>
-        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+        <div className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
           <MasteryGrid mastery={profile?.mastery} />
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            Status dihitung dari riwayat jawabanmu: 3+ percobaan jadi Dipahami, 5+ dengan akurasi
-            80% jadi Ahli.
+            Status dihitung dari riwayat jawabanmu.
           </p>
         </div>
 
@@ -309,6 +308,18 @@ function StatMini({ label, value, color }: { label: string; value: number; color
     </div>
   );
 }
+function activeDates(lastActive: string | undefined, streak: number): Set<string> {
+  if (!lastActive || streak <= 0) return new Set();
+  const active = new Set<string>();
+  const end = new Date(`${lastActive}T00:00:00Z`);
+  for (let i = 0; i < Math.min(7, streak); i += 1) {
+    const d = new Date(end);
+    d.setUTCDate(d.getUTCDate() - i);
+    active.add(d.toISOString().slice(0, 10));
+  }
+  return active;
+}
+
 function StreakCard({ streak, lastActive }: { streak: number; lastActive?: string }) {
   const today = witaTodayStr();
   const days = Array.from({ length: 7 }, (_, i) => {
@@ -316,9 +327,9 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
     d.setUTCDate(d.getUTCDate() - (6 - i));
     return d.toISOString().slice(0, 10);
   });
-  const activeCount = Math.min(7, streak);
+  const active = activeDates(lastActive, streak);
   return (
-    <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
+    <div className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40">
       <div className="mb-4 flex items-center gap-3">
         <div className="flex size-10 items-center justify-center rounded-2xl bg-warning/15 text-warning">
           <Flame className="size-5" />
@@ -337,20 +348,18 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
         role="img"
         aria-label={`Streak ${streak} hari${lastActive === today ? ", sudah belajar hari ini" : ""}`}
       >
-        {days.map((day, i) => {
-          const lit = i >= 7 - activeCount;
+        {days.map((day) => {
+          const lit = active.has(day);
           const isToday = day === today;
           return (
             <div
               key={day}
               title={day}
               className={`flex h-9 items-center justify-center rounded-xl text-xs font-bold tabular-nums transition-colors ${
-                lit
-                  ? "bg-warning text-warning-foreground shadow-sm"
-                  : "bg-muted/60 text-muted-foreground"
+                lit ? "bg-warning text-background shadow-sm" : "bg-muted/60 text-muted-foreground"
               } ${isToday ? "ring-2 ring-warning/60 ring-offset-2 ring-offset-card" : ""}`}
             >
-              {lit ? <Flame className="size-4" aria-hidden /> : i + 1}
+              {lit ? <Flame className="size-4" aria-hidden /> : day.slice(8)}
             </div>
           );
         })}

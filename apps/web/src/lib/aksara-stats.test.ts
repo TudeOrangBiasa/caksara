@@ -1,4 +1,5 @@
 import { deriveMasteryMap, mergeProgressStats, recordAksaraAnswer } from "./aksara-stats";
+import { aksaraStatsSchema } from "./zod/profile";
 import { deriveMastery } from "./game-rules";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
@@ -53,6 +54,11 @@ describe("mergeProgressStats", () => {
     expect(merged).toContainEqual({ aksaraId: "wre_01", correctCount: 3, totalCount: 5 });
     expect(merged).toContainEqual({ aksaraId: "wre_05", correctCount: 0, totalCount: 1 });
     expect(merged.some((r) => r.aksaraId === "asing")).toBe(false);
+  });
+
+  test("skema menolak benar melebihi total", () => {
+    expect(aksaraStatsSchema.safeParse({ wre_01: { correct: 3, total: 2 } }).success).toBe(false);
+    expect(aksaraStatsSchema.safeParse({ wre_01: { correct: 2, total: 2 } }).success).toBe(true);
   });
 
   test("ambang baris progres memakai game-rules yang sama", () => {
