@@ -359,6 +359,20 @@ function writeNum(key: string, field: string, value: number): void {
     // Storage diblokir: level adaptif kembali ke level dasar modul.
   }
 }
+/** Hapus level adaptif + hitung percobaan sesi (dipakai reset progres total #27). */
+export function clearQuizProgress(): void {
+  try {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(LEVEL_KEY);
+      window.localStorage.removeItem(ATTEMPT_KEY);
+      return;
+    }
+    memStore().delete(LEVEL_KEY);
+    memStore().delete(ATTEMPT_KEY);
+  } catch {
+    // Storage diblokir: tidak ada yang perlu dihapus.
+  }
+}
 
 /**
  * Level adaptif berbasis data (#23): mulai dari level dasar modul, lalu

@@ -51,6 +51,15 @@ function writeCache(all: Record<string, CacheRow>): void {
     // Storage diblokir: cache dilewati, kuis tetap jalan dari fallback lokal.
   }
 }
+/** Hapus cache kuis Gemini (dipakai reset progres total #27). */
+export function clearQuizCache(): void {
+  try {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(CACHE_KEY);
+  } catch {
+    // Storage diblokir: tidak ada yang perlu dihapus.
+  }
+}
 
 export function readCachedQuiz(moduleId: string, level: number): GeneratedQuiz | null {
   const row = readCache()[`${moduleId}:L${level}`];

@@ -38,7 +38,10 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
             latinText={question.latinText}
           />
         ) : (
-          <p className="font-balinese text-4xl leading-loose break-words text-card-foreground sm:text-5xl">
+          <p
+            lang="ban"
+            className="font-balinese wresastra-flow leading-loose break-words text-card-foreground"
+          >
             {question.prompt}
           </p>
         )}

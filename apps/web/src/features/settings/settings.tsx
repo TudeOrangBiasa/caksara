@@ -16,13 +16,14 @@ import * as React from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
-import { useTheme } from "../../components/theme-provider";
 import { Bedawang } from "../../components/bedawang";
-import { playCue } from "../../lib/sound";
-import { clearSelesai } from "../module/module-store";
-import { resetProfile } from "../../lib/profile-store";
+import { useTheme } from "../../components/theme-provider";
+import { playPreview } from "../../lib/sound";
+import { notifyProgressReset } from "../../lib/notify";
 import {
+  initSettings,
   loadSettings,
+  resetAllProgress,
   setSoundEnabled,
   setWresastraFontSize,
   subscribeSettings,
@@ -126,17 +127,20 @@ function MenuList({
 }
 
 export function SettingsPage({ onBack }: { onBack: () => void }) {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, theme: themeSetting, resolvedTheme } = useTheme();
   const [settings, setSettingsState] = React.useState(loadSettings);
   const [section, setSection] = React.useState<SettingsSection | null>(null);
 
   React.useEffect(() => {
+    initSettings();
     setSettingsState(loadSettings());
     return subscribeSettings(() => setSettingsState(loadSettings()));
   }, []);
 
+  // Radio mencerminkan setting ("system" tetap "system"); preview memakai hasil resolved.
   const theme: ThemeMode =
-    resolvedTheme === "light" || resolvedTheme === "dark" ? resolvedTheme : "system";
+    themeSetting === "light" || themeSetting === "dark" ? themeSetting : "system";
+  const preview: "light" | "dark" = resolvedTheme === "dark" ? "dark" : "light";
 
   function pickTheme(next: ThemeMode) {
     if (next === "system") setTheme("system");
@@ -172,7 +176,9 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto px-4 py-5 lg:[&>*]:mx-auto lg:[&>*]:w-full lg:[&>*]:max-w-3xl">
         {section === null && <MenuList onSelect={setSection} summary={summary} />}
         {section === "profil" && <ProfileSection />}
-        {section === "tampilan" && <ThemeSection theme={theme} pickTheme={pickTheme} />}
+        {section === "tampilan" && (
+          <ThemeSection theme={theme} preview={preview} pickTheme={pickTheme} />
+        )}
         {section === "aksara" && <AksaraSection fontSize={settings.wresastraFontSize} />}
         {section === "suara" && <SoundSection enabled={settings.soundEnabled} />}
         {section === "data" && <DataSection />}
@@ -184,9 +190,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
 function ThemeSection({
   theme,
+  preview,
   pickTheme,
 }: {
   theme: ThemeMode;
+  preview: "light" | "dark";
   pickTheme: (next: ThemeMode) => void;
 }) {
   return (
@@ -227,6 +235,26 @@ function ThemeSection({
           );
         })}
       </div>
+      <div
+        aria-label="Pratinjau tema"
+        className="overflow-hidden rounded-3xl border bg-card shadow-sm transition-colors duration-300"
+      >
+        <div className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground transition-colors duration-300">
+          <Bedawang mood="senang" className="size-10 shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold">Bedawang Nala</p>
+            <p className="text-xs opacity-80">Pratinjau langsung tema {preview}</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <span className="font-balinese text-2xl leading-none text-primary transition-colors duration-300">
+            ᬳᬦᬘᬭᬓ
+          </span>
+          <span className="rounded-full bg-success/15 px-2.5 py-1 text-xs font-semibold text-cta">
+            +10 XP
+          </span>
+        </div>
+      </div>
       <p className="rounded-3xl bg-card p-4 text-xs leading-relaxed text-muted-foreground shadow-sm">
         Ikuti sistem artinya tampilan menyesuaikan pengaturan terang/gelap di perangkatmu secara
         otomatis.
@@ -251,13 +279,18 @@ function AksaraSection({ fontSize }: { fontSize: number }) {
       </div>
 
       <div
-        className="flex items-center justify-center rounded-3xl bg-card py-6 shadow-sm"
-        style={{ fontSize }}
+        className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-3xl bg-card px-4 py-6 text-center shadow-sm"
         data-fontsize={fontSize}
       >
-        <span className="font-balinese leading-none" aria-label="Pratinjau aksara Wresastra">
+        <span
+          lang="ban"
+          className="font-balinese leading-none transition-[font-size] duration-300"
+          style={{ fontSize }}
+          aria-label="Pratinjau aksara Wresastra"
+        >
           {PREVIEW_GLYPH}
         </span>
+        <span className="text-xs text-muted-foreground">hanacaraka · {fontSize}px</span>
       </div>
 
       <div
@@ -321,7 +354,7 @@ function SoundSection({ enabled }: { enabled: boolean }) {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => playCue("success")}
+          onClick={() => playPreview("success")}
           className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground"
         >
           Coba
@@ -347,7 +380,8 @@ function DataSection() {
             Reset progres
           </h2>
           <p className="text-xs text-muted-foreground">
-            Hapus semua XP, hati, streak, dan modul yang sudah selesai.
+            Hapus XP, hati, streak, modul selesai, dan tawaran lanjut kuis. Tema, ukuran aksara, dan
+            suara tidak ikut terhapus.
           </p>
         </div>
       </div>
@@ -514,9 +548,9 @@ function ResetConfirm({ trigger }: { trigger: React.ReactNode }) {
   }, [open]);
 
   function confirm() {
-    resetProfile();
-    clearSelesai();
+    resetAllProgress();
     setOpen(false);
+    notifyProgressReset();
   }
 
   return (

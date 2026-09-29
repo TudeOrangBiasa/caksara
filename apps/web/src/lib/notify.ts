@@ -51,6 +51,13 @@ export function notifyModuleLocked() {
     duration: 3500,
   });
 }
+/** #27: reset progres total → konfirmasi singkat, ajak mulai lagi. */
+export function notifyProgressReset() {
+  toast.success("Progres direset", {
+    description: "Mulai lagi dari Modul 1, pelan-pelan ya.",
+    duration: 3500,
+  });
+}
 /** #23: Edge/Gemini gagal → sesi jalan dari bank statis lokal + cache. */
 export function notifyQuizFallback() {
   toast.info("Mode offline kuis", {
