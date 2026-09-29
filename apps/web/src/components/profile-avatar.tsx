@@ -1,7 +1,7 @@
 import { cn } from "@caksara/ui/lib/utils";
 
 import type { ProfileAvatar } from "../lib/zod/profile";
-import { defaultAvatarUri } from "../lib/default-avatar";
+import { defaultAvatarUri, ipAvatarUriForName } from "../lib/default-avatar";
 import { Bedawang } from "./bedawang";
 
 export const AVATAR_PRESETS = [
@@ -32,9 +32,14 @@ export function ProfileAvatar({
   textClassName?: string;
 }) {
   if (!avatar) {
+    const ip = ipAvatarUriForName(name);
+    const fallback = defaultAvatarUri(name);
     return (
       <img
-        src={defaultAvatarUri(name)}
+        src={ip}
+        onError={(e) => {
+          if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+        }}
         alt={`Avatar ${name}`}
         className={cn("rounded-full object-cover", className)}
       />
@@ -53,10 +58,19 @@ export function ProfileAvatar({
       </span>
     );
   }
-  if (avatar?.kind === "photo" && avatar.value.startsWith("data:image")) {
+  // Allowlist sempit: foto upload (data:image) + avatar IP lokal
+  // (/assets/avatar-*.webp). BUKAN /assets/ umum, BUKAN http(s) eksternal.
+  if (
+    avatar?.kind === "photo" &&
+    (avatar.value.startsWith("data:image") || avatar.value.startsWith("/assets/avatar-"))
+  ) {
+    const svgFallback = defaultAvatarUri(name);
     return (
       <img
         src={avatar.value}
+        onError={(e) => {
+          if (e.currentTarget.src !== svgFallback) e.currentTarget.src = svgFallback;
+        }}
         alt={`Foto ${name}`}
         className={cn("rounded-full object-cover", className)}
       />
