@@ -224,6 +224,13 @@ export default function Home() {
     initSoundboard();
   }, []);
 
+  // V9: refill Hati + reset Streak harian berjalan saat profil siap
+  // (onboarding gate menunda HomeShell, jadi tidak bisa di sana).
+  useEffect(() => {
+    if (!profileLoaded) return;
+    if (applyOvernightReset()) notifyStreakReset();
+    if (refillHearts()) notifyHeartsRefilled();
+  }, [profileLoaded]);
   if (!profileLoaded) {
     return <OnboardingGate onComplete={handleComplete} />;
   }
@@ -398,10 +405,7 @@ function HomeShell({
   content: React.ReactNode;
 }) {
   const isDesktop = useIsDesktop();
-  useEffect(() => {
-    if (applyOvernightReset()) notifyStreakReset();
-    if (refillHearts()) notifyHeartsRefilled();
-  }, []);
+  // V9 refill/reset berjalan di Home (profileLoaded), bukan di sini.
 
   return (
     <div className="flex h-full flex-col">
