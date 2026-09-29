@@ -395,6 +395,17 @@ function drawTidbit(
     }
   }
   if (cur) lines.push(cur);
+  // Maks 2 baris muat di kotak 132px: gabung luapan ke baris 2 + elipsis.
+  if (lines.length > 2) {
+    let merged = lines.slice(1).join(" ");
+    while (merged.length > 1 && ctx.measureText(`${merged}…`).width > maxTextW) {
+      merged = merged.slice(
+        0,
+        merged.lastIndexOf(" ") > 0 ? merged.lastIndexOf(" ") : merged.length - 1,
+      );
+    }
+    lines.splice(1, lines.length - 1, `${merged}…`);
+  }
   ctx.fillStyle = PALETTE.muted;
   ctx.font = "600 18px Inter, sans-serif";
   ctx.fillText("TAHUKAH KAMU?", g.pad + 76, tidbitTop + 34);
