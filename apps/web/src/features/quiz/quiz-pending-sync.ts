@@ -18,6 +18,10 @@ const pendingSessionSchema = z.object({
     correct: z.number().int().nonnegative(),
     total: z.number().int().nonnegative(),
   }),
+  // Bagian yang sudah terkonfirmasi terkirim: flush melewatkannya agar tak
+  // kirim ulang (progres kirim-ulang menggandakan hitungan Mastery).
+  sessionSent: z.boolean().default(false),
+  progressSent: z.boolean().default(false),
   enqueuedAt: z.number().int(),
 });
 
@@ -52,17 +56,27 @@ function prune(all: PendingSession[], now = Date.now()): PendingSession[] {
   return all.filter((p) => now - p.enqueuedAt <= MAX_AGE_MS);
 }
 
-/** Tambah sesi selesai yang gagal terkirim ke antrean buffer lokal. */
+/**
+ * Tambah sesi selesai yang gagal terkirim ke antrean buffer lokal.
+ * Tolak skor inkonsisten (benar/total tak cocok jawaban) di batas agar entri
+ * tak antre selamanya sampai prune 14 hari. Kembalikan true bila masuk antrean.
+ */
 export function enqueuePendingSession(input: {
   moduleId: string;
   answers: QuizAnswerDetail[];
   score: { correct: number; total: number };
-}): void {
+  sessionSent?: boolean;
+  progressSent?: boolean;
+}): boolean {
   const parsed = pendingSessionSchema.omit({ enqueuedAt: true }).safeParse(input);
-  if (!parsed.success) return;
+  if (!parsed.success) return false;
+  const derivedCorrect = parsed.data.answers.filter((a) => a.correct).length;
+  if (derivedCorrect !== parsed.data.score.correct) return false;
+  if (parsed.data.answers.length !== parsed.data.score.total) return false;
   const all = prune(readAll());
   all.push({ ...parsed.data, enqueuedAt: Date.now() });
   writeAll(all);
+  return true;
 }
 
 export function readPendingSessions(): PendingSession[] {
@@ -73,10 +87,18 @@ export function pendingSessionCount(): number {
   return readPendingSessions().length;
 }
 
-function dropSent(sent: PendingSession[]): void {
-  if (sent.length === 0) return;
-  const sentKeys = new Set(sent.map((s) => `${s.moduleId}:${s.enqueuedAt}`));
-  writeAll(prune(readAll()).filter((p) => !sentKeys.has(`${p.moduleId}:${p.enqueuedAt}`)));
+function entryKey(p: PendingSession): string {
+  return `${p.moduleId}:${p.enqueuedAt}`;
+}
+
+function persistEntry(next: PendingSession): void {
+  const key = entryKey(next);
+  writeAll(prune(readAll()).map((p) => (entryKey(p) === key ? next : p)));
+}
+
+function dropEntry(done: PendingSession): void {
+  const key = entryKey(done);
+  writeAll(prune(readAll()).filter((p) => entryKey(p) !== key));
 }
 
 export interface FlushResult {
@@ -102,7 +124,14 @@ export interface FlushDeps {
 
 /**
  * Kirim antrean buffer saat online (ADR-0008: buffer lokal + sync saat
- * online). No-op saat offline/tanpa backend. Tidak pernah melempar.
+ * online). Atomik per entri: kedua bagian (sesi + progres) milik entri yang
+ * sama dikirim dari entri itu; bagian yang sudah terkonfirmasi terkirim
+ * dilewati agar tak kirim ulang (progres kirim-ulang menggandakan hitungan
+ * Mastery). Entri hanya di-drop bila keduanya tuntas. Dedup sisi klien:
+ * kunci moduleId:enqueuedAt. Batas: tanpa dedupe server, dua tab yang flush
+ * bersamaan bisa insert sesi ganda — flag parsial dipersist per upaya agar
+ * retry tak mengulang bagian yang sudah sukses. No-op saat offline/tanpa
+ * backend. Tidak pernah melempar.
  */
 export async function flushPendingSessions(opts: FlushDeps = {}): Promise<FlushResult> {
   const online = opts.online ?? (typeof navigator === "undefined" ? true : navigator.onLine);
@@ -121,21 +150,30 @@ export async function flushPendingSessions(opts: FlushDeps = {}): Promise<FlushR
   const saveSession = opts.saveSession ?? saveQuizSession;
   const saveProgress = opts.saveProgress ?? saveAksaraProgress;
   const knownIds = opts.knownIds ?? [];
-  const sent: PendingSession[] = [];
+  let sent = 0;
   for (const p of pending) {
     try {
-      const sessionRes = await saveSession(p.moduleId, p.answers, p.score);
-      if (!sessionRes.saved) continue;
-      const progressRes = await saveProgress(p.answers, knownIds);
-      if (!progressRes.saved) continue;
-      sent.push(p);
+      let next = p;
+      if (!next.sessionSent) {
+        const sessionRes = await saveSession(next.moduleId, next.answers, next.score);
+        if (!sessionRes.saved) continue;
+        next = { ...next, sessionSent: true };
+        persistEntry(next);
+      }
+      if (!next.progressSent) {
+        const progressRes = await saveProgress(next.answers, knownIds);
+        if (!progressRes.saved) continue;
+        next = { ...next, progressSent: true };
+        persistEntry(next);
+      }
+      dropEntry(next);
+      sent += 1;
     } catch {
       continue;
     }
   }
-  dropSent(sent);
   const remaining = prune(readAll()).length;
-  return { attempted: pending.length, sent: sent.length, remaining };
+  return { attempted: pending.length, sent, remaining };
 }
 
 export interface SyncOnBackOnlineDeps extends FlushDeps {
@@ -143,18 +181,19 @@ export interface SyncOnBackOnlineDeps extends FlushDeps {
 }
 
 /**
- * Sinkronisasi ulang saat koneksi pulih: kirim antrean buffer lalu
- * segarkan KB cache bila antrean tuntas. Tidak pernah melempar.
+ * Sinkronisasi ulang saat koneksi pulih: flush buffer dan refresh KB cache
+ * berjalan independen — KB selalu disegarkan walau antrean tersisa, karena
+ * keterbacaan materi offline tak boleh diblokir kiriman tertunda. Keduanya
+ * tak pernah melempar; kegagalan satu tak menggugurkan yang lain.
  */
 export async function syncOnBackOnline(opts: SyncOnBackOnlineDeps = {}): Promise<FlushResult> {
   const { refreshKbCache, ...flushOpts } = opts;
   const result = await flushPendingSessions(flushOpts);
-  if (result.remaining > 0) return result;
   try {
     if (refreshKbCache) await refreshKbCache();
     else await fetchKbEntries({ readCache: () => null });
   } catch {
-    // KB refresh gagal: antrean tetap terkirim, cache lama tetap dipakai.
+    // KB refresh gagal: antrean tetap dilaporkan apa adanya, cache lama dipakai.
   }
   return result;
 }

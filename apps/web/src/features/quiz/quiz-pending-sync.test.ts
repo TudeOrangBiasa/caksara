@@ -129,7 +129,7 @@ describe("flushPendingSessions — sync saat online", () => {
     expect(out.remaining).toBe(1);
   });
 
-  test("progress gagal → sesi tidak di-drop (kirim ulang utuh)", async () => {
+  test("progress gagal → sesi tidak di-drop, flag parsial dipersist", async () => {
     enqueue();
     const out = await pending.flushPendingSessions({
       online: true,
@@ -139,8 +139,100 @@ describe("flushPendingSessions — sync saat online", () => {
     });
     expect(out.sent).toBe(0);
     expect(out.remaining).toBe(1);
+    expect(pending.readPendingSessions()[0]?.sessionSent).toBe(true);
+    expect(pending.readPendingSessions()[0]?.progressSent).toBe(false);
   });
 
+  test("retry tak kirim ulang bagian sukses: sesi dilewati, progres dikirim", async () => {
+    enqueue();
+    let sessionCalls = 0;
+    let progressCalls = 0;
+    await pending.flushPendingSessions({
+      online: true,
+      hasBackend: true,
+      saveSession: async () => {
+        sessionCalls += 1;
+        return { saved: true };
+      },
+      saveProgress: async () => {
+        progressCalls += 1;
+        return { saved: false };
+      },
+    });
+    const out = await pending.flushPendingSessions({
+      online: true,
+      hasBackend: true,
+      saveSession: async () => {
+        sessionCalls += 1;
+        return { saved: true };
+      },
+      saveProgress: async () => {
+        progressCalls += 1;
+        return { saved: true };
+      },
+    });
+    expect(out).toEqual({ attempted: 1, sent: 1, remaining: 0 });
+    expect(sessionCalls).toBe(1);
+    expect(progressCalls).toBe(2);
+  });
+
+  test("sesi sudah sukses saat enqueue → flush hanya kirim progres", async () => {
+    pending.enqueuePendingSession({
+      moduleId: "mod_01",
+      answers,
+      score,
+      sessionSent: true,
+      progressSent: false,
+    });
+    let sessionCalls = 0;
+    const out = await pending.flushPendingSessions({
+      online: true,
+      hasBackend: true,
+      saveSession: async () => {
+        sessionCalls += 1;
+        return { saved: true };
+      },
+      saveProgress: async () => ({ saved: true }),
+    });
+    expect(out).toEqual({ attempted: 1, sent: 1, remaining: 0 });
+    expect(sessionCalls).toBe(0);
+  });
+
+  test("progres sudah sukses saat enqueue → flush hanya kirim sesi", async () => {
+    pending.enqueuePendingSession({
+      moduleId: "mod_01",
+      answers,
+      score,
+      sessionSent: false,
+      progressSent: true,
+    });
+    let progressCalls = 0;
+    const out = await pending.flushPendingSessions({
+      online: true,
+      hasBackend: true,
+      saveSession: async () => ({ saved: true }),
+      saveProgress: async () => {
+        progressCalls += 1;
+        return { saved: true };
+      },
+    });
+    expect(out).toEqual({ attempted: 1, sent: 1, remaining: 0 });
+    expect(progressCalls).toBe(0);
+  });
+
+  test("skor inkonsisten ditolak di batas (tak antre selamanya)", () => {
+    const badScore = { correct: 0, total: 2 };
+    const ok = pending.enqueuePendingSession({ moduleId: "mod_01", answers, score: badScore });
+    expect(ok).toBe(false);
+    expect(pending.pendingSessionCount()).toBe(0);
+  });
+
+  test("total tak cocok jawaban ditolak di batas", () => {
+    const badScore = { correct: 1, total: 5 };
+    const ok = pending.enqueuePendingSession({ moduleId: "mod_01", answers, score: badScore });
+    expect(ok).toBe(false);
+    expect(pending.pendingSessionCount()).toBe(0);
+  });
   test("antrean kosong → no-op tanpa memanggil saver", async () => {
     let called = false;
     const out = await pending.flushPendingSessions({
@@ -157,8 +249,24 @@ describe("flushPendingSessions — sync saat online", () => {
   });
 });
 
-describe("syncOnBackOnline — antrean + KB cache", () => {
-  test("tuntas → KB cache disegarkan", async () => {
+describe("syncOnBackOnline — KB independen dari buffer", () => {
+  test("sisa antrean → KB cache tetap disegarkan", async () => {
+    enqueue();
+    let refreshed = false;
+    const out = await pending.syncOnBackOnline({
+      online: true,
+      hasBackend: true,
+      saveSession: async () => ({ saved: false }),
+      saveProgress: async () => ({ saved: true }),
+      refreshKbCache: async () => {
+        refreshed = true;
+      },
+    });
+    expect(out.remaining).toBe(1);
+    expect(refreshed).toBe(true);
+  });
+
+  test("antrean tuntas → KB cache disegarkan", async () => {
     enqueue();
     let refreshed = false;
     const out = await pending.syncOnBackOnline({
@@ -172,22 +280,6 @@ describe("syncOnBackOnline — antrean + KB cache", () => {
     });
     expect(out.remaining).toBe(0);
     expect(refreshed).toBe(true);
-  });
-
-  test("sisa antrean → KB cache tidak disegarkan", async () => {
-    enqueue();
-    let refreshed = false;
-    const out = await pending.syncOnBackOnline({
-      online: true,
-      hasBackend: true,
-      saveSession: async () => ({ saved: false }),
-      saveProgress: async () => ({ saved: true }),
-      refreshKbCache: async () => {
-        refreshed = true;
-      },
-    });
-    expect(out.remaining).toBe(1);
-    expect(refreshed).toBe(false);
   });
 
   test("refresh KB gagal → hasil flush tetap dilaporkan", async () => {

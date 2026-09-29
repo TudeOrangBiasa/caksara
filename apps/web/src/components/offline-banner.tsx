@@ -50,6 +50,8 @@ export function OfflineBanner() {
         </p>
         <button
           type="button"
+          // Debt: reload keras pre-existing (di luar delta V10) — ganti soft
+          // retry (refetch KB tanpa reload) bila banner disentuh berikutnya.
           onClick={() => window.location.reload()}
           className="shrink-0 rounded-full bg-card px-3 py-1.5 text-xs font-semibold transition-transform active:scale-95"
         >

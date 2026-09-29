@@ -268,14 +268,33 @@ export default function Home() {
             recordSessionLevel(view.mod.id, score.correct, score.total);
           }
           recordAnswerStats(detail);
-          // V10 offline-buffer: sesi gagal terkirim → antre lokal, sync saat online.
-          void saveQuizSession(view.mod.id, detail, score).then((res) => {
-            if (!res.saved && res.reason !== "validation") {
-              enqueuePendingSession({ moduleId: view.mod.id, answers: detail, score });
+          // V10 offline-buffer: enqueue bila SALAH SATU gagal (sesi ATAU
+          // progres); flag menandai bagian yang sudah sukses agar flush tak
+          // kirim ulang. Coba-lagi reload keras pre-existing (di luar delta).
+          void Promise.allSettled([
+            saveQuizSession(view.mod.id, detail, score),
+            saveAksaraProgress(detail, WRESASTRA_IDS),
+          ]).then(([sessionRes, progressRes]) => {
+            const sessionOk =
+              sessionRes.status === "fulfilled" &&
+              (sessionRes.value.saved || sessionRes.value.reason === "validation");
+            const progressOk = progressRes.status === "fulfilled" && progressRes.value.saved;
+            // Skor inkonsisten = bug pemanggil, bukan offline: jangan antre.
+            if (sessionRes.status === "fulfilled" && !sessionRes.value.saved) {
+              if (sessionRes.value.reason === "validation") return;
+            }
+            if (
+              enqueuePendingSession({
+                moduleId: view.mod.id,
+                answers: detail,
+                score,
+                sessionSent: sessionOk,
+                progressSent: progressOk,
+              })
+            ) {
               notifyQueuedOffline();
             }
           });
-          void saveAksaraProgress(detail, WRESASTRA_IDS);
           setView({
             kind: "result",
             mod: view.mod,
