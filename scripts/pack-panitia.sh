@@ -61,10 +61,18 @@ else
 fi
 
 # Verifikasi ref project: VITE_SUPABASE_URL host harus ref panitia.
-# Hanya WARN bila beda (bukan abort); laporkan ref-nya, bukan nilai URL.
+# Default ABORT bila beda/kosong; override eksplisit via PANITIA_REF=<ref-lain> untuk testing.
+# Laporkan ref-nya saja, bukan nilai URL.
+EXPECTED_REF="${PANITIA_REF:-ntjslqbqyfjridotjaac}"
 ENVREF="$(sed -nE 's/^[[:space:]]*VITE_SUPABASE_URL=[^/]*\/\/([A-Za-z0-9-]+).*/\1/p' "$STAGE/apps/web/.env" | head -1)"
-if [ -n "$ENVREF" ] && [ "$ENVREF" != "ntjslqbqyfjridotjaac" ]; then
-  echo "WARN: VITE_SUPABASE_URL ref ($ENVREF) beda dari ekspektasi (ntjslqbqyfjridotjaac)" >&2
+if [ -n "${PANITIA_REF:-}" ]; then
+  if [ "$ENVREF" != "$EXPECTED_REF" ]; then
+    echo "WARN: VITE_SUPABASE_URL ref (${ENVREF:-kosong}) beda dari PANITIA_REF ($EXPECTED_REF)" >&2
+  fi
+elif [ -z "$ENVREF" ] || [ "$ENVREF" != "$EXPECTED_REF" ]; then
+  echo "ABORT: VITE_SUPABASE_URL ref (${ENVREF:-kosong}) beda dari ekspektasi ($EXPECTED_REF)" >&2
+  echo "Cara override (testing): PANITIA_REF=<ref-lain> $0 $REF $OUT" >&2
+  exit 1
 fi
 
 # Sabuk pengaman global: tak ada NILAI secret dalam bentuk apapun di staging.
