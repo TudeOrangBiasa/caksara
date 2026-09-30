@@ -37,6 +37,10 @@ Root `.env` (DATABASE_URL, GEMINI_API_KEY, dst — gitignored, tak pernah
 masuk zip) didekripsi via dotenvx hanya di mesin owner:
 `./scripts/start.sh` (= `dotenvx run -- bun run dev:web`).
 
+> Catatan untuk panitia: bagian di bawah garis (Struktur, Quick Start,
+> Glosarium, ADRs, Deploy) hanya berlaku untuk repo penuh, bukan isi zip —
+> abaikan bila file yang dirujuk tidak ada di zip.
+
 ---
 
 # CAKSARA — Web Edukasi Interaktif Aksara Bali
