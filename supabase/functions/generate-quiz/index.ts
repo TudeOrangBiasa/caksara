@@ -350,7 +350,11 @@ function responseSchema(): Record<string, unknown> {
                   minItems: 1,
                   items: {
                     type: "OBJECT",
-                    properties: { left: { type: "STRING" }, right: { type: "STRING" } },
+                    properties: {
+                      left: { type: "STRING" },
+                      right: { type: "STRING" },
+                      leftLabel: { type: "STRING" },
+                    },
                     required: ["left", "right"],
                   },
                 },

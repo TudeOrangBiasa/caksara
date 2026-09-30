@@ -65,15 +65,12 @@ function QuestionBody({
       />
     );
   }
-
   if (question.type === "cocokkan" && question.pairs) {
     return (
       <Cocokkan
         pairs={question.pairs}
         disabled={session.showFeedback}
-        onAnswer={({ matches, cocokkanSalah }) =>
-          setAnswer(cocokkanSalah > 0 ? { matches, cocokkanSalah } : { matches })
-        }
+        onAnswer={({ matches, cocokkanSalah }) => setAnswer({ matches, cocokkanSalah })}
       />
     );
   }
