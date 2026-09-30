@@ -16,7 +16,7 @@ jobs:
       - name: Ping Supabase Auth health
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/auth/v1/health")
           echo "auth-health: $code"
           [ "$code" = "200" ] || exit 1
@@ -25,7 +25,7 @@ jobs:
         continue-on-error: true
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/modules?select=id&limit=1")
           echo "rest-modules: $code (info only — tabel modules belum tentu ada sebelum db:push)"

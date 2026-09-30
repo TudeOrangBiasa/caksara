@@ -30,7 +30,7 @@ caksara/
 
 ```bash
 bun install
-cp apps/web/.env.example apps/web/.env  # isi VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+cp apps/web/.env.example apps/web/.env  # isi VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY
 bun run dev          # web di http://localhost:5173
 bun run check        # oxlint + oxfmt
 bun run db:push      # drizzle-kit push ke Supabase (butuh DATABASE_URL)
@@ -52,7 +52,7 @@ FE via Vercel (`vercel.json`), DB/Edge/Storage via Supabase. API key Gemini hany
 
 ### Vercel env (FE — panduan, bukan secrets)
 
-FE hanya butuh 2 env publik (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` — anon key
+FE hanya butuh 2 env publik (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` — publishable key
 aman di bundle karena RLS mengunci per `auth.uid()`). Jangan taruh `GEMINI_API_KEY` di
 Vercel/FE — ia hanya hidup di Edge Function (`supabase functions deploy generate-quiz`
 ++ `supabase secrets set GEMINI_API_KEY=...`).
@@ -60,7 +60,7 @@ Vercel/FE — ia hanya hidup di Edge Function (`supabase functions deploy genera
 ```bash
 cp apps/web/.env.example apps/web/.env  # isi 2 VITE_* dari Supabase Dashboard > Project Settings > API
 bunx vercel env add VITE_SUPABASE_URL preview production   # ulangi per env; production = deploy --prod
-bunx vercel env add VITE_SUPABASE_ANON_KEY preview production
+bunx vercel env add VITE_SUPABASE_PUBLISHABLE_KEY preview production
 bunx vercel env ls            # verifikasi; redeploy agar env berlaku
 ```
 
