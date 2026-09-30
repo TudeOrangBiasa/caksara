@@ -5,6 +5,8 @@ export interface QuizAnswer {
   ordered?: string[];
   /** Pasangan cocokkan yang terpasang ({kiri: kanan}); soal selesai bila SEMUA pairs cocok. */
   matches?: Record<string, string>;
+  /** Jumlah klik pasangan salah di cocokkan; >0 → soal dinilai gagal walau akhirnya lengkap. */
+  cocokkanSalah?: number;
 }
 
 export interface QuizSession {
@@ -74,6 +76,7 @@ export function isAnswerCorrect(question: Question, answer: QuizAnswer): boolean
     case "cocokkan": {
       if (!question.pairs || !answer.matches) return false;
       if (Object.keys(answer.matches).length !== question.pairs.length) return false;
+      if ((answer.cocokkanSalah ?? 0) > 0) return false;
       return question.pairs.every((p) => answer.matches?.[p.left] === p.right);
     }
     default:

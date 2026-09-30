@@ -54,4 +54,32 @@ describe("cocokkan: soal selesai hanya bila SEMUA pasangan matched", () => {
       false,
     );
   });
+
+  test("salah-satu-lalu-lengkapi: semua pasangan terkunci namun ada percobaan salah → false", () => {
+    assert.equal(
+      isAnswerCorrect(sapaan, {
+        matches: {
+          "Om Swastiastu": "Salam sejahtera",
+          "Rahajeng semeng": "Selamat pagi",
+          Suksma: "Terima kasih",
+        },
+        cocokkanSalah: 1,
+      }),
+      false,
+    );
+  });
+
+  test("semua-benar-tanpa-salah → true (cocokkanSalah 0 eksplisit)", () => {
+    assert.equal(
+      isAnswerCorrect(sapaan, {
+        matches: {
+          "Om Swastiastu": "Salam sejahtera",
+          "Rahajeng semeng": "Selamat pagi",
+          Suksma: "Terima kasih",
+        },
+        cocokkanSalah: 0,
+      }),
+      true,
+    );
+  });
 });

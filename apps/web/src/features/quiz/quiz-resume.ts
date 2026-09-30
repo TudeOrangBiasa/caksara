@@ -4,6 +4,7 @@ const storedAnswerSchema = z.object({
   selectedIndex: z.number().int().optional(),
   ordered: z.array(z.string()).optional(),
   matches: z.record(z.string(), z.string()).optional(),
+  cocokkanSalah: z.number().int().nonnegative().optional(),
 });
 
 const resumeSchema = z.object({
