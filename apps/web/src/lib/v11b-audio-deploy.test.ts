@@ -76,21 +76,55 @@ describe("v11b edge: 429 sebelum Gemini, bulk 3-8 Zod, kunci server-only", () =>
   });
 });
 
-describe("edge keys: plural JSON dicts baru, tanpa singular legacy", () => {
-  test('parse SUPABASE_PUBLISHABLE_KEYS / SUPABASE_SECRET_KEYS via ["default"] + try/catch', () => {
-    // Runtime baru menginjeksi dict PLURAL JSON {"default": "sb_..."} —
-    // Deno.env.get singular return null → 500 setiap quiz bila rename naif.
-    // Guard file-level (pola rls-policy.test.ts, jalan di CI tanpa Deno):
-    // helper secretFromJsonPlural ada, dipakai untuk kedua dict, aman JSON rusak.
-    assert.ok(edge.includes("secretFromJsonPlural"));
-    assert.ok(edge.includes('Deno.env.get("SUPABASE_PUBLISHABLE_KEYS")'));
-    assert.ok(edge.includes('Deno.env.get("SUPABASE_SECRET_KEYS")'));
-    assert.ok(edge.includes('["default"]') || edge.includes(".default"));
-    assert.ok(edge.includes("try {"));
+describe("edge keys: dict plural baru — outcome nyata, bukan kunci teks", () => {
+  // Helper tinggal di secret-keys.ts (modul tanpa impor) sehingga bun
+  // mengujinya LANGSUNG sebagai outcome: dict valid → kunci keluar,
+  // hilang/rusak/salah bentuk → string kosong (handler balas 500 eksplisit).
+  // Debt kecil: path 500 handler tak dieksekusi di sini — index.ts butuh
+  // runtime Deno (Deno.serve + Deno.env); pesan 500 diverifikasi terpisah
+  // via deno eval satu-perintah di bawah bila Deno ada, dilewati bila tidak.
+  test("secretFromJsonPlural: dict valid → default; hilang/rusak → kosong", async () => {
+    const { secretFromJsonPlural } =
+      await import("../../../../supabase/functions/generate-quiz/secret-keys.ts");
+    assert.equal(secretFromJsonPlural('{"default":"sb_publishable_x"}', "L"), "sb_publishable_x");
+    assert.equal(secretFromJsonPlural(undefined, "L"), "");
+    assert.equal(secretFromJsonPlural("bukan-json", "L"), "");
+    assert.equal(secretFromJsonPlural('{"other":1}', "L"), "");
+    assert.equal(secretFromJsonPlural('{"default":42}', "L"), "");
   });
 
-  test("tanpa kunci singular legacy di Edge", () => {
-    assert.ok(!edge.includes('Deno.env.get("SUPABASE_ANON'));
-    assert.ok(!edge.includes("SUPABASE_SERVICE_ROLE"));
+  test("handler tanpa env → 500 menyebut kunci plural baru (Deno; skip bila tak ada)", async () => {
+    // Outcome path-500 butuh runtime Deno (index.ts pakai Deno.serve/env).
+    // Guard import.meta.main di index.ts membuat impor handler tak menyalakan
+    // server, sehingga deno eval satu-perintah ini selesai <1 dtk. Bun tak bisa
+    // mengeksekusi modul Deno — ini satu-satunya pengecualian test lintas-runtime.
+    // which via shell: Bun.spawnSync tak mewarisi nix PATH di semua env CI.
+    const candidates = [
+      "/root/.nix-profile/bin/deno",
+      `${process.env.HOME}/.nix-profile/bin/deno`,
+      "deno",
+    ];
+    let deno: string | null = null;
+    for (const c of candidates) {
+      const p = Bun.spawnSync(["sh", "-c", `command -v ${c} 2>/dev/null`]);
+      const found = new TextDecoder().decode(p.stdout).trim();
+      if (found) {
+        deno = found;
+        break;
+      }
+    }
+    if (!deno) {
+      console.warn("[skip] deno tak ada di PATH — lewati outcome 500 handler");
+      return;
+    }
+    const script = `import { handler } from ${JSON.stringify(join(root, "supabase", "functions", "generate-quiz", "index.ts"))}; const r = await handler(new Request("http://x/", { method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({ moduleId: "mod_01" }) })); console.log(JSON.stringify([r.status, await r.text()]));`;
+    const proc = Bun.spawnSync([deno, "eval", "--no-check", script], {
+      env: { ...process.env, NO_COLOR: "1", DENO_NO_UPDATE_CHECK: "1" },
+    });
+    assert.equal(proc.exitCode, 0, new TextDecoder().decode(proc.stderr).slice(0, 300));
+    const [status, text] = JSON.parse(new TextDecoder().decode(proc.stdout)) as [number, string];
+    assert.equal(status, 500);
+    assert.ok(text.includes("SUPABASE_PUBLISHABLE_KEYS"));
+    assert.ok(text.includes("SUPABASE_SECRET_KEYS"));
   });
 });

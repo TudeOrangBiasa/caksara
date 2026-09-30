@@ -9,6 +9,7 @@
 
 import { quizSchema } from "../../../apps/web/src/lib/zod/question.ts";
 import type { Question } from "../../../apps/web/src/lib/zod/question.ts";
+import { secretFromJsonPlural } from "./secret-keys.ts";
 
 const FALLBACK_BANK: Record<string, Question[]> = {
   mod_01: [
@@ -244,26 +245,12 @@ function json(status: number, body: unknown, extra?: Record<string, string>): Re
 /**
  * Kunci server baru Supabase berbentuk PLURAL JSON dict, mis.
  * SUPABASE_PUBLISHABLE_KEYS = {"default": "sb_publishable_..."}.
- * Deno.env.get singular return null — parse ["default"] dengan try/catch.
+ * Deno.env.get singular return null — parse ["default"] dengan try/catch
+ * (lihat secret-keys.ts, diuji outcome via bun tanpa Deno).
  * Tanpa fallback legacy: string kosong berarti konfigurasi belum lengkap
  * (handler balas 500 yang jelas, bukan 500 misterius).
  * Tak pernah log nilai kunci — hanya label bila JSON rusak.
  */
-function secretFromJsonPlural(raw: string | undefined, label: string): string {
-  if (!raw) return "";
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    console.error(`[${label}] bukan JSON valid`);
-    return "";
-  }
-  if (parsed && typeof parsed === "object" && "default" in parsed) {
-    const def: unknown = parsed.default;
-    return typeof def === "string" ? def : "";
-  }
-  return "";
-}
 
 function clampLevel(v: unknown): number {
   const n = typeof v === "number" ? Math.round(v) : 1;
@@ -613,5 +600,6 @@ export async function handler(req: Request): Promise<Response> {
   );
 }
 
-// Supabase Edge runtime: layani request masuk.
-Deno.serve(handler);
+// Supabase Edge runtime: layani request masuk. Guard import.meta.main agar
+// impor handler (mis. deno eval/test outcome 500) tak ikut menyalakan server.
+if (import.meta.main) Deno.serve(handler);

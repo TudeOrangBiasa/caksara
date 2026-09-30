@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { env } from "@caksara/env/web";
 
 let cached: SupabaseClient | null | undefined;
 
@@ -7,11 +8,13 @@ let cached: SupabaseClient | null | undefined;
  * Klien Supabase (lazy). Kembalikan null bila env belum diset sehingga
  * aplikasi tetap jalan penuh secara lokal (localStorage) tanpa backend.
  * Env dibaca dari apps/web/.env (gitignored, lihat .env.example).
+ * Impor @caksara/env/web memvalidasi VITE_SUPABASE_URL +
+ * VITE_SUPABASE_PUBLISHABLE_KEY saat build (Zod, bukan runtime diam).
  */
 export function getSupabase(): SupabaseClient | null {
   if (cached !== undefined) return cached;
-  const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+  const url = env.VITE_SUPABASE_URL as string | undefined;
+  const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
   if (!url || !publishableKey) {
     if (import.meta.env.DEV) {
       console.warn(
