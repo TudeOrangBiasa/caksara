@@ -3,31 +3,39 @@
 Prasyarat: [Bun](https://bun.sh) ≥ 1.1 (sudah termasuk runtime + package manager).
 
 ```bash
+unzip panitia-caksara.zip && cd panitia-caksara
 bun install
-bun run start   # → http://localhost:5173
+bun run dev:web   # → http://localhost:5173, mode lokal penuh
 ```
 
-`bun run start` (= `./scripts/start.sh`) mendekripsi root `.env` via
-`dotenvx run` ke memori lalu menjalankan `dev:web`. Tidak ada plaintext
-rahasia di repo/zip: root `.env` tersimpan terenkripsi (`encrypted:`),
-`.env.keys` ikut di zip agar jalan out-of-box.
+Tanpa env apapun aplikasi jalan penuh secara lokal: `getSupabase()` di
+`apps/web/src/lib/supabase.ts` mengembalikan `null` bila
+`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` belum diset, dan seluruh
+fitur (modul, kuis fallback lokal, progres/XP/Hati/Streak, KB cache)
+memakai `localStorage`. Console hanya menampilkan warning
+`"[supabase] ... mode lokal."` — itu normal, bukan error.
 
-Online vs lokal: FE berbicara ke Supabase cloud (auth anon, Postgres,
-Edge Function kuis, Storage) — butuh internet. Yang jalan lokal hanya
-Vite dev server + bundle; tidak ada database lokal.
+Zip ini 100% bersih dari secret: TIDAK berisi `.env` / `.env.keys` /
+`apps/web/.env` dalam bentuk apapun (plaintext maupun `encrypted:`).
+Verifikasi: `bun run check:secrets` hijau; `grep -rE 'sb_secret|postgres://|AIza|encrypted:eyJ' .`
+0 hit.
 
-Verifikasi tanpa-membuka-rahasia (hanya nama var + status, nilai tak pernah tampil):
+### Mode online (opsional, butuh Supabase sendiri)
 
 ```bash
-bun run check:secrets
-grep -c '^DATABASE_URL="encrypted:' .env   # >0 berarti terenkripsi, bukan plaintext
+cp apps/web/.env.example apps/web/.env   # isi 2 VITE_* milik sendiri
+bun run dev:web
 ```
 
-Catatan: `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`
-(di `apps/web/.env`, plaintext) memang publik by design — ikut terkirim di
-JS bundle ke setiap pengunjung. Keamanannya dari RLS per `auth.uid()`,
-bukan dari menyembunyikan key. Yang dienkripsi = root `.env`
-(`DATABASE_URL`, `GEMINI_API_KEY`, dst).
+Ambil nilai dari Supabase Dashboard (proyek milik sendiri) >
+Project Settings > API. Jangan minta kredensial owner — owner memakai
+repo + `.env` lokal sendiri dan tidak membagikannya.
+
+### Untuk owner/developer (bukan panitia)
+
+Root `.env` (DATABASE_URL, GEMINI_API_KEY, dst — gitignored, tak pernah
+masuk zip) didekripsi via dotenvx hanya di mesin owner:
+`./scripts/start.sh` (= `dotenvx run -- bun run dev:web`).
 
 ---
 

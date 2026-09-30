@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
-# Pack zip panitia yang out-of-box: git archive + file gitignored + dotenvx encrypt.
+# Pack zip panitia yang 100% BERSIH dari secret: git archive + exclude meta-docs/dev-only.
+# TIDAK menyertakan .env / .env.keys / apps/web/.env dalam bentuk apapun.
+# Panitia jalan mode lokal penuh tanpa env (getSupabase→null + localStorage).
 # Pakai: ./scripts/pack-panitia.sh [ref-git] [output-zip]
 # Default: HEAD -> /tmp/panitia-caksara.zip. Staging di /tmp/panitia-stage (di luar repo).
 # Repo TIDAK dihapus/diubah oleh script ini (exclude = hapus dari staging saja).
@@ -12,8 +14,6 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 command -v git >/dev/null || { echo "butuh git" >&2; exit 1; }
 command -v zip >/dev/null || { echo "butuh zip" >&2; exit 1; }
-test -f "$ROOT/.env" || { echo "root .env tidak ada" >&2; exit 1; }
-test -f "$ROOT/apps/web/.env" || { echo "apps/web/.env tidak ada" >&2; exit 1; }
 
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
@@ -30,15 +30,13 @@ rm -rf \
   "$STAGE/scripts/proof-ui.ts" "$STAGE/scripts/lint-tailwind.js" "$STAGE/scripts/check-loc.js"
 rm -f "$STAGE"/*.log "$STAGE/apps/web/.env.local"
 
-# File gitignored yang dibutuhkan runtime.
-cp "$ROOT/.env" "$STAGE/.env"
-mkdir -p "$STAGE/apps/web"
-cp "$ROOT/apps/web/.env" "$STAGE/apps/web/.env"
-
-# Enkripsi root .env DI STAGING. .env.keys ikut ke zip agar out-of-box.
-# (Key dibuat di staging, bukan di repo root, agar tak sengaja ter-commit.)
-(cd "$STAGE" && bunx @dotenvx/dotenvx encrypt -f .env)
-test -f "$STAGE/.env.keys" || { echo "enkripsi gagal: .env.keys tak terbentuk" >&2; exit 1; }
+# Sabuk pengaman: tak ada file secret dalam bentuk apapun di staging.
+# (git archive tak menyertakan file gitignored, tapi pastikan eksplisit.)
+rm -f "$STAGE/.env" "$STAGE/.env.keys" "$STAGE/apps/web/.env" "$STAGE/.env.local"
+if grep -rIlE 'sb_secret|postgres://postgres:|AIza[0-9A-Za-z_-]{20,}|encrypted:eyJ' "$STAGE" 2>/dev/null | head -5; then
+  echo "ABORT: pola secret terdeteksi di staging (lihat di atas)" >&2
+  exit 1
+fi
 
 rm -f "$OUT"
 (cd "$STAGE" && zip -qr "$OUT" .)

@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-# Panitia: ./scripts/start.sh  (atau: bun install && bun run start)
-# dotenvx mendekripsi root .env ke memori; Vite baca apps/web/.env dari file.
+# Owner/developer only: jalankan dev dengan root .env (dotenvx decrypt ke memori).
+# Panitia TIDAK pakai ini — panitia jalan mode lokal via: bun run dev:web
 set -eu
+cd "$(dirname "$0")/.."
 exec bunx @dotenvx/dotenvx run -- bun run dev:web "$@"
