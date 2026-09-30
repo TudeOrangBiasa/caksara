@@ -7,14 +7,16 @@
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
 // pernah macet, API key tidak pernah bocor ke klien.
 
-import { quizSchema } from "../../../apps/web/src/lib/zod/question.ts";
-import type { Question } from "../../../apps/web/src/lib/zod/question.ts";
+import { quizSchema } from "./question.ts";
+import type { Question } from "./question.ts";
+import { secretFromJsonPlural } from "./secret-keys.ts";
 
 const FALLBACK_BANK: Record<string, Question[]> = {
   mod_01: [
     {
       type: "dengar_pilih",
       prompt: "Dengarkan, lalu pilih sapaan yang benar.",
+      promptBali: "ᬒᬁᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ",
       latinText: "Om Swastiastu",
       audioType: "latin",
       choices: [
@@ -82,6 +84,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan bunyi aksara ini, lalu pilih huruf Latin yang tepat.",
+      promptBali: "ᬳ",
       latinText: "ha",
       audioType: "latin",
       choices: [
@@ -125,6 +128,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan kata ini, lalu pilih arti yang tepat.",
+      promptBali: "ᬗᬚᭂᬂ",
       latinText: "Ngajeng",
       audioType: "latin",
       choices: [
@@ -168,6 +172,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan nama hari raya ini, lalu pilih yang benar.",
+      promptBali: "ᬕᬮᬸᬗᬦ᭄",
       latinText: "Galungan",
       audioType: "latin",
       choices: [
@@ -241,6 +246,15 @@ function json(status: number, body: unknown, extra?: Record<string, string>): Re
   }
   return new Response(JSON.stringify(body), { status, headers });
 }
+/**
+ * Kunci server baru Supabase berbentuk PLURAL JSON dict, mis.
+ * SUPABASE_PUBLISHABLE_KEYS = {"default": "sb_publishable_..."}.
+ * Deno.env.get singular return null — parse ["default"] dengan try/catch
+ * (lihat secret-keys.ts, diuji outcome via bun tanpa Deno).
+ * Tanpa fallback legacy: string kosong berarti konfigurasi belum lengkap
+ * (handler balas 500 yang jelas, bukan 500 misterius).
+ * Tak pernah log nilai kunci — hanya label bila JSON rusak.
+ */
 
 function clampLevel(v: unknown): number {
   const n = typeof v === "number" ? Math.round(v) : 1;
@@ -271,6 +285,7 @@ function responseSchema(): Record<string, unknown> {
   };
   const base = {
     prompt: { type: "STRING" },
+    promptBali: { type: "STRING" },
     audioUrl: { type: "STRING" },
     audioType: { type: "STRING", enum: ["original", "latin"] },
     latinText: { type: "STRING" },
@@ -365,6 +380,7 @@ function buildPrompt(req: GenerateQuizRequest, context: string): string {
     `Buat ${req.count} soal untuk modul ${req.moduleId} pada level ${req.level}.`,
     "Syarat: tepat 2-3 tipe berbeda dari [dengar_pilih, susun_aksara, kenali_visual, checkpoint_budaya, cocokkan],",
     "wajib ada 1 soal dengar_pilih (audioUrl boleh kosong; isi latinText bila audio belum ada — jangan pura-pura TTS aksara),",
+    "dengar_pilih wajib isi promptBali dengan glyph aksara Bali (U+1B00-U+1B7F, mis. ᬳ untuk 'ha') — prompt Latin tetap ada tapi FE merender glyph,",
     "setiap soal memakai tepat satu KB Entry di atas (cantumkan sourceRef 'id · Basis Pengetahuan' dan level KB),",
     "choices tepat 4 dengan satu isCorrect true bila tipe pilihan.",
     context,
@@ -374,7 +390,7 @@ function buildPrompt(req: GenerateQuizRequest, context: string): string {
 
 async function queryKb(
   supabaseUrl: string,
-  serviceKey: string,
+  secretKey: string,
   moduleId: string,
   level: number,
 ): Promise<KbRow[]> {
@@ -395,7 +411,7 @@ async function queryKb(
     limit: "24",
   });
   const res = await fetch(`${supabaseUrl}/rest/v1/kb_entries?${params}`, {
-    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    headers: { apikey: secretKey, Authorization: `Bearer ${secretKey}` },
   });
   if (!res.ok) return [];
   const rows = (await res.json()) as KbRow[];
@@ -420,7 +436,7 @@ function rateLimited(calledAts: string[]): boolean {
 
 async function checkRateLimit(
   supabaseUrl: string,
-  serviceKey: string,
+  secretKey: string,
   profileId: string,
 ): Promise<boolean> {
   const params = new URLSearchParams({
@@ -430,19 +446,19 @@ async function checkRateLimit(
     limit: String(RATE_LIMIT_PER_HOUR),
   });
   const res = await fetch(`${supabaseUrl}/rest/v1/quiz_calls?${params}`, {
-    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    headers: { apikey: secretKey, Authorization: `Bearer ${secretKey}` },
   });
   if (!res.ok) return false;
   const rows = (await res.json()) as Array<{ called_at: string }>;
   return rateLimited(rows.map((r) => r.called_at));
 }
 
-async function recordCall(supabaseUrl: string, serviceKey: string, profileId: string) {
+async function recordCall(supabaseUrl: string, secretKey: string, profileId: string) {
   await fetch(`${supabaseUrl}/rest/v1/quiz_calls`, {
     method: "POST",
     headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
+      apikey: secretKey,
+      Authorization: `Bearer ${secretKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ profile_id: profileId }),
@@ -495,10 +511,14 @@ async function callGemini(apiKey: string, req: GenerateQuizRequest, context: str
   return { quiz: null as null, rateLimited: false as const, error: lastError };
 }
 
-async function authProfileId(supabaseUrl: string, anonKey: string, req: Request): Promise<string> {
+async function authProfileId(
+  supabaseUrl: string,
+  publishableKey: string,
+  req: Request,
+): Promise<string> {
   const auth = req.headers.get("authorization") ?? "";
   const res = await fetch(`${supabaseUrl}/auth/v1/user`, {
-    headers: { apikey: anonKey, Authorization: auth },
+    headers: { apikey: publishableKey, Authorization: auth },
   });
   if (!res.ok) throw new Error("unauthorized");
   const user = (await res.json()) as { id?: string };
@@ -523,26 +543,38 @@ export async function handler(req: Request): Promise<Response> {
     : [];
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  // Runtime baru menginjeksi dict PLURAL JSON, bukan string singular:
+  // SUPABASE_PUBLISHABLE_KEYS / SUPABASE_SECRET_KEYS = {"default": "sb_..."}.
+  // Kunci singular lama sudah tidak ada — jangan baca singular di sini.
+  const publishableKey = secretFromJsonPlural(
+    Deno.env.get("SUPABASE_PUBLISHABLE_KEYS"),
+    "SUPABASE_PUBLISHABLE_KEYS",
+  );
+  const secretKey = secretFromJsonPlural(
+    Deno.env.get("SUPABASE_SECRET_KEYS"),
+    "SUPABASE_SECRET_KEYS",
+  );
   const apiKey = Deno.env.get("GEMINI_API_KEY");
-  if (!supabaseUrl || !serviceKey || !anonKey) {
-    return json(500, { error: "konfigurasi server belum lengkap" });
+  if (!supabaseUrl || !secretKey || !publishableKey) {
+    return json(500, {
+      error:
+        'konfigurasi server belum lengkap (SUPABASE_URL / SUPABASE_PUBLISHABLE_KEYS["default"] / SUPABASE_SECRET_KEYS["default"])',
+    });
   }
 
   let profileId: string;
   try {
-    profileId = await authProfileId(supabaseUrl, anonKey, req);
+    profileId = await authProfileId(supabaseUrl, publishableKey, req);
   } catch {
     return json(401, { error: "butuh sesi anon" });
   }
 
-  if (await checkRateLimit(supabaseUrl, serviceKey, profileId)) {
+  if (await checkRateLimit(supabaseUrl, secretKey, profileId)) {
     return json(429, { error: "terlalu banyak permintaan, coba lagi sebentar" });
   }
-  await recordCall(supabaseUrl, serviceKey, profileId);
+  await recordCall(supabaseUrl, secretKey, profileId);
 
-  const kb = await queryKb(supabaseUrl, serviceKey, moduleId, level);
+  const kb = await queryKb(supabaseUrl, secretKey, moduleId, level);
   const context =
     kb.length > 0
       ? kbContext(kb, wrongTopics)
@@ -574,5 +606,6 @@ export async function handler(req: Request): Promise<Response> {
   );
 }
 
-// Supabase Edge runtime: layani request masuk.
-Deno.serve(handler);
+// Supabase Edge runtime: layani request masuk. Guard import.meta.main agar
+// impor handler (mis. deno eval/test outcome 500) tak ikut menyalakan server.
+if (import.meta.main) Deno.serve(handler);

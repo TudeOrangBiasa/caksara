@@ -1,7 +1,7 @@
 // Seed kb_entries + modules dari data lokal (ADR-0003).
 // Pakai: bun run db:seed  (baca apps/web/.env)
 // RLS hanya mengizinkan insert via policy sementara "tmp_seed_insert"
-// (dibuat manual sebelum seed, di-drop setelahnya), jadi tanpa service_role key:
+// (dibuat manual sebelum seed, di-drop setelahnya), jadi tanpa secret key:
 //   create policy "tmp_seed_insert" on public.kb_entries for insert to authenticated with check (true);
 //   create policy "tmp_seed_insert" on public.modules for insert to authenticated with check (true);
 // Idempoten: lewati tabel yang sudah berisi baris.
@@ -11,9 +11,9 @@ import { KB_ENTRIES } from "../apps/web/src/features/kb/kb-data";
 import { courseModules } from "../apps/web/src/features/module/module-data";
 
 const url = process.env.VITE_SUPABASE_URL;
-const key = process.env.VITE_SUPABASE_ANON_KEY;
+const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if (!url || !key) {
-  throw new Error("VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY kosong — isi apps/web/.env");
+  throw new Error("VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY kosong — isi apps/web/.env");
 }
 
 const supabase = createClient(url, key);
