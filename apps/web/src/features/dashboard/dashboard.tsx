@@ -28,7 +28,7 @@ function FeaturedModul({
         className="absolute -bottom-2 right-0 w-[120px] drop-shadow-2xl animate-in fade-in slide-in-from-right-8 duration-700 delay-300 fill-mode-both sm:right-4 sm:w-[130px]"
         alt=""
       />
-      <div className="absolute right-5 bottom-[6.5rem] sm:right-6 sm:bottom-[7rem] rounded-2xl rounded-br-sm bg-primary-foreground/20 px-3 py-1.5 text-[11px] font-bold backdrop-blur-md shadow-sm animate-in zoom-in fade-in duration-500 delay-500 fill-mode-both">
+      <div className="absolute right-5 bottom-[6.5rem] sm:right-6 sm:bottom-[7rem] rounded-2xl bg-primary-foreground/20 px-3 py-1.5 text-[11px] font-bold backdrop-blur-md shadow-sm animate-in zoom-in fade-in duration-500 delay-500 fill-mode-both">
         Swastiastu!
       </div>
 

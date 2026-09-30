@@ -270,8 +270,8 @@ function Bubble({
         className={cn(
           "max-w-[82%] px-4 py-2.5",
           isUser
-            ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
+            ? "rounded-2xl bg-primary text-sm text-primary-foreground"
+            : "rounded-2xl bg-card shadow-sm",
         )}
       >
         {msg.title && (
@@ -339,10 +339,7 @@ function ThinkingBubble() {
       aria-label="Bedawang sedang mengetik"
     >
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
-      <div
-        className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm"
-        aria-hidden
-      >
+      <div className="flex items-center gap-1 rounded-2xl bg-card px-4 py-3 shadow-sm" aria-hidden>
         <span
           className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
           style={{ animationDelay: "0ms" }}
