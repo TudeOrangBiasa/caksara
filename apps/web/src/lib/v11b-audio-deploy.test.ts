@@ -75,3 +75,22 @@ describe("v11b edge: 429 sebelum Gemini, bulk 3-8 Zod, kunci server-only", () =>
     assert.ok(edge.includes("x-quiz-source"));
   });
 });
+
+describe("edge keys: plural JSON dicts baru, tanpa singular legacy", () => {
+  test('parse SUPABASE_PUBLISHABLE_KEYS / SUPABASE_SECRET_KEYS via ["default"] + try/catch', () => {
+    // Runtime baru menginjeksi dict PLURAL JSON {"default": "sb_..."} —
+    // Deno.env.get singular return null → 500 setiap quiz bila rename naif.
+    // Guard file-level (pola rls-policy.test.ts, jalan di CI tanpa Deno):
+    // helper secretFromJsonPlural ada, dipakai untuk kedua dict, aman JSON rusak.
+    assert.ok(edge.includes("secretFromJsonPlural"));
+    assert.ok(edge.includes('Deno.env.get("SUPABASE_PUBLISHABLE_KEYS")'));
+    assert.ok(edge.includes('Deno.env.get("SUPABASE_SECRET_KEYS")'));
+    assert.ok(edge.includes('["default"]') || edge.includes(".default"));
+    assert.ok(edge.includes("try {"));
+  });
+
+  test("tanpa kunci singular legacy di Edge", () => {
+    assert.ok(!edge.includes('Deno.env.get("SUPABASE_ANON'));
+    assert.ok(!edge.includes("SUPABASE_SERVICE_ROLE"));
+  });
+});

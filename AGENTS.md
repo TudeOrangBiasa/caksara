@@ -31,7 +31,7 @@ bun run db:generate            # generate migrations
 
 ## Secrets
 
-Jangan commit `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `GEMINI_API_KEY` plaintext. API key Gemini hanya di Edge Function. Pakai `.env` lokal (gitignored) dan Vercel env.
+Jangan commit `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `GEMINI_API_KEY` plaintext. API key Gemini hanya di Edge Function. Pakai `.env` lokal (gitignored) dan Vercel env.
 
 ## Skills
 

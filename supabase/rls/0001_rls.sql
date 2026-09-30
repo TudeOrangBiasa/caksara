@@ -52,7 +52,7 @@ create policy "own_calls_all" on public.quiz_calls
   for all using (auth.uid()::text = profile_id) with check (auth.uid()::text = profile_id);
 
 -- 3. Tabel publik read-only: kb_entries + modules bisa dibaca semua orang,
--- tulis hanya service_role (tanpa policy insert/update/delete = ditolak).
+-- tulis hanya via secret key (role service_role, tanpa policy insert/update/delete = ditolak).
 alter table public.kb_entries enable row level security;
 alter table public.modules enable row level security;
 drop policy if exists "public_read_kb" on public.kb_entries;
