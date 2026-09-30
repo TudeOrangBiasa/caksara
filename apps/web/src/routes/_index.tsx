@@ -268,9 +268,15 @@ export default function Home() {
         level={sessionLevel}
         initialHearts={loadProfile()?.hearts ?? MAX_HEARTS}
         onFinish={(score, detail) => {
+          // QuizFinishDetail.aksaraId opsional; saveAksaraProgress/deriveWrongTopics
+          // butuh string wajib — saring entri tanpa aksaraId (keduanya sudah
+          // melewatkan undefined saat runtime, jadi murni perbaikan tipe).
+          const detailWithAksara = detail.filter(
+            (a): a is typeof a & { aksaraId: string } => a.aksaraId !== undefined,
+          );
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
-            const wrong = deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, detail);
+            const wrong = deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, detailWithAksara);
             recordSessionLevel(view.mod.id, score.correct, score.total, wrong);
           }
           recordAnswerStats(detail);
@@ -279,7 +285,7 @@ export default function Home() {
           // kirim ulang. Coba-lagi reload keras pre-existing (di luar delta).
           void Promise.allSettled([
             saveQuizSession(view.mod.id, detail, score),
-            saveAksaraProgress(detail, WRESASTRA_IDS),
+            saveAksaraProgress(detailWithAksara, WRESASTRA_IDS),
           ]).then(([sessionRes, progressRes]) => {
             const sessionOk =
               sessionRes.status === "fulfilled" &&

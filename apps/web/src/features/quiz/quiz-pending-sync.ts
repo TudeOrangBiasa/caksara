@@ -179,7 +179,14 @@ export async function flushPendingSessions(opts: FlushDeps = {}): Promise<FlushR
         persistEntry(next);
       }
       if (!next.progressSent) {
-        const progressRes = await saveProgress(next.answers, knownIds);
+        // Pending answers membawa aksaraId opsional; saveProgress butuh string
+        // wajib — saring entri tanpa aksaraId (runtime sudah melewatkannya).
+        const progressRes = await saveProgress(
+          next.answers.filter(
+            (a): a is typeof a & { aksaraId: string } => a.aksaraId !== undefined,
+          ),
+          knownIds,
+        );
         if (!progressRes.saved) continue;
         next = { ...next, progressSent: true };
         persistEntry(next);
