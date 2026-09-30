@@ -26,6 +26,20 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     }
   });
 
+  test("dengar_pilih punya promptBali glyph U+1B00–U+1B7F (anti bocoran Latin)", () => {
+    for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
+      const bank = QUIZ_BANK[mod] ?? [];
+      const dengar = bank.filter((q) => q.type === "dengar_pilih");
+      assert.ok(dengar.length >= 1, `${mod} tanpa dengar_pilih`);
+      for (const q of dengar) {
+        assert.ok(
+          typeof q.promptBali === "string" && /[ᬀ-᭿]/u.test(q.promptBali),
+          `${mod} dengar_pilih tanpa promptBali glyph Bali`,
+        );
+      }
+    }
+  });
+
   test("sesi berisi 3-8 soal dengan 2+ tipe termasuk dengar_pilih", () => {
     for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
       const quiz = buildSessionQuiz(mod, { seed: 0 });
