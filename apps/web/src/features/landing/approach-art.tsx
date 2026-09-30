@@ -416,16 +416,27 @@ export function ArtModul({ className }: { className?: string }) {
               stroke="var(--card-gold)"
               strokeWidth="2.5"
             />
-            <text
-              x="462"
-              y={138 + i * 72 + 6}
-              textAnchor="middle"
-              fontSize="17"
-              fontWeight="800"
-              fill={i < 2 ? "var(--card-ink)" : "var(--card-gold)"}
-            >
-              {i < 2 ? "✓" : `0${i + 1}`}
-            </text>
+            {i < 2 ? (
+              <path
+                d={`M455 ${133 + i * 72} l5 5 l9 -11`}
+                fill="none"
+                stroke="var(--card-ink)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ) : (
+              <text
+                x="462"
+                y={138 + i * 72 + 6}
+                textAnchor="middle"
+                fontSize="17"
+                fontWeight="800"
+                fill="var(--card-gold)"
+              >
+                {`0${i + 1}`}
+              </text>
+            )}
             <text
               x="490"
               y={138 + i * 72 + 6}

@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Rocket, Sparkles } from "lucide-react";
 import type { RefObject } from "react";
 import { useEffect } from "react";
 
@@ -24,7 +24,7 @@ export function MascotBubble({
   return (
     <div className="flex items-start gap-3.5">
       <Bedawang mood={mood} className="size-16 shrink-0 drop-shadow-xs" />
-      <div className="relative flex-1 rounded-2xl rounded-tl-xs border bg-card p-3.5 text-left shadow-xs">
+      <div className="relative flex-1 rounded-2xl border bg-card p-3.5 text-left shadow-xs">
         <p className="text-sm font-semibold text-foreground">{title}</p>
         {subtitle ? <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p> : null}
       </div>
@@ -44,6 +44,7 @@ export function OptionPicker({
   return (
     <div role="radiogroup" className="mt-5 space-y-2.5">
       {options.map((opt) => {
+        const Icon = opt.icon;
         const isSelected = opt.id === selectedId;
         return (
           <button
@@ -61,11 +62,11 @@ export function OptionPicker({
           >
             <span
               className={cn(
-                "flex size-10 shrink-0 items-center justify-center rounded-xl text-lg",
-                isSelected ? "bg-primary/15" : "bg-muted/70",
+                "flex size-10 shrink-0 items-center justify-center rounded-xl",
+                isSelected ? "bg-primary/15 text-primary" : "bg-muted/70 text-muted-foreground",
               )}
             >
-              {opt.icon}
+              <Icon className="size-5" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">{opt.label}</p>
@@ -279,8 +280,13 @@ export function StepReadySection({ name, onStart }: { name: string; onStart: () 
         pasti bisa!
       </p>
       <div className="mt-6 w-full">
-        <Button size="lg" className="w-full text-base font-semibold" onClick={onStart}>
-          Mulai Petualangan 🚀
+        <Button
+          variant="cta"
+          size="lg"
+          className="w-full text-base font-semibold"
+          onClick={onStart}
+        >
+          <Rocket className="size-5" aria-hidden /> Mulai Petualangan
         </Button>
       </div>
     </div>

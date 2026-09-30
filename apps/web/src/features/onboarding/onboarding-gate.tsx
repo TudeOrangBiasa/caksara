@@ -183,7 +183,12 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
 
         {isReadyStep ? null : (
           <footer className="pt-6">
-            <Button size="lg" className="w-full text-base font-semibold" onClick={handleNext}>
+            <Button
+              variant="cta"
+              size="lg"
+              className="w-full text-base font-semibold"
+              onClick={handleNext}
+            >
               {step === TOTAL_STEPS - 1 ? "Selesai" : "Lanjut"}
             </Button>
           </footer>
