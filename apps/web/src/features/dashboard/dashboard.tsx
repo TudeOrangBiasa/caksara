@@ -1,4 +1,4 @@
-import { Flame, Target, ChevronRight, BookOpen, Library, Bot, Trophy } from "lucide-react";
+import { Flame, Hand, Target, ChevronRight, BookOpen, Library, Bot, Trophy } from "lucide-react";
 
 import { courseModules, deriveStatus } from "../module/module-data";
 import type { CourseModule, ModuleStatus } from "../module/module-data";
@@ -210,8 +210,8 @@ export function Dashboard({
       {/* Header */}
       <header className="mb-8 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-500">
         <div>
-          <h1 className="text-[22px] font-extrabold tracking-tight text-foreground">
-            Rahajeng, {userName}! 👋
+          <h1 className="flex items-center gap-2 text-[22px] font-extrabold tracking-tight text-foreground">
+            Rahajeng, {userName}! <Hand className="size-5 text-accent" aria-hidden />
           </h1>
           <p className="mt-1 text-[13px] font-medium text-muted-foreground">
             Mau belajar apa hari ini?
