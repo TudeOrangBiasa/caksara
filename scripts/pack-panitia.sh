@@ -30,11 +30,12 @@ rm -rf \
   "$STAGE/scripts/proof-ui.ts" "$STAGE/scripts/lint-tailwind.js" "$STAGE/scripts/check-loc.js"
 rm -f "$STAGE"/*.log "$STAGE/apps/web/.env.local"
 
-# Sabuk pengaman: tak ada file secret dalam bentuk apapun di staging.
-# (git archive tak menyertakan file gitignored, tapi pastikan eksplisit.)
-rm -f "$STAGE/.env" "$STAGE/.env.keys" "$STAGE/apps/web/.env" "$STAGE/.env.local"
-if grep -rIlE 'sb_secret|postgres://postgres:|AIza[0-9A-Za-z_-]{20,}|encrypted:eyJ' "$STAGE" 2>/dev/null | head -5; then
-  echo "ABORT: pola secret terdeteksi di staging (lihat di atas)" >&2
+# Sabuk pengaman: tak ada nilai secret dalam bentuk apapun di staging.
+# (Kecualikan script ini + *.md: keduanya memang menyebut NAMA POLA sebagai dokumentasi.)
+HITS="$(grep -rIlE --exclude='pack-panitia.sh' --exclude='*.md' 'sb_secret|postgres://postgres:|AIza[0-9A-Za-z_-]{20,}|encrypted:eyJ' "$STAGE" 2>/dev/null || true)"
+if [ -n "$HITS" ]; then
+  echo "ABORT: pola secret terdeteksi di staging:" >&2
+  echo "$HITS" >&2
   exit 1
 fi
 

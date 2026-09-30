@@ -16,9 +16,9 @@ memakai `localStorage`. Console hanya menampilkan warning
 `"[supabase] ... mode lokal."` — itu normal, bukan error.
 
 Zip ini 100% bersih dari secret: TIDAK berisi `.env` / `.env.keys` /
-`apps/web/.env` dalam bentuk apapun (plaintext maupun `encrypted:`).
-Verifikasi: `bun run check:secrets` hijau; `grep -rE 'sb_secret|postgres://|AIza|encrypted:eyJ' .`
-0 hit.
+`apps/web/.env` dalam bentuk apapun (plaintext maupun terenkripsi).
+Verifikasi: `bun run check:secrets` hijau; grep pola nilai secret
+(`sb_secret`, conn-string postgres, `AIza…`, `encrypted:eyJ…`) → 0 hit.
 
 ### Mode online (opsional, butuh Supabase sendiri)
 
