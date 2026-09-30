@@ -6,6 +6,7 @@ export const QUIZ_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan, lalu pilih sapaan yang benar.",
+      promptBali: "ᬒᬁᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ",
       latinText: "Om Swastiastu",
       audioType: "latin",
       choices: [
@@ -83,6 +84,7 @@ export const QUIZ_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan bunyi aksara ini, lalu pilih huruf Latin yang tepat.",
+      promptBali: "ᬳ",
       latinText: "ha",
       audioType: "latin",
       choices: [
@@ -162,6 +164,7 @@ export const QUIZ_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan kata ini, lalu pilih arti yang tepat.",
+      promptBali: "ᬗᬚᭂᬂ",
       latinText: "Ngajeng",
       audioType: "latin",
       choices: [
@@ -238,6 +241,7 @@ export const QUIZ_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan nama hari raya ini, lalu pilih yang benar.",
+      promptBali: "ᬕᬮᬸᬗᬦ᭄",
       latinText: "Galungan",
       audioType: "latin",
       choices: [

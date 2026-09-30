@@ -7,16 +7,16 @@
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
 // pernah macet, API key tidak pernah bocor ke klien.
 
-import { quizSchema } from "../../../apps/web/src/lib/zod/question.ts";
-import type { Question } from "../../../apps/web/src/lib/zod/question.ts";
+import { quizSchema } from "./question.ts";
+import type { Question } from "./question.ts";
 
 const FALLBACK_BANK: Record<string, Question[]> = {
   mod_01: [
     {
       type: "dengar_pilih",
       prompt: "Dengarkan, lalu pilih sapaan yang benar.",
+      promptBali: "ᬒᬁᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ",
       latinText: "Om Swastiastu",
-      audioType: "latin",
       choices: [
         { text: "Om Swastiastu", isCorrect: true },
         { text: "Matur suksma", isCorrect: false },
@@ -82,6 +82,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan bunyi aksara ini, lalu pilih huruf Latin yang tepat.",
+      promptBali: "ᬳ",
       latinText: "ha",
       audioType: "latin",
       choices: [
@@ -125,6 +126,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan kata ini, lalu pilih arti yang tepat.",
+      promptBali: "ᬗᬚᭂᬂ",
       latinText: "Ngajeng",
       audioType: "latin",
       choices: [
@@ -168,6 +170,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
     {
       type: "dengar_pilih",
       prompt: "Dengarkan nama hari raya ini, lalu pilih yang benar.",
+      promptBali: "ᬕᬮᬸᬗᬦ᭄",
       latinText: "Galungan",
       audioType: "latin",
       choices: [
@@ -271,6 +274,7 @@ function responseSchema(): Record<string, unknown> {
   };
   const base = {
     prompt: { type: "STRING" },
+    promptBali: { type: "STRING" },
     audioUrl: { type: "STRING" },
     audioType: { type: "STRING", enum: ["original", "latin"] },
     latinText: { type: "STRING" },
@@ -365,8 +369,8 @@ function buildPrompt(req: GenerateQuizRequest, context: string): string {
     `Buat ${req.count} soal untuk modul ${req.moduleId} pada level ${req.level}.`,
     "Syarat: tepat 2-3 tipe berbeda dari [dengar_pilih, susun_aksara, kenali_visual, checkpoint_budaya, cocokkan],",
     "wajib ada 1 soal dengar_pilih (audioUrl boleh kosong; isi latinText bila audio belum ada — jangan pura-pura TTS aksara),",
+    "dengar_pilih wajib isi promptBali dengan glyph aksara Bali (U+1B00-U+1B7F, mis. ᬳ untuk 'ha') — prompt Latin tetap ada tapi FE merender glyph,",
     "setiap soal memakai tepat satu KB Entry di atas (cantumkan sourceRef 'id · Basis Pengetahuan' dan level KB),",
-    "choices tepat 4 dengan satu isCorrect true bila tipe pilihan.",
     context,
     "Balas hanya JSON sesuai responseSchema: { moduleId, questions }.",
   ].join("\n");

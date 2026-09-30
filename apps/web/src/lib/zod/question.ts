@@ -21,6 +21,8 @@ const matchPairSchema = z.object({
 
 const questionBase = z.object({
   prompt: z.string().min(1),
+  /** Glyph aksara Bali (U+1B00–U+1B7F) untuk prompt dengar_pilih — render sebagai prompt, bukan Latin. */
+  promptBali: z.string().min(1).optional(),
   audioUrl: z.string().optional(),
   audioType: z.enum(["original", "latin"]).optional(),
   // Teks Latin yang dibaca saat audio asli belum terkurasi (ADR-0005: bukan TTS aksara).

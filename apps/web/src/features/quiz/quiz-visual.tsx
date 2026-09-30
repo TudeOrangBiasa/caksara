@@ -36,6 +36,7 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
             audioUrl={question.audioUrl}
             audioType={question.audioType}
             latinText={question.latinText}
+            glyph={question.promptBali}
           />
         ) : (
           <p
