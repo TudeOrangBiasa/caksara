@@ -1,3 +1,36 @@
+## Untuk Panitia
+
+Prasyarat: [Bun](https://bun.sh) ≥ 1.1 (sudah termasuk runtime + package manager).
+
+```bash
+bun install
+bun run start   # → http://localhost:5173
+```
+
+`bun run start` (= `./scripts/start.sh`) mendekripsi root `.env` via
+`dotenvx run` ke memori lalu menjalankan `dev:web`. Tidak ada plaintext
+rahasia di repo/zip: root `.env` tersimpan terenkripsi (`encrypted:`),
+`.env.keys` ikut di zip agar jalan out-of-box.
+
+Online vs lokal: FE berbicara ke Supabase cloud (auth anon, Postgres,
+Edge Function kuis, Storage) — butuh internet. Yang jalan lokal hanya
+Vite dev server + bundle; tidak ada database lokal.
+
+Verifikasi tanpa-membuka-rahasia (hanya nama var + status, nilai tak pernah tampil):
+
+```bash
+bun run check:secrets
+grep -c '^DATABASE_URL="encrypted:' .env   # >0 berarti terenkripsi, bukan plaintext
+```
+
+Catatan: `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`
+(di `apps/web/.env`, plaintext) memang publik by design — ikut terkirim di
+JS bundle ke setiap pengunjung. Keamanannya dari RLS per `auth.uid()`,
+bukan dari menyembunyikan key. Yang dienkripsi = root `.env`
+(`DATABASE_URL`, `GEMINI_API_KEY`, dst).
+
+---
+
 # CAKSARA — Web Edukasi Interaktif Aksara Bali
 
 INVENTION 2026 · Web Design · "Building Smarter Communities Through Digital Learning"
