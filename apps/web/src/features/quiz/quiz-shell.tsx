@@ -71,7 +71,9 @@ function QuestionBody({
       <Cocokkan
         pairs={question.pairs}
         disabled={session.showFeedback}
-        onAnswer={(matches) => setAnswer({ matches })}
+        onAnswer={({ matches, cocokkanSalah }) =>
+          setAnswer(cocokkanSalah > 0 ? { matches, cocokkanSalah } : { matches })
+        }
       />
     );
   }

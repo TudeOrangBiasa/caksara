@@ -68,9 +68,9 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       type: "cocokkan",
       prompt: "Pasangkan sapaan dengan artinya.",
       pairs: [
-        { left: "Om Swastiastu", right: "Salam sejahtera" },
-        { left: "Matur suksma", right: "Terima kasih" },
-        { left: "Ampura", right: "Mohon maaf" },
+        { left: "ᬒᬁᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ", right: "Salam sejahtera", leftLabel: "Om Swastiastu" },
+        { left: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬲ᭄ᬫ", right: "Terima kasih", leftLabel: "Matur suksma" },
+        { left: "ᬅᬫ᭄ᬧᬸᬭ", right: "Mohon maaf", leftLabel: "Ampura" },
       ],
       explanation: "Salam sejahtera, terima kasih, dan mohon maaf adalah makna yang tepat.",
       sourceRef: "kb_sapaan · Basis Pengetahuan",

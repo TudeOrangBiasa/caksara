@@ -23,6 +23,8 @@ export type QuestionType = z.infer<typeof questionTypeSchema>;
 const matchPairSchema = z.object({
   left: z.string().min(1),
   right: z.string().min(1),
+  /** Label Latin untuk screen reader bila left berupa glyph aksara Bali. */
+  leftLabel: z.string().min(1).optional(),
 });
 
 const questionBase = z.object({

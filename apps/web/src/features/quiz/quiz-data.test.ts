@@ -39,6 +39,23 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
       }
     }
   });
+  test("cocokkan mod_01: kolom kiri glyph Bali + aria-label Latin, kanan arti Indonesia", () => {
+    const bank = QUIZ_BANK.mod_01 ?? [];
+    const cocokkan = bank.filter((q) => q.type === "cocokkan");
+    assert.ok(cocokkan.length >= 1, "mod_01 tanpa cocokkan");
+    for (const q of cocokkan) {
+      if (q.type !== "cocokkan" || !q.pairs) continue;
+      for (const p of q.pairs) {
+        assert.ok(/[ᬀ-᭿]/u.test(p.left), `left bukan glyph Bali: ${p.left}`);
+        assert.ok(
+          typeof p.leftLabel === "string" && p.leftLabel.length > 0,
+          `left tanpa leftLabel Latin: ${p.left}`,
+        );
+      }
+      const kanan = q.pairs.map((p) => p.right).sort();
+      assert.deepEqual(kanan, ["Mohon maaf", "Salam sejahtera", "Terima kasih"]);
+    }
+  });
 
   test("sesi berisi 3-8 soal dengan 2+ tipe termasuk dengar_pilih", () => {
     for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
