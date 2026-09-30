@@ -7,8 +7,8 @@
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
 // pernah macet, API key tidak pernah bocor ke klien.
 
-import { quizSchema } from "../../../apps/web/src/lib/zod/question.ts";
-import type { Question } from "../../../apps/web/src/lib/zod/question.ts";
+import { quizSchema } from "./question.ts";
+import type { Question } from "./question.ts";
 import { secretFromJsonPlural } from "./secret-keys.ts";
 
 const FALLBACK_BANK: Record<string, Question[]> = {
