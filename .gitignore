@@ -20,6 +20,7 @@ local.db-*
 
 # Panitia pack output (dibuat via scripts/pack-panitia.sh ke /tmp)
 panitia-*.zip
+*.zip
 
 # IDEs and editors
 .vscode/*
