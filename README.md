@@ -5,37 +5,25 @@ Prasyarat: [Bun](https://bun.sh) ≥ 1.1 (sudah termasuk runtime + package manag
 ```bash
 unzip panitia-caksara.zip && cd panitia-caksara
 bun install
-bun run dev:web   # → http://localhost:5173, mode lokal penuh
+bun run dev:web   # → http://localhost:5173, tanpa isi env lagi
 ```
 
-Tanpa env apapun aplikasi jalan penuh secara lokal: `getSupabase()` di
-`apps/web/src/lib/supabase.ts` mengembalikan `null` bila
-`VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` belum diset, dan seluruh
-fitur (modul, kuis fallback lokal, progres/XP/Hati/Streak, KB cache)
-memakai `localStorage`. Console hanya menampilkan warning
-`"[supabase] ... mode lokal."` — itu normal, bukan error.
+`.env` berisi 2 var publik (`VITE_SUPABASE_URL`,
+`VITE_SUPABASE_PUBLISHABLE_KEY`) SUDAH ada di dalam zip (`apps/web/.env`),
+jadi semua fitur jalan out-of-box — mode online otomatis ke proyek owner,
+tak perlu Supabase sendiri. Tanpa koneksi, aplikasi tetap jalan lokal
+(`localStorage`) dengan warning `"[supabase] ... mode lokal."` — itu normal.
 
-Zip ini 100% bersih dari secret: TIDAK berisi `.env` / `.env.keys` /
-`apps/web/.env` dalam bentuk apapun (plaintext maupun terenkripsi).
-Verifikasi: `bun run check:secrets` hijau; grep pola nilai secret
-(`sb_secret`, conn-string postgres, `AIza…`, `encrypted:eyJ…`) → 0 hit.
-
-### Mode online (opsional, butuh Supabase sendiri)
-
-```bash
-cp apps/web/.env.example apps/web/.env   # isi 2 VITE_* milik sendiri
-bun run dev:web
-```
-
-Ambil nilai dari Supabase Dashboard (proyek milik sendiri) >
-Project Settings > API. Jangan minta kredensial owner — owner memakai
-repo + `.env` lokal sendiri dan tidak membagikannya.
+Aman: publishable key bersifat PUBLIK by design (ikut terkirim di JS bundle
+ke setiap pengunjung) dan dilindungi RLS per `auth.uid()`. Secret owner
+(`DATABASE_URL`, `GEMINI_API_KEY`, `PRIVATE_KEY`) TIDAK ada di zip ini.
 
 ### Untuk owner/developer (bukan panitia)
 
 Root `.env` (DATABASE_URL, GEMINI_API_KEY, dst — gitignored, tak pernah
 masuk zip) didekripsi via dotenvx hanya di mesin owner:
 `./scripts/start.sh` (= `dotenvx run -- bun run dev:web`).
+PANITIA JANGAN pakai `scripts/start.sh` — itu owner-only.
 
 > Catatan untuk panitia: bagian di bawah garis (Struktur, Quick Start,
 > Glosarium, ADRs, Deploy) hanya berlaku untuk repo penuh, bukan isi zip —
