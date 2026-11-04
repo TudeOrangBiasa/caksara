@@ -8,10 +8,7 @@ export const BEDAWANG_MOOD_SRC: Record<BedawangMood, string> = {
   sedih: "/assets/bedawang-standing.png",
 };
 
-// HACK(debt): pakai SATU set nama saja (bedawang-*). Varian mascot-* identik
-// byte-for-byte (md5 sama) — duplikasi ~1,1MB, lihat debt issue. JPG lama
-// (new-hero-mascot.jpg) tak lagi dirujuk kode; dibiarkan agar tidak break
-// pemakai tak terduga, hapus terpisah.
+// Maskot memakai SATU set aset saja (bedawang-*).
 
 export interface BedawangProps {
   mood?: BedawangMood;
