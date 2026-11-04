@@ -286,3 +286,35 @@ export function StepReadySection({ name, onStart }: { name: string; onStart: () 
     </div>
   );
 }
+
+export function GoogleSaveOffer({
+  onGoogle,
+  onSkip,
+}: {
+  onGoogle: () => void;
+  onSkip: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center">
+      <Bedawang mood="senang" className="size-24 drop-shadow-md" />
+      <h2 className="mt-3 text-xl font-bold tracking-tight">Simpan progresmu?</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Masuk pakai Google biar XP dan streak tersimpan di semua perangkat dan muncul di papan
+        peringkat. Boleh juga dilewati dulu.
+      </p>
+      <div className="mt-6 flex w-full flex-col gap-2">
+        <Button size="lg" className="w-full text-base font-semibold" onClick={onGoogle}>
+          Simpan pakai Google
+        </Button>
+        <Button
+          size="lg"
+          variant="ghost"
+          className="w-full text-base font-semibold"
+          onClick={onSkip}
+        >
+          Lewati dulu
+        </Button>
+      </div>
+    </div>
+  );
+}

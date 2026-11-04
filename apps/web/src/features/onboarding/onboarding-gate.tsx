@@ -5,9 +5,12 @@ import type { RefObject } from "react";
 import { Button } from "@caksara/ui/components/button";
 
 import { Bedawang } from "../../components/bedawang";
+import { getSupabase } from "../../lib/supabase";
+import { startGoogleLogin } from "../../lib/auth-google";
 import { loadProfile } from "../../lib/profile-store";
 import { profileNameSchema } from "../../lib/zod/profile";
 import {
+  GoogleSaveOffer,
   OnboardingTopBar,
   StepCommitment,
   StepGoal,
@@ -100,12 +103,23 @@ function StepBody({
 
 function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => void }) {
   const [step, setStep] = useState(0);
+  const [offer, setOffer] = useState<"none" | "google">("none");
   const [goal, setGoal] = useState("budaya");
   const [level, setLevel] = useState("nol");
   const [commitment, setCommitment] = useState("santai");
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const resolvedName = name.trim() || "Penjelajah";
+
+  async function handleGoogle() {
+    const url = await startGoogleLogin(window.location.origin);
+    if (url) {
+      window.location.assign(url);
+      return;
+    }
+    onComplete(resolvedName);
+  }
 
   function handleNext() {
     if (step < TOTAL_STEPS - 1) {
@@ -157,10 +171,20 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
 
           <main className="pt-2">
             {isReadyStep ? (
-              <StepReadySection
-                name={name}
-                onStart={() => onComplete(name.trim() || "Penjelajah")}
-              />
+              offer === "google" ? (
+                <GoogleSaveOffer onGoogle={handleGoogle} onSkip={() => onComplete(resolvedName)} />
+              ) : (
+                <StepReadySection
+                  name={name}
+                  onStart={() => {
+                    if (getSupabase()) {
+                      setOffer("google");
+                      return;
+                    }
+                    onComplete(name.trim() || "Penjelajah");
+                  }}
+                />
+              )
             ) : (
               <StepBody
                 step={step}

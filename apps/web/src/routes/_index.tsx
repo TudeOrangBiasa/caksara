@@ -40,6 +40,7 @@ import {
   recordSessionLevel,
 } from "../features/quiz/quiz-data";
 import { deriveWrongTopics } from "../lib/aksara-stats";
+import { migrateLocalToServer, readGoogleSession } from "../lib/auth-google";
 import { loadResume } from "../features/quiz/quiz-resume";
 import type { Quiz } from "../lib/zod/question";
 import { Button } from "@caksara/ui/components/button";
@@ -54,6 +55,7 @@ import {
 } from "../lib/profile-store";
 import { MAX_HEARTS } from "../lib/game-rules";
 import {
+  notifyGoogleSynced,
   notifyHeartsRefilled,
   notifyQueuedOffline,
   notifyQuizFallback,
@@ -231,11 +233,17 @@ export default function Home() {
   }, []);
 
   // V9: refill Hati + reset Streak harian berjalan saat profil siap
-  // (onboarding gate menunda HomeShell, jadi tidak bisa di sana).
   useEffect(() => {
     if (!profileLoaded) return;
     if (applyOvernightReset()) notifyStreakReset();
     if (refillHearts()) notifyHeartsRefilled();
+    // #89: kembali dari callback OAuth → migrasi progres lokal sekali, lalu sambut.
+    void readGoogleSession().then((session) => {
+      if (!session) return;
+      void migrateLocalToServer(session).then((ok) => {
+        if (ok) notifyGoogleSynced();
+      });
+    });
   }, [profileLoaded]);
   if (!profileLoaded) {
     return <OnboardingGate onComplete={handleComplete} />;

@@ -82,3 +82,11 @@ export function notifyPendingSynced(sent: number) {
     duration: 3500,
   });
 }
+
+/** #89: login Google sukses → progres lokal sudah digabung ke server. */
+export function notifyGoogleSynced() {
+  toast.success("Tersimpan pakai Google", {
+    description: "XP dan streak lokal sudah digabung ke akunmu.",
+    duration: 4000,
+  });
+}
