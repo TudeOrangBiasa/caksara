@@ -125,13 +125,18 @@ Akun demo Google untuk juri dibagikan via kanal panitia, bukan repo.
 - Live-OAuth hanya jalan bila provider Google aktif di dashboard Supabase;
   tanpa itu tombol Google disembunyikan dan app tetap jalan sebagai tamu.
 
-## Kredit (#91)
+## Kredit (#91, #105 #109)
 
 - Maskot **Bedawang Nala** — aset orisinal CAKSARA (`apps/web/public/assets/bedawang-*.png`).
 - Font Noto Sans Balinese (self-host woff2, OFL) untuk glyph U+1B00–U+1B7F.
-- Audio pelafalan: subset "Balinese Text-to-Speech Dataset" (Mendeley Data, CC BY 4.0).
+- Audio pelafalan: 10 klip terkurasi dari "Balinese Text-to-Speech Dataset"
+  (Mendeley Data, DOI 10.17632/6syjwz24v5.2, **CC BY 4.0** —
+  https://creativecommons.org/licenses/by/4.0/) — lihat
+  `apps/web/public/audio/NOTICE-AUDIO.md` (provenance + langkah Storage).
+- Efek suara UI: 8 klip Kenney Interface Sounds (**CC0 1.0**,
+  https://kenney.nl/assets/interface-sounds) — lihat
+  `apps/web/public/sfx/NOTICE-SFX.md`.
 - Avatar IP oleh s1dashu (MIT) via ipaslogo.com — lihat `apps/web/public/NOTICE-IP-AVATARS.md`.
-- Tidak ada aset CC0 yang dipakai saat ini.
 
 ## Tag rilis (#91)
 

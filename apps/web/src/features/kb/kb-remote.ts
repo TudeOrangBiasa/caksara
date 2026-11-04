@@ -13,6 +13,8 @@ export interface SupabaseKbRow {
    * diekstrak dari pola "Aksara: <glyph> (Latin: …)" di mana pun dalam body. */
   glyph?: string | null;
   latin?: string | null;
+  /** #105: kolom audio_url Supabase (opsional) — URL Storage /audio/... bila sudah diunggah. */
+  audio_url?: string | null;
 }
 
 /** Pecah kolom source seed ("Nama — ket\n...") jadi daftar sumber terstruktur. */
@@ -56,6 +58,7 @@ export function parseSupabaseKbRows(rows: SupabaseKbRow[] | null | undefined): K
       body: parsed.data.body,
       level: String(parsed.data.level),
       sources,
+      ...(row.audio_url?.trim() ? { audioUrl: row.audio_url.trim() } : {}),
     });
     if (entry.success) out.push(entry.data);
   }

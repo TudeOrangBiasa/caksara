@@ -1,8 +1,8 @@
-import { ArrowLeft, BookMarked, ShieldCheck, Volume2 } from "lucide-react";
+import { ArrowLeft, BookMarked, ShieldCheck } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
 
-import { speakLatin, useSpeechSupported } from "../../lib/speech";
+import { KbAudio } from "./kb-audio";
 import { LevelBadge } from "./kb-list";
 import { KB_CATEGORY_META } from "./kb-data";
 import { TransliterateStrip } from "./transliterate-strip";
@@ -14,7 +14,6 @@ interface KbDetailProps {
 }
 
 export function KbDetail({ entry, onBack }: KbDetailProps) {
-  const speech = useSpeechSupported();
   const latin = entry.latin;
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 md:max-w-2xl lg:max-w-5xl py-5">
@@ -47,18 +46,16 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
           {entry.title}
         </h1>
         {latin && (
-          <p className="mt-1 flex items-center justify-center gap-2 text-sm text-white/80">
-            {latin}
-            {speech && (
-              <button
-                type="button"
-                onClick={() => speakLatin(latin)}
-                aria-label={`Dengarkan: ${latin}`}
-                className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
-              >
-                <Volume2 className="size-4" aria-hidden />
-              </button>
-            )}
+          <div className="mt-1 flex items-center justify-center gap-2 text-sm text-white/80">
+            <span>{latin}</span>
+            <KbAudio audioUrl={entry.audioUrl} latin={latin} />
+          </div>
+        )}
+        {entry.audioUrl && (
+          <p className="mt-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white">
+              Suara asli Bali · CC BY 4.0
+            </span>
           </p>
         )}
         <p className="mt-2 text-[11px] font-medium text-white/70">ID {entry.id}</p>

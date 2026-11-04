@@ -1,4 +1,4 @@
-import { BookOpen, FilterX, RefreshCw, Search, WifiOff } from "lucide-react";
+import { BookOpen, FilterX, RefreshCw, Search, Volume2, WifiOff } from "lucide-react";
 import { useDeferredValue, useEffect, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
@@ -307,9 +307,9 @@ function KbCard({ entry, onOpen }: { entry: KbEntry; onOpen: (e: KbEntry) => voi
           <BookOpen className="size-5 text-primary" />
         </span>
       )}
-      <span className="truncate text-xs font-medium">{entry.title}</span>
-      <span className="text-[11px] text-muted-foreground">
-        {entry.category === "wresastra" ? entry.latin : KB_CATEGORY_META[entry.category].label}
+      <span className="flex w-full items-center justify-center gap-1 text-xs font-medium">
+        {entry.audioUrl && <Volume2 className="size-3 shrink-0 text-primary" aria-hidden />}
+        <span className="truncate">{entry.title}</span>
       </span>
     </button>
   );
