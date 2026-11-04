@@ -15,6 +15,8 @@ interface QuizResultProps {
   score: { correct: number; total: number };
   /** Level adaptif setelah sesi direkam (#33 V11a); absen untuk Latihan. */
   level?: number;
+  /** Level sesi yang baru selesai — pembanding deteksi naik (#102). */
+  prevLevel?: number;
   isLatihan?: boolean;
   tidbit?: string;
   onRetry: () => void;
@@ -24,6 +26,7 @@ export function QuizResult({
   mod,
   score,
   level,
+  prevLevel,
   isLatihan,
   tidbit,
   onRetry,
@@ -40,7 +43,13 @@ export function QuizResult({
   useEffect(() => {
     if (passed) playFanfare();
     else playCue("error");
-  }, [passed]);
+    // Naik level adaptif (#96→#102): levelUp setelah fanfare selesai (±600ms),
+    // tanpa animasi tambahan — bunyi saja, aman di reduced-motion.
+    if (level !== undefined && prevLevel !== undefined && level > prevLevel) {
+      const t = window.setTimeout(() => playCue("levelUp"), 700);
+      return () => window.clearTimeout(t);
+    }
+  }, [passed, level, prevLevel]);
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center px-4 md:max-w-xl py-8">

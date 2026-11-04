@@ -237,7 +237,7 @@ export function QuizShell({
   const current = quiz.questions[session.currentIndex];
 
   useEffect(() => {
-    updateStreak();
+    if (updateStreak()) playCue("streak");
     if (refillHearts()) notifyHeartsRefilled();
   }, []);
 

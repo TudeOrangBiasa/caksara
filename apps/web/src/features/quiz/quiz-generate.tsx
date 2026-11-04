@@ -32,6 +32,14 @@ interface GenerateQuizResponse {
   offline?: boolean;
 }
 
+/** Body persis yang dikirim ke Edge generate-quiz (#96: level adaptif + wrongTopics). */
+export interface GenerateQuizRequestBody {
+  moduleId: string;
+  level: number;
+  count: number;
+  wrongTopics: string[];
+}
+
 const CACHE_KEY = "caksara.quiz-cache.v1";
 const CACHE_TTL_MS = 5 * 60_000;
 
@@ -100,6 +108,11 @@ export async function fetchGeneratedQuiz(
     deferRemote?: boolean;
     /** Suntik pemanggil Edge untuk uji 429/non-429 tanpa Supabase (#29 V8c). */
     invokeRemote?: () => Promise<{ data: GenerateQuizResponse | null; error: unknown }>;
+    /**
+     * Intip body request Edge (#96): dipanggil sebelum invoke dengan body
+     * persis yang dikirim. Hanya untuk uji/harness — produksi abaikan.
+     */
+    onRequestBody?: (body: GenerateQuizRequestBody) => void;
   },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
@@ -131,7 +144,13 @@ export async function fetchGeneratedQuiz(
     if (cached?.quiz && cached.quiz.questions.length >= 3) return cached;
     // Seam uji: invokeRemote menyuntik hasil Edge tanpa sesi jaringan.
     if (!opts?.invokeRemote) await ensureAnonSession();
-    const body = { moduleId, level, count, wrongTopics: opts?.wrongTopics ?? [] };
+    const body: GenerateQuizRequestBody = {
+      moduleId,
+      level,
+      count,
+      wrongTopics: opts?.wrongTopics ?? [],
+    };
+    opts?.onRequestBody?.(body);
     const invoke =
       opts?.invokeRemote ??
       (() => supabase?.functions.invoke<GenerateQuizResponse>("generate-quiz", { body }));

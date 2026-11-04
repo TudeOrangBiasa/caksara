@@ -79,6 +79,8 @@ type View =
       score: { correct: number; total: number };
       isLatihan?: boolean;
       tidbit: string;
+      /** Level sesi yang selesai — pembanding cue levelUp (#102). */
+      prevLevel?: number;
     };
 /**
  * Sesi kuis modul (#85): 3 soal bervariasi 2+ tipe + dengar_pilih dari
@@ -246,6 +248,7 @@ export default function Home() {
         mod={view.mod}
         score={view.score}
         level={view.isLatihan ? undefined : getAdaptiveLevel(view.mod.id)}
+        prevLevel={view.prevLevel}
         isLatihan={view.isLatihan}
         tidbit={view.tidbit}
         onRetry={() =>
@@ -311,6 +314,7 @@ export default function Home() {
             score,
             isLatihan: view.isLatihan,
             tidbit: pickTidbit(),
+            prevLevel: view.isLatihan ? undefined : sessionLevel,
           });
         }}
         onBack={() =>
