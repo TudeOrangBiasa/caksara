@@ -432,7 +432,7 @@ function AboutSection() {
           Web edukasi aksara Bali — pola Duo, rasa Caksara.
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Audio pelafalan: subset terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
+          Audio pelafalan: 10 klip terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
           (Mendeley Data, CC BY 4.0) —{" "}
           <a
             href="https://data.mendeley.com/datasets/6syjwz24v5/2"
@@ -441,9 +441,8 @@ function AboutSection() {
             className="underline underline-offset-2"
           >
             data.mendeley.com/datasets/6syjwz24v5/2
-          </a>
-          . Selama belum terkurasi, soal dengar_pilih memakai badge Audio Latin (sementara); audio
-          Bali asli di luar scope MVP.
+          </a>{" "}
+          · efek suara UI Kenney (CC0). Entri tanpa audio memakai badge Audio Latin (sementara).
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Avatar IP oleh s1dashu (MIT) via ipaslogo.com —{" "}
