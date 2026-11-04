@@ -1,5 +1,5 @@
 import { ArrowLeft, BookX, Heart, HeartCrack, RotateCcw } from "lucide-react";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
@@ -26,6 +26,7 @@ import {
 import type { QuizAnswer, QuizSession } from "./quiz-store";
 import type { QuizResume } from "./quiz-resume";
 import { clearResume, loadResume, saveResume } from "./quiz-resume";
+import type { Question, Quiz } from "../../lib/zod/question";
 
 export interface QuizFinishDetail {
   questionIndex: number;
@@ -256,25 +257,40 @@ export function QuizShell({
   }, [current, session, hearts, moduleId, resumeOffer, resumed]);
 
   // Keyboard desktop (#22): 1-4 memilih, Enter lanjut setelah feedback.
+  // Listener didaftar sekali; state terbaru dibaca lewat ref agar closure tak basi (#46).
+  const keyStateRef = useRef({
+    showFeedback: session.showFeedback,
+    currentIndex: session.currentIndex,
+    questions: quiz.questions,
+    handleNext,
+    submitAnswer,
+  });
+  keyStateRef.current = {
+    showFeedback: session.showFeedback,
+    currentIndex: session.currentIndex,
+    questions: quiz.questions,
+    handleNext,
+    submitAnswer,
+  };
   useEffect(() => {
-    if (!current) return;
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
-      if (e.key === "Enter" && session.showFeedback) {
+      const latest = keyStateRef.current;
+      if (e.key === "Enter" && latest.showFeedback) {
         e.preventDefault();
-        handleNext();
-      } else if (!session.showFeedback && e.key >= "1" && e.key <= "4") {
+        latest.handleNext();
+      } else if (!latest.showFeedback && e.key >= "1" && e.key <= "4") {
         const index = Number(e.key) - 1;
-        const question = quiz.questions[session.currentIndex];
+        const question = latest.questions[latest.currentIndex];
         if (question && "choices" in question && index < question.choices.length) {
-          submitAnswer(session.currentIndex, { selectedIndex: index });
+          latest.submitAnswer(latest.currentIndex, { selectedIndex: index });
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, []);
 
   const handleResume = () => {
     const offer = resumeOffer;
