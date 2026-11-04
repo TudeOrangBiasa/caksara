@@ -126,4 +126,7 @@ Akun demo Google untuk juri dibagikan via kanal panitia, bukan repo.
 
 ## Tag rilis (#91)
 
+Demo Digifest: tag annotated `v1.0-submission` di commit
+`88518df91c772d938af85f7c233f71d549447d1f` (objek tag
+`cc5fd164c27113c6e90196c1b3137625e6831173`).
 <!-- END digifest-authdocs -->
