@@ -11,6 +11,8 @@ export interface TeacherReply {
   glyph?: string;
   /** ID entri KB asal jawaban — tautan balik kecil ke KbDetail (bila ada). */
   entryId?: string;
+  /** Kutipan numerik Edge guru-rag (#94) — chip tanpa deep-link lokal. */
+  entryIds?: string[];
   outside: boolean;
   suggestions?: string[];
 }

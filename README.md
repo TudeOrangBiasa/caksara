@@ -14,8 +14,19 @@ Sesi Kuis digenerate Edge Function `supabase/functions/generate-quiz/index.ts`
 (model `gemini-3.1-flash-lite`, temp 0.3, `responseSchema` JSON + Zod `quizSchema`).
 Soal Gemini wajib mengutip KB Entry yang di-inject (`sourceRef` "KB#id · Basis
 Pengetahuan"); soal tanpa kutipan valid ditolak ke fallback bank + header
-`x-quiz-source: gemini|fallback` yang jujur. Guru Virtual menjawab lokal dari
-27 materi KB (`teacher-data.ts`); varian Edge/RAG menyusul (#94).
+`x-quiz-source: gemini|fallback` yang jujur.
+
+### Guru Virtual = Gemini RAG Digifest (#94 #95)
+
+Edge Function `supabase/functions/guru-rag/index.ts` (model
+`gemini-3.1-flash-lite`, temp 0.3, `responseSchema` `{ answer, entryIds,
+outside }` + Zod `ragResponseSchema`): seluruh 27 entri KB (id + judul + isi
+ringkas) di-inject sebagai konteks terikat; `entryIds` asing dibuang
+server-side; `outside:true` → FE render kalimat tolak exact #90; gagal/tanpa
+key → 503 + fallback lokal (`getTeacherReply` / explanation statis), tak
+pernah blank. Mode `explain` melayani tombol "Kenapa?" pada jawaban salah
+kuis (2-3 kalimat + chip sumber). Secrets (`GEMINI_API_KEY`) hanya di
+Supabase Edge dashboard — jangan pernah commit.
 
 ## Struktur
 
