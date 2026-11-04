@@ -1,21 +1,19 @@
-import { ArrowLeft, BookX, Heart, HeartCrack, RotateCcw } from "lucide-react";
+import { ArrowLeft, BookX, Heart } from "lucide-react";
 import { useEffect, useReducer, useRef, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { EmptyState } from "../../components/empty-state";
-import { Bedawang } from "../../components/bedawang";
 import { SessionLevelBadge } from "./quiz-level-badge";
+import { QuestionBody } from "./quiz-question-body";
+import { ResumeDialog } from "./quiz-resume-dialog";
+import { GameOver } from "./quiz-game-over";
 import { addXp, refillHearts, setHearts, updateStreak } from "../../lib/profile-store";
 import { MAX_HEARTS, XP_PER_CORRECT } from "../../lib/game-rules";
 import { notifyHeartsRefilled } from "../../lib/notify";
 import { playCue } from "../../lib/sound";
-import { Cocokkan } from "./quiz-cocokkan";
-import { SusunAksara } from "./quiz-susun";
-import { QuizChoice } from "./quiz-choice";
 import { QuizFeedback } from "./quiz-feedback";
-import { KenaliVisualPrompt } from "./quiz-visual";
 import {
   createSession,
   getScore,
@@ -23,10 +21,10 @@ import {
   isAnswerCorrect,
   quizReducer,
 } from "./quiz-store";
-import type { QuizAnswer, QuizSession } from "./quiz-store";
+import type { QuizAnswer } from "./quiz-store";
 import type { QuizResume } from "./quiz-resume";
 import { clearResume, loadResume, saveResume } from "./quiz-resume";
-import type { Question, Quiz } from "../../lib/zod/question";
+import type { Quiz } from "../../lib/zod/question";
 
 export interface QuizFinishDetail {
   questionIndex: number;
@@ -44,146 +42,6 @@ interface QuizShellProps {
   onBack: () => void;
   /** Tautan balik kecil sourceRef → entri KB (deep-link /kb/:id bila rute ada). */
   onOpenKbEntry?: (entryId: string) => void;
-}
-
-function QuestionBody({
-  question,
-  session,
-  setAnswer,
-}: {
-  question: Question;
-  session: QuizSession;
-  setAnswer: (answer: QuizAnswer) => void;
-}) {
-  const answer = session.answers.get(session.currentIndex);
-
-  if (question.type === "susun_aksara" && question.tiles) {
-    return (
-      <SusunAksara
-        tiles={question.tiles}
-        disabled={session.showFeedback}
-        onAnswer={(ordered) => setAnswer({ ordered })}
-      />
-    );
-  }
-
-  if (question.type === "cocokkan" && question.pairs) {
-    return (
-      <Cocokkan
-        pairs={question.pairs}
-        disabled={session.showFeedback}
-        onAnswer={(matches) => setAnswer({ matches })}
-      />
-    );
-  }
-
-  if (question.type === "dengar_pilih" || question.type === "kenali_visual") {
-    return (
-      <div className="space-y-4">
-        <KenaliVisualPrompt
-          question={question}
-          showFeedback={session.showFeedback}
-          isCorrect={answer ? isAnswerCorrect(question, answer) : undefined}
-        />
-        <QuizChoice
-          question={question}
-          selectedIndex={answer?.selectedIndex ?? null}
-          showFeedback={session.showFeedback}
-          shakeIndex={answer?.selectedIndex ?? null}
-          onSelect={(i) => setAnswer({ selectedIndex: i })}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <QuizChoice
-      question={question}
-      selectedIndex={answer?.selectedIndex ?? null}
-      showFeedback={session.showFeedback}
-      shakeIndex={answer?.selectedIndex ?? null}
-      onSelect={(i) => setAnswer({ selectedIndex: i })}
-    />
-  );
-}
-
-function ResumeDialog({
-  resume,
-  total,
-  onResume,
-  onRestart,
-}: {
-  resume: QuizResume;
-  total: number;
-  onResume: () => void;
-  onRestart: () => void;
-}) {
-  const tanggal = new Date(resume.updatedAt).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-  });
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Lanjutkan kuis"
-      className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center"
-    >
-      <span className="flex size-20 items-center justify-center rounded-full bg-accent/20">
-        <RotateCcw className="size-10 text-accent" />
-      </span>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Lanjutkan kuis?</h1>
-      <p className="mt-2 max-w-[32ch] text-sm text-muted-foreground">
-        Terakhir sampai soal ke-{resume.currentIndex + 1} dari {total} ({tanggal}).
-      </p>
-      <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
-        <Button
-          variant="cta"
-          className="h-12 w-full text-base font-bold tracking-wide"
-          onClick={onResume}
-        >
-          Lanjut dari soal ke-{resume.currentIndex + 1}
-        </Button>
-        <Button variant="outline" className="h-12 w-full" onClick={onRestart}>
-          Mulai ulang
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function GameOver({ onRetry, onBack }: { onRetry: () => void; onBack: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Hati habis, kuis berakhir"
-        className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center"
-      >
-        <Bedawang mood="sedih" className="size-24 drop-shadow-md" />
-        <span className="mt-4 flex size-14 items-center justify-center rounded-full bg-destructive/10 animate-card-pop">
-          <HeartCrack className="size-7 text-destructive" aria-hidden />
-        </span>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight">Hati kamu habis</h1>
-        <p className="mt-2 max-w-[30ch] text-sm text-muted-foreground">
-          Nggak apa-apa, salah itu bagian dari belajar. Hati sudah pulih penuh, yuk coba lagi!
-        </p>
-        <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
-          <Button
-            variant="cta"
-            className="h-12 w-full gap-2 text-base font-bold tracking-wide"
-            onClick={onRetry}
-          >
-            <RotateCcw className="size-4" aria-hidden /> Coba Lagi
-          </Button>
-          <Button variant="outline" className="h-12 w-full" onClick={onBack}>
-            Kembali
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function QuizShell({
