@@ -405,6 +405,10 @@ export function QuizShell({
             isCorrect={isAnswerCorrect(current, session.answers.get(session.currentIndex) ?? {})}
             explanation={current.explanation}
             sourceRef={current.sourceRef}
+            aksaraId={current.aksaraId}
+            prompt={current.prompt}
+            answer={session.answers.get(session.currentIndex)}
+            choices={"choices" in current ? current.choices : undefined}
             onOpenKbEntry={onOpenKbEntry}
             onNext={handleNext}
             isLast={session.currentIndex === quiz.questions.length - 1}

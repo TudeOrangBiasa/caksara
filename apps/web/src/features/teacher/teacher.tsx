@@ -5,6 +5,8 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { GEMINI_DOWN_MESSAGE } from "../../lib/notify";
+import { fetchGuruRemote } from "./guru-remote";
+import type { GuruRemoteVerdict } from "./guru-remote";
 import { getTeacherReply, QUICK_REPLIES } from "./teacher-data";
 import type { TeacherReply } from "./teacher-data";
 
@@ -17,6 +19,8 @@ interface Message {
   title?: string;
   glyph?: string;
   entryId?: string;
+  /** Kutipan numerik Edge (id → judul) — chip per entryIds #94. */
+  remoteCitations?: { id: string; title: string }[];
   suggestions?: string[];
   streaming?: boolean;
   isError?: boolean;
@@ -24,16 +28,40 @@ interface Message {
 let msgId = 0;
 const nextId = () => ++msgId;
 
-/** #90: Guru menjawab lokal; bila gagal, banner AI-down exact (bukan toast). */
-function resolveTeacherReply(trimmed: string): { reply: TeacherReply; isError: boolean } {
+/** #94: Edge guru-rag dulu; gagal → fallback lokal getTeacherReply; gagal → AI-down exact. */
+async function resolveTeacherReply(trimmed: string): Promise<{
+  reply: TeacherReply;
+  remote: GuruRemoteVerdict | null;
+  isError: boolean;
+}> {
   try {
-    return { reply: getTeacherReply(trimmed), isError: false };
+    const remote = await fetchGuruRemote({ mode: "ask", question: trimmed });
+    if (remote.ok && remote.verdict) {
+      const reply = toTeacherReply(remote.verdict);
+      return { reply, remote: remote.verdict, isError: false };
+    }
+  } catch {
+    // Jatuh ke lokal di bawah — Edge tak boleh memutihkan Guru.
+  }
+  try {
+    return { reply: getTeacherReply(trimmed), remote: null, isError: false };
   } catch {
     return {
       reply: { answer: GEMINI_DOWN_MESSAGE, sources: [], outside: true },
+      remote: null,
       isError: true,
     };
   }
+}
+
+/** Petakan verdict Edge ke bentuk Bubble; citations numerik tanpa deep-link lokal. */
+function toTeacherReply(verdict: GuruRemoteVerdict): TeacherReply {
+  return {
+    answer: verdict.answer,
+    sources: [],
+    entryIds: verdict.entryIds,
+    outside: verdict.outside,
+  };
 }
 
 const GREETING =
@@ -57,9 +85,12 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
     setMessages((m) => [...m, { id: nextId(), role: "user", content: trimmed, full: trimmed }]);
 
     setThinking(true);
-    window.setTimeout(() => {
+    void (async () => {
+      // Giliran event-loop agar ThinkingBubble sempat render sebelum fetch Edge.
+      const gate = new Promise((resolve) => window.setTimeout(resolve, 350));
+      await gate;
+      const { reply, remote, isError } = await resolveTeacherReply(trimmed);
       setThinking(false);
-      const { reply, isError } = resolveTeacherReply(trimmed);
       const id = nextId();
       setMessages((m) => [
         ...m,
@@ -72,6 +103,7 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
           title: reply.title,
           glyph: reply.glyph,
           entryId: reply.entryId,
+          remoteCitations: remote?.citations,
           suggestions: reply.suggestions,
           streaming: true,
           isError,
@@ -92,7 +124,7 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
         });
       }, 24);
       window.setTimeout(() => clearInterval(stream), 4000);
-    }, 700);
+    })();
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -325,6 +357,19 @@ function Bubble({
                 Buka di Basis Pengetahuan →
               </button>
             )}
+          </div>
+        )}
+
+        {msg.remoteCitations && msg.remoteCitations.length > 0 && isDone && (
+          <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Sumber rujukan">
+            {msg.remoteCitations.map((c) => (
+              <span
+                key={c.id}
+                className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary"
+              >
+                {c.title}
+              </span>
+            ))}
           </div>
         )}
 
