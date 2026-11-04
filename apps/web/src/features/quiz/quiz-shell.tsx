@@ -71,7 +71,7 @@ function QuestionBody({
       <Cocokkan
         pairs={question.pairs}
         disabled={session.showFeedback}
-        onAnswer={(left, right) => setAnswer({ match: { left, right } })}
+        onAnswer={(matches) => setAnswer({ matches })}
       />
     );
   }

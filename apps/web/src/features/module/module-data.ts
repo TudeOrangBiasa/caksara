@@ -34,7 +34,7 @@ export const courseModules: CourseModule[] = [
     description:
       "Kenalan sama sapaan sehari-hari dan basa-basi adat Bali, dari Om Swastiastu sampai matur suksma.",
     poinBelajar: ["Sapaan pembuka", "Basa-basi adat", "Pengucapan halus"],
-    jumlahSoal: 8,
+    jumlahSoal: 3,
     estimasiMenit: 3,
     order: 1,
     materi: [
@@ -72,7 +72,7 @@ export const courseModules: CourseModule[] = [
     theme: "18 aksara dasar",
     description: "Kenal 18 aksara wresastra, dari bentuk, bunyi, sampai filosofi tiap aksaranya.",
     poinBelajar: ["18 aksara dasar", "Bentuk & bunyi", "Filosofi aksara"],
-    jumlahSoal: 8,
+    jumlahSoal: 3,
     estimasiMenit: 4,
     order: 2,
     materi: [
@@ -102,7 +102,7 @@ export const courseModules: CourseModule[] = [
     description:
       "Belajar beda tingkat bahasa, biar tahu kapan pakai kata biasa dan kapan harus halus.",
     poinBelajar: ["Andap vs Alus", "Kontek sopan-santun", "Basa Alus"],
-    jumlahSoal: 8,
+    jumlahSoal: 3,
     estimasiMenit: 4,
     order: 3,
     materi: [
@@ -135,7 +135,7 @@ export const courseModules: CourseModule[] = [
     description:
       "Mengenal hari raya dan tradisi Bali: Galungan, Nyepi, canang, sampai caranya menghormati.",
     poinBelajar: ["Galungan", "Nyepi", "Canang & upacara"],
-    jumlahSoal: 8,
+    jumlahSoal: 3,
     estimasiMenit: 4,
     order: 4,
     materi: [

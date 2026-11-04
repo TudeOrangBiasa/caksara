@@ -81,7 +81,7 @@ type View =
       tidbit: string;
     };
 /**
- * Sesi kuis modul (#23): 5 soal bervariasi 2+ tipe + dengar_pilih dari
+ * Sesi kuis modul (#85): 3 soal bervariasi 2+ tipe + dengar_pilih dari
  * bank lokal. Edge generate-quiz (Gemini) diambil via useQuizLaunch saat
  * sesi dibuka; bank lokal adalah fallback yang tidak pernah macet.
  */

@@ -1,8 +1,8 @@
 /// <reference lib="deno.ns" />
 // Edge Function: generate-quiz (#23 V4).
 // Kontrak: terima { moduleId, level, count, wrongTopics }, kembalikan
-// { moduleId, questions[3..8], cached } dengan 2+ tipe soal termasuk
-// dengar_pilih (audio asli bila ada, badge Latin bila belum terkurasi).
+// { moduleId, questions[tepat 3, Digifest #85], cached } dengan 2+ tipe soal
+// termasuk dengar_pilih (audio asli bila ada, badge Latin bila belum terkurasi).
 // Ketahanan: rate-limit 429 sebelum panggil Gemini, retry 2x lalu fallback
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
 // pernah macet, API key tidak pernah bocor ke klien.
@@ -256,11 +256,6 @@ function clampLevel(v: unknown): number {
   const n = typeof v === "number" ? Math.round(v) : 1;
   return Math.min(3, Math.max(1, n));
 }
-
-function clampCount(v: unknown): number {
-  const n = typeof v === "number" ? Math.round(v) : 5;
-  return Math.min(8, Math.max(3, n));
-}
 function pickFallback(moduleId: string, count: number): Question[] {
   const bank = FALLBACK_BANK[moduleId] ?? FALLBACK_BANK.mod_01 ?? [];
   const sliced = bank.slice(0, Math.min(count, Math.max(3, bank.length)));
@@ -296,7 +291,7 @@ function responseSchema(): Record<string, unknown> {
       questions: {
         type: "ARRAY",
         minItems: 3,
-        maxItems: 8,
+        maxItems: 3,
         items: {
           anyOf: [
             {
@@ -531,7 +526,7 @@ export async function handler(req: Request): Promise<Response> {
   const moduleId = typeof body.moduleId === "string" ? body.moduleId.trim() : "";
   if (!moduleId) return json(400, { error: "moduleId wajib" });
   const level = clampLevel(body.level);
-  const count = clampCount(body.count);
+  const count = 3; // Digifest #85: sesi selalu tepat 3 soal, abaikan count klien.
   const wrongTopics = Array.isArray(body.wrongTopics)
     ? body.wrongTopics.filter((t): t is string => typeof t === "string").slice(0, 8)
     : [];

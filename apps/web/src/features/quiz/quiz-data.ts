@@ -312,7 +312,7 @@ export const QUIZ_BANK: Record<string, Question[]> = {
   ],
 };
 
-const SESSION_COUNT = 5;
+const SESSION_COUNT = 3;
 const MIN_TYPES = 2;
 
 const MODULE_BASE_LEVEL: Record<string, number> = {
@@ -441,13 +441,13 @@ const TYPE_ORDER: Question["type"][] = [
 
 /**
  * Pilih soal sesi: selalu sertakan dengar_pilih bila bank punya, jaga
- * 2+ tipe berbeda (batas atas default 3 dari 5 agar sesi fokus),
- * utamakan level target (±1), lalu putar urutan per seed agar
- * pengulangan tidak monoton. Deterministik — aman untuk resume.
+ * 2+ tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
+ * agar pengulangan tidak monoton. Deterministik — aman untuk resume.
+ * Sesi Digifest selalu 3 soal (#85); bank kelebihan tetap di source, tak dipilih.
  */
 export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptions): Question[] {
   const level = Math.min(3, Math.max(1, Math.round(opts?.level ?? 1)));
-  const count = Math.min(8, Math.max(3, Math.round(opts?.count ?? SESSION_COUNT)));
+  const count = SESSION_COUNT;
   const seed = Math.max(0, Math.round(opts?.seed ?? 0));
   const maxTypes = Math.min(5, Math.max(MIN_TYPES, Math.round(opts?.maxTypes ?? 3)));
   if (bank.length === 0) return [];
@@ -531,7 +531,7 @@ export function buildMixedQuiz(moduleIds: string[]): Quiz {
   return quizSchema.parse({ moduleId: "latihan", questions: shuffled });
 }
 
-/** Sesi kuis modul: 3-8 soal bervariasi, tervalidasi Zod di batas. */
+/** Sesi kuis modul: 3 soal bervariasi, tervalidasi Zod di batas. */
 export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
   const bank = QUIZ_BANK[moduleId] ?? QUIZ_BANK.mod_01;
   const level = opts?.level ?? getAdaptiveLevel(moduleId);

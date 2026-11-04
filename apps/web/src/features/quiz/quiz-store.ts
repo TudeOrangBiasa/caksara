@@ -3,7 +3,8 @@ import type { Question, Quiz } from "../../lib/zod/question";
 export interface QuizAnswer {
   selectedIndex?: number;
   ordered?: string[];
-  match?: { left: string; right: string };
+  /** Pasangan cocokkan yang terpasang ({kiri: kanan}); soal selesai bila SEMUA pairs cocok. */
+  matches?: Record<string, string>;
 }
 
 export interface QuizSession {
@@ -71,9 +72,9 @@ export function isAnswerCorrect(question: Question, answer: QuizAnswer): boolean
       return arraysEqual(question.tiles, answer.ordered);
     }
     case "cocokkan": {
-      if (!question.pairs || !answer.match) return false;
-      const pair = question.pairs.find((p) => p.left === answer.match?.left);
-      return pair?.right === answer.match?.right;
+      if (!question.pairs || !answer.matches) return false;
+      if (Object.keys(answer.matches).length !== question.pairs.length) return false;
+      return question.pairs.every((p) => answer.matches?.[p.left] === p.right);
     }
     default:
       return false;
