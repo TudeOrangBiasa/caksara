@@ -72,7 +72,7 @@ export function QuizFeedback({
               </span>
             )}
           </div>
-          {explanation && <p className="mt-1 text-sm text-muted-foreground">{explanation}</p>}
+          {explanation && <p className="mt-1 text-sm text-foreground/80">{explanation}</p>}
           {showKenapa && (
             <button
               type="button"
@@ -95,7 +95,7 @@ export function QuizFeedback({
             </button>
           )}
           {kenapaBusy && (
-            <p className="mt-2 text-xs text-muted-foreground" role="status">
+            <p className="mt-2 text-xs text-foreground/80" role="status">
               Bedawang mikir…
             </p>
           )}
@@ -117,7 +117,7 @@ export function QuizFeedback({
             </div>
           )}
           {sourceRef && (
-            <p className="mt-1 text-[11px] text-muted-foreground">
+            <p className="mt-1 text-[11px] text-foreground/80">
               Sumber: {sourceRef}
               {onOpenKbEntry && (
                 <button
@@ -131,7 +131,7 @@ export function QuizFeedback({
             </p>
           )}
           {!isCorrect && (
-            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 ring-1 ring-border/60">
               <BookOpenCheck className="size-3.5 shrink-0 text-primary" />
               Penjelasan dari Basis Pengetahuan
             </p>
