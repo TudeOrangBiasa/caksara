@@ -112,6 +112,7 @@ Configuration > Redirect URLs; provider Google diaktifkan Tude di dashboard):
 
 - `http://localhost:5173/` (dev lokal)
 - `https://<proyek>.vercel.app/` (preview + production)
+- `app.caksara.web://auth/callback` (shell Android #100 — custom scheme, allowlist manual)
 
 Akun demo Google untuk juri dibagikan via kanal panitia, bukan repo.
 

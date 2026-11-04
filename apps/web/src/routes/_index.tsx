@@ -64,6 +64,7 @@ import {
 } from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
+import { useNativeAuthDeepLink } from "../lib/use-native-auth-deep-link";
 import { LandingHome } from "../features/landing/landing-home";
 
 type View =
@@ -213,6 +214,7 @@ export default function Home() {
   const [navTab, setNavTab] = useState<NavTab>("beranda");
   const [kbQuery, setKbQuery] = useState("");
   const isDesktop = useIsDesktop();
+  useNativeAuthDeepLink();
 
   const selesai = new Set<string>(courseModules.map((m) => m.id).filter((id) => hasSelesai(id)));
 

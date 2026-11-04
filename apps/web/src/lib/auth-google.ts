@@ -8,11 +8,17 @@ export const LEADERBOARD_LIMIT = 20;
 export const SUFFIX_MIN = 100;
 export const SUFFIX_MAX = 999;
 
+/** #100: scheme deep-link OAuth di shell Android (intent-filter + allowlist dashboard). */
+export const NATIVE_AUTH_SCHEME = "app.caksara.web";
+export const NATIVE_AUTH_PATH = "/auth/callback";
+export const NATIVE_AUTH_REDIRECT = `${NATIVE_AUTH_SCHEME}://${NATIVE_AUTH_PATH.slice(1)}`;
+
 /**
  * URL kembali OAuth Google. Daftarkan di Dashboard Supabase > Authentication >
  * URL Configuration > Redirect URLs:
  * - http://localhost:5173/ (dev lokal)
  * - https://<proyek>.vercel.app/ (preview + production)
+ * - app.caksara.web://auth/callback (shell Android #100)
  * Tanpa entri ini Supabase menolak callback; Tude mengaktifkan provider
  * Google + mendaftarkan URL di dashboard (bukan di repo).
  */
@@ -41,21 +47,37 @@ export interface GoogleSession {
 }
 
 /**
- * Mulai login Google via Supabase OAuth. Mengembalikan URL tujuan bila
- * backend + provider siap; null bila tombol wajib disembunyikan (env kosong,
- * offline, atau provider mati) — app tetap jalan sebagai tamu.
+ * Mulai login Google via Supabase OAuth. Kembalikan URL tujuan bila backend
+ * + provider siap; null bila tombol wajib disembunyikan (env kosong,
+ * offline, provider mati, atau halaman OAuth sudah dibuka di browser
+ * sistem native) — app tetap jalan sebagai tamu.
  */
 export async function startGoogleLogin(origin: string): Promise<string | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
   if (typeof navigator !== "undefined" && !navigator.onLine) return null;
+  const native = typeof window !== "undefined" && "Capacitor" in window;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: googleRedirectTo(origin) },
+    options: {
+      redirectTo: native ? NATIVE_AUTH_REDIRECT : googleRedirectTo(origin),
+      skipBrowserRedirect: native,
+    },
   });
   if (error || !data.url) {
     if (import.meta.env.DEV) console.warn("[auth] Google login gagal:", error?.message);
     return null;
+  }
+  if (native) {
+    try {
+      // Modul @capacitor/browser tidak ada di web; impor dinamis di cabang
+      // native saja agar bundle web tidak menarik runtime Capacitor.
+      const { Browser } = await import("@capacitor/browser");
+      await Browser.open({ url: data.url });
+      return null;
+    } catch {
+      return data.url;
+    }
   }
   return data.url;
 }
@@ -68,14 +90,10 @@ export async function readGoogleSession(): Promise<GoogleSession | null> {
   if (error || !data.session) return null;
   const user = data.session.user;
   if (user.is_anonymous) return null;
-  const meta = user.user_metadata as { full_name?: unknown; name?: unknown } | null;
-  const displayName =
-    typeof meta?.full_name === "string"
-      ? meta.full_name
-      : typeof meta?.name === "string"
-        ? meta.name
-        : null;
-  return { uid: user.id, displayName };
+  return toGoogleSession(
+    user.id,
+    user.user_metadata as { full_name?: unknown; name?: unknown } | null,
+  );
 }
 
 export interface MigrationPlan {
@@ -161,14 +179,86 @@ export function watchGoogleSession(onSignedIn: (session: GoogleSession) => void)
   const { data } = supabase.auth.onAuthStateChange((_event, session) => {
     const user = session?.user;
     if (!user || user.is_anonymous) return;
-    const meta = user.user_metadata as { full_name?: unknown; name?: unknown } | null;
-    const displayName =
-      typeof meta?.full_name === "string"
-        ? meta.full_name
-        : typeof meta?.name === "string"
-          ? meta.name
-          : null;
-    onSignedIn({ uid: user.id, displayName });
+    onSignedIn(
+      toGoogleSession(
+        user.id,
+        user.user_metadata as { full_name?: unknown; name?: unknown } | null,
+      ),
+    );
   });
   return () => data.subscription.unsubscribe();
+}
+
+/**
+ * True bila URL adalah callback OAuth milik scheme native
+ * (`app.caksara.web://auth/callback?...`, murni — aman diuji tanpa WebView).
+ */
+export function isNativeAuthCallback(rawUrl: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== `${NATIVE_AUTH_SCHEME}:`) return false;
+  // URL non-spesial: `auth` jadi host, bukan segmen path — gabungkan kembali.
+  return `${parsed.host}${parsed.pathname}` === NATIVE_AUTH_PATH.slice(1);
+}
+
+/**
+ * Ambil potongan sesi (`code` PKCE / `access_token`+`refresh_token` implicit)
+ * dari URL callback. Kembalikan null bila bukan callback native atau
+ * tanpa kredensial — pemanggil menampilkan EmptyState, bukan crash.
+ */
+export function parseNativeAuthCallback(rawUrl: string): {
+  code: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+} | null {
+  if (!isNativeAuthCallback(rawUrl)) return null;
+  const query = new URL(rawUrl).searchParams;
+  const fragment = new URLSearchParams(new URL(rawUrl).hash.slice(1));
+  const code = query.get("code");
+  const accessToken = fragment.get("access_token") ?? query.get("access_token");
+  const refreshToken = fragment.get("refresh_token") ?? query.get("refresh_token");
+  if (!code && !(accessToken && refreshToken)) return null;
+  return { code, accessToken, refreshToken };
+}
+
+/**
+ * Tukar kredensial deep-link native jadi sesi Supabase. PKCE (`code`)
+ * diutamakan; implicit (`access_token`+`refresh_token`) cadangan.
+ * Null bila backend mati atau tukaran gagal — tamu tetap jalan.
+ */
+export async function exchangeNativeAuthCallback(rawUrl: string): Promise<GoogleSession | null> {
+  const supabase = getSupabase();
+  const parsed = parseNativeAuthCallback(rawUrl);
+  if (!supabase || !parsed) return null;
+  if (parsed.code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(parsed.code);
+    if (error || !data.session || data.session.user.is_anonymous) return null;
+    return toGoogleSession(data.session.user.id, data.session.user.user_metadata);
+  }
+  if (parsed.accessToken && parsed.refreshToken) {
+    const { data, error } = await supabase.auth.setSession({
+      access_token: parsed.accessToken,
+      refresh_token: parsed.refreshToken,
+    });
+    if (error || !data.session || data.session.user.is_anonymous) return null;
+    return toGoogleSession(data.session.user.id, data.session.user.user_metadata);
+  }
+  return null;
+}
+
+function toGoogleSession(
+  uid: string,
+  meta: { full_name?: unknown; name?: unknown } | null,
+): GoogleSession {
+  const displayName =
+    typeof meta?.full_name === "string"
+      ? meta.full_name
+      : typeof meta?.name === "string"
+        ? meta.name
+        : null;
+  return { uid, displayName };
 }

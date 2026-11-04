@@ -50,10 +50,17 @@
     "db:studio": "drizzle-kit studio",
     "prepare": "husky",
     "verify": "bash scripts/verify.sh",
-    "verify:caksara": "bun skills/verify-caksara/verify-caksara.ts"
+    "verify:caksara": "bun skills/verify-caksara/verify-caksara.ts",
+    "cap:sync": "bunx cap sync",
+    "cap:android": "bunx cap open android"
   },
   "dependencies": {
     "@caksara/env": "workspace:*",
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/splash-screen": "8.0.2",
     "@supabase/supabase-js": "^2.59.0",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.44.2",
@@ -62,6 +69,8 @@
   },
   "devDependencies": {
     "@caksara/config": "workspace:*",
+    "@capacitor/cli": "8.6.0",
+    "@capacitor/core": "8.6.0",
     "@shadcn/lint": "^0.2.0",
     "@types/node": "catalog:",
     "drizzle-kit": "^0.31.4",
