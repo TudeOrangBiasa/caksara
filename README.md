@@ -2,11 +2,14 @@
 
 INVENTION 2026 · Web Design · "Building Smarter Communities Through Digital Learning"
 
-Edutainment 4 Modul (Sapaan & Adat → Wresastra → Andap/Alus → Tradisi) dengan Sesi Kuis digenerate Gemini Flash dari Knowledge Base terpercaya (bukan ngarang), progres per Profil Anon (XP/Hati/Streak/Mastery).
+Edutainment 4 Modul (Sapaan & Adat → Wresastra → Andap/Alus → Tradisi) dengan Sesi Kuis
+3 soal per modul digenerate Gemini Flash dari Knowledge Base terpercaya (bukan ngarang),
+progres per Profil Anon (XP/Hati/Streak/Mastery). Nama panggilan dulu, Google opsional,
+papan peringkat top 20 XP.
 
 ## Stack
 
-React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · Drizzle ORM · Supabase (Postgres + Auth Anonymous + Edge Function + Storage + RLS + Cron) · `gemini-3.1-flash-lite` temp 0.3 · Noto Sans Balinese (U+1B00–U+1B7F self-host) · Deployed Vercel (FE) + Supabase (DB/Edge).
+React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · Drizzle ORM · Supabase (Postgres + Auth Anonymous + Auth Google + Edge Function + Storage + RLS + Cron) · `gemini-3.1-flash-lite` temp 0.3 · Noto Sans Balinese (U+1B00–U+1B7F self-host) · Deployed Vercel (FE) + Supabase (DB/Edge).
 
 ## AI: kuis & Guru
 
@@ -40,9 +43,9 @@ caksara/
 ```bash
 bun install
 cp apps/web/.env.example apps/web/.env  # isi VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY
-bun run dev          # web di http://localhost:5173
-bun run check        # oxlint + oxfmt
-bun run db:push      # drizzle-kit push ke Supabase (butuh DATABASE_URL)
+bun run dev:web    # web di http://localhost:5173
+bun run check      # oxlint + oxfmt
+bun run db:push    # drizzle-kit push ke Supabase (butuh DATABASE_URL)
 ```
 
 Lihat `caksara-docs/README.md` untuk viewer verifikasi aksara/soal.
@@ -79,3 +82,48 @@ E2E checklist juri (manual ≤15 mnt): Onboarding → Sesi Kuis (dengar_pilih ba
 atribusi) → Profil; 18 Wresastra tanpa tofu di 390/1280 + zoom 200%; `bun run check:secrets`
 hijau (no GEMINI di bundle); RLS A≠B via `supabase/rls/0001_rls.sql`; Edge 429 sebelum
 Gemini (lihat `x-quiz-source`); `bun run build` + Vercel preview hijau.
+
+<!-- BEGIN digifest-authdocs (#89 #91) — jangan gabung dengan seksi AI OwnerI -->
+
+## Auth Google + Papan Peringkat (#89)
+
+Login = Supabase Auth **provider Google saja** (`signInWithOAuth({ provider: 'google' })`,
+lihat `apps/web/src/lib/auth-google.ts`). Setelah nama panggilan, app menawarkan
+**Simpan pakai Google** + **Lewati dulu** (tidak blocking): tamu tetap main penuh
+dengan XP/Hati di `localStorage`, dan setelah OAuth sukses progres lokal dimigrasi
+ke baris server (`profile_id = auth.uid()`, XP/streak menang-maks).
+
+Papan peringkat (`leaderboard_entries`: `display_name`, `suffix` 100-999 hash stabil
+`profile_id`, `xp`, `updated_at`) tampil di tab Profil sebagai `Nama NNN` top 20
+diurut XP desc; RLS: SELECT publik (anon+auth), tulis hanya baris sendiri
+(`supabase/rls/0001_rls.sql` + migrasi `supabase/migrations/0001_*`).
+
+Redirect URL yang wajib didaftarkan (Dashboard Supabase > Authentication > URL
+Configuration > Redirect URLs; provider Google diaktifkan Tude di dashboard):
+
+- `http://localhost:5173/` (dev lokal)
+- `https://<proyek>.vercel.app/` (preview + production)
+
+Akun demo Google untuk juri dibagikan via kanal panitia, bukan repo.
+
+## Batasan yang diketahui (#91)
+
+- Web Speech (`speechSynthesis`, `lib/speech.ts`) hanya membacakan teks Latin
+  (`lang id-ID`, rate 0.9); tidak ada voice Bali, glyph aksara tidak pernah
+  dibacakan (ADR-0005). Audio kurasi Mendeley dipakai bila entri sudah terkurasi.
+- KB 27 materi (18 wresastra + 9 kosakata/budaya); Guru Virtual menjawab dari
+  materi lokal ini saja.
+- Live-OAuth hanya jalan bila provider Google aktif di dashboard Supabase;
+  tanpa itu tombol Google disembunyikan dan app tetap jalan sebagai tamu.
+
+## Kredit (#91)
+
+- Maskot **Bedawang Nala** — aset orisinal CAKSARA (`apps/web/public/assets/bedawang-*.png`).
+- Font Noto Sans Balinese (self-host woff2, OFL) untuk glyph U+1B00–U+1B7F.
+- Audio pelafalan: subset "Balinese Text-to-Speech Dataset" (Mendeley Data, CC BY 4.0).
+- Avatar IP oleh s1dashu (MIT) via ipaslogo.com — lihat `apps/web/public/NOTICE-IP-AVATARS.md`.
+- Tidak ada aset CC0 yang dipakai saat ini.
+
+## Tag rilis (#91)
+
+<!-- END digifest-authdocs -->

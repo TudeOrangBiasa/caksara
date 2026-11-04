@@ -12,6 +12,7 @@ import { useSyncExternalStore } from "react";
 import { ProfileAvatar } from "../../components/profile-avatar";
 import { AnimatedNumber } from "../../components/animated-number";
 import { MasteryGrid } from "../../components/mastery-grid";
+import { LeaderboardCard } from "../leaderboard/leaderboard";
 import { loadProfile, subscribeProfile, witaTodayStr } from "../../lib/profile-store";
 import { courseModules } from "../module/module-data";
 interface Badge {
@@ -256,6 +257,7 @@ export function ProfilPage({
             Status dihitung dari riwayat jawabanmu.
           </p>
         </div>
+        <LeaderboardCard currentProfileId={profile?.id} />
 
         {/* Mobile-only share & settings (hidden on desktop) */}
         <div className="grid gap-3 pt-2 sm:grid-cols-2 lg:hidden">
