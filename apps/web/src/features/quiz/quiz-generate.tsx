@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
 import { quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
@@ -43,19 +44,23 @@ export interface GenerateQuizRequestBody {
 const CACHE_KEY = "caksara.quiz-cache.v1";
 const CACHE_TTL_MS = 5 * 60_000;
 
-interface CacheRow {
-  quiz: Quiz;
-  source: QuizSource;
-  at: number;
-}
+const cacheRowSchema = z.object({
+  quiz: quizSchema,
+  source: z.enum(["gemini", "fallback", "offline", "cache"]),
+  at: z.number(),
+});
+
+type CacheRow = z.infer<typeof cacheRowSchema>;
+
+const cacheSchema = z.record(z.string(), cacheRowSchema);
 
 function readCache(): Record<string, CacheRow> {
   try {
     if (typeof window === "undefined") return {};
     const raw = window.localStorage.getItem(CACHE_KEY);
     if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, CacheRow>;
-    return typeof parsed === "object" && parsed !== null ? parsed : {};
+    const parsed = cacheSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : {};
   } catch {
     return {};
   }
@@ -64,7 +69,9 @@ function readCache(): Record<string, CacheRow> {
 function writeCache(all: Record<string, CacheRow>): void {
   try {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(CACHE_KEY, JSON.stringify(all));
+    const validated = cacheSchema.safeParse(all);
+    if (!validated.success) return;
+    window.localStorage.setItem(CACHE_KEY, JSON.stringify(validated.data));
   } catch {
     // Storage diblokir: cache dilewati, kuis tetap jalan dari fallback lokal.
   }
