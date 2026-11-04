@@ -14,6 +14,8 @@ import { secretFromJsonPlural } from "./secret-keys.ts";
 import { canUseFastPath, rateLimited, windowHourStart } from "./rate-window.ts";
 import type { QuizCallRow } from "./rate-window.ts";
 
+// Vendored dari apps/web/src/features/quiz/quiz-data.ts — JANGAN EDIT MANUAL, jalankan bun vendor-bank.ts
+// Impor lintas batas Deno/Vite ditolak bundler Edge; sumber tunggal tetap QUIZ_BANK FE.
 const FALLBACK_BANK: Record<string, Question[]> = {
   mod_01: [
     {
@@ -78,10 +80,20 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       sourceRef: "kb_sapaan · Basis Pengetahuan",
       level: 1,
     },
+    {
+      type: "kenali_visual",
+      prompt: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬲ᭄ᬫ",
+      choices: [
+        { text: "Mohon maaf", isCorrect: false },
+        { text: "Selamat tinggal", isCorrect: false },
+        { text: "Terima kasih", isCorrect: true },
+        { text: "Permisi lewat", isCorrect: false },
+      ],
+      explanation: "Matur suksma berarti terima kasih, bentuk halus dari suksma.",
+      sourceRef: "kb_matur_suksma · Basis Pengetahuan",
+      level: 1,
+    },
   ],
-  // Disalin minimal dari apps/web/src/features/quiz/quiz-data.ts (QUIZ_BANK)
-  // agar fallback Edge relevan per modul. Sumber tunggal tetap QUIZ_BANK FE
-  // (debt: bank ganda FE/Edge) — bila bank FE berubah, salin ulang ke sini.
   mod_02: [
     {
       type: "dengar_pilih",
@@ -96,6 +108,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       ],
       explanation: "Bunyinya 'ha', aksara pembuka urutan Ha Na Ca Ra Ka.",
       sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      aksaraId: "wre_01",
       level: 1,
     },
     {
@@ -109,6 +122,7 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       ],
       explanation: "Aksara dasar dimulai dari Ha, Na, Ca, Ra, Ka.",
       sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      aksaraId: "wre_01",
       level: 1,
     },
     {
@@ -122,6 +136,40 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       ],
       explanation: "Urutannya dibawa Aji Saka dan sarat makna filosofis.",
       sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "susun_aksara",
+      prompt: "Susun tiga aksara pertama yang benar (Latin).",
+      tiles: ["Ha", "Na", "Ca"],
+      explanation: "Urutan yang benar: Ha - Na - Ca.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "cocokkan",
+      prompt: "Pasangkan aksara dengan bunyinya.",
+      pairs: [
+        { left: "ᬳ", right: "ha" },
+        { left: "ᬦ", right: "na" },
+        { left: "ᬘ", right: "ca" },
+      ],
+      explanation: "Ha, na, ca adalah tiga aksara pembuka wresastra.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Aksara 'ka' ditulis seperti apa?",
+      choices: [
+        { text: "ᬓ", isCorrect: true },
+        { text: "ᬫ", isCorrect: false },
+        { text: "ᬩ", isCorrect: false },
+        { text: "ᬕ", isCorrect: false },
+      ],
+      explanation: "Bentuk 'ka' adalah ᬓ.",
+      sourceRef: "kb_wre_05 · Basis Pengetahuan",
+      aksaraId: "wre_05",
       level: 1,
     },
   ],
@@ -167,6 +215,39 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
       level: 2,
     },
+    {
+      type: "cocokkan",
+      prompt: "Pasangkan kata Andap dengan padanan Alus-nya.",
+      pairs: [
+        { left: "Madaar", right: "Ngajeng" },
+        { left: "Pules", right: "Sirep" },
+        { left: "Tiang", right: "Titiang" },
+      ],
+      explanation: "Masing-masing adalah pasangan Andap dan Alus.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Kata ganti 'aku' yang paling halus adalah...",
+      choices: [
+        { text: "Icang", isCorrect: false },
+        { text: "Tiang", isCorrect: false },
+        { text: "Titiang", isCorrect: true },
+        { text: "Cai", isCorrect: false },
+      ],
+      explanation: "Titiang adalah bentuk kata ganti orang yang paling halus.",
+      sourceRef: "kb_titiang · Basis Pengetahuan",
+      level: 3,
+    },
+    {
+      type: "susun_aksara",
+      prompt: "Susun kalimat Basa Alus 'saya mau makan'.",
+      tiles: ["Titiang", "jagi", "ngajeng"],
+      explanation: "Urutan yang benar: Titiang - jagi - ngajeng.",
+      sourceRef: "kb_titiang · Basis Pengetahuan",
+      level: 3,
+    },
   ],
   mod_04: [
     {
@@ -208,6 +289,39 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       ],
       explanation: "Kuningan datang 10 hari setelah Galungan menandai akhir rangkaian.",
       sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Saat Nyepi, umat diminta untuk...",
+      choices: [
+        { text: "Bekerja sepanjang hari", isCorrect: false },
+        { text: "Hening tanpa api, kerja, berpergian, atau hiburan", isCorrect: true },
+        { text: "Berpesta di jalan", isCorrect: false },
+        { text: "Menyalakan api unggun", isCorrect: false },
+      ],
+      explanation: "Nyepi adalah hari hening penuh refleksi diri.",
+      sourceRef: "kb_nyepi · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "susun_aksara",
+      prompt: "Susun kata 'galungan' dengan benar.",
+      tiles: ["ga", "lu", "ngan"],
+      explanation: "Urutan yang benar: ga - lu - ngan.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "cocokkan",
+      prompt: "Pasangkan tradisi dengan cirinya.",
+      pairs: [
+        { left: "Galungan", right: "Penjor & sembahyang" },
+        { left: "Nyepi", right: "Hari hening" },
+        { left: "Canang Sari", right: "Sesaji harian" },
+      ],
+      explanation: "Setiap tradisi punya ciri khasnya masing-masing.",
+      sourceRef: "kb_nyepi · Basis Pengetahuan",
       level: 2,
     },
   ],
