@@ -11,6 +11,8 @@ import { allQuestionsGrounded } from "./quiz-grounding.ts";
 import { quizSchema } from "./question.ts";
 import type { Question } from "./question.ts";
 import { secretFromJsonPlural } from "./secret-keys.ts";
+import { canUseFastPath, rateLimited, windowHourStart } from "./rate-window.ts";
+import type { QuizCallRow } from "./rate-window.ts";
 
 const FALLBACK_BANK: Record<string, Question[]> = {
   mod_01: [
@@ -215,7 +217,6 @@ const GENERATE_MODEL = "gemini-3.1-flash-lite";
 const GEMINI_ENDPOINT = (model: string) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
-const RATE_LIMIT_PER_MINUTE = 10;
 const KB_CACHE_TTL_MS = 60_000;
 
 interface KbRow {
@@ -412,25 +413,42 @@ async function queryKb(
   return out;
 }
 
-// Debt: quiz_calls tak punya kolom jam — counter 50/jam butuh kolom baru
-// (mis. window_hour). Untuk kini hitung di memori dari called_at 60 menit
-// terakhir di samping batas 10/menit. Migrasi kolom bila rate dinaikkan.
+// #60: bucket jam UTC (kolom window_hour + index) untuk counter 50/jam —
+// nullable agar baris pra-migrasi (null) tetap valid dan jatuh ke hitung
+// in-memory 60-menit. Batas 10/menit + 50/jam tak berubah.
 const RATE_LIMIT_PER_HOUR = 50;
-
-function rateLimited(calledAts: string[]): boolean {
-  const now = Date.now();
-  const lastMinute = calledAts.filter((iso) => Date.parse(iso) >= now - 60_000).length;
-  const lastHour = calledAts.filter((iso) => Date.parse(iso) >= now - 3_600_000).length;
-  return lastMinute >= RATE_LIMIT_PER_MINUTE || lastHour >= RATE_LIMIT_PER_HOUR;
-}
 
 async function checkRateLimit(
   supabaseUrl: string,
   secretKey: string,
   profileId: string,
 ): Promise<boolean> {
+  // Jalur cepat #60: satu query atas index (profile_id, window_hour).
+  try {
+    const hourStart = windowHourStart();
+    const fast = new URLSearchParams({
+      select: "called_at",
+      profile_id: `eq.${profileId}`,
+      window_hour: `gte.${hourStart}`,
+      order: "called_at.desc",
+      limit: String(RATE_LIMIT_PER_HOUR + 1),
+    });
+    const fastRes = await fetch(`${supabaseUrl}/rest/v1/quiz_calls?${fast}`, {
+      headers: { apikey: secretKey, Authorization: `Bearer ${secretKey}` },
+    });
+    if (fastRes.ok) {
+      const fastRows = (await fastRes.json()) as QuizCallRow[];
+      if (canUseFastPath(fastRows)) {
+        return (
+          fastRows.length > RATE_LIMIT_PER_HOUR || rateLimited(fastRows.map((r) => r.called_at))
+        );
+      }
+    }
+  } catch {
+    // Jaringan/parse gagal → fallback di bawah.
+  }
   const params = new URLSearchParams({
-    select: "called_at",
+    select: "called_at,window_hour",
     profile_id: `eq.${profileId}`,
     order: "called_at.desc",
     limit: String(RATE_LIMIT_PER_HOUR),
@@ -439,7 +457,7 @@ async function checkRateLimit(
     headers: { apikey: secretKey, Authorization: `Bearer ${secretKey}` },
   });
   if (!res.ok) return false;
-  const rows = (await res.json()) as Array<{ called_at: string }>;
+  const rows = (await res.json()) as QuizCallRow[];
   return rateLimited(rows.map((r) => r.called_at));
 }
 
@@ -451,7 +469,7 @@ async function recordCall(supabaseUrl: string, secretKey: string, profileId: str
       Authorization: `Bearer ${secretKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ profile_id: profileId }),
+    body: JSON.stringify({ profile_id: profileId, window_hour: windowHourStart() }),
   });
 }
 

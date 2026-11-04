@@ -15,6 +15,13 @@
       "when": 1793797350865,
       "tag": "0001_stiff_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793820066222,
+      "tag": "0002_abandoned_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }
