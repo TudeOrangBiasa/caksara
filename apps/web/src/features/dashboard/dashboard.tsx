@@ -1,9 +1,19 @@
-import { Flame, Target, ChevronRight, BookOpen, Library, Bot, Trophy } from "lucide-react";
+import {
+  Flame,
+  Target,
+  ChevronRight,
+  BookOpen,
+  LibraryBig,
+  MessageCircleQuestion,
+  Trophy,
+} from "lucide-react";
 
 import { courseModules, deriveStatus } from "../module/module-data";
 import type { CourseModule, ModuleStatus } from "../module/module-data";
 import type { UserProfile } from "../../lib/zod/profile";
 
+import { MasteryGrid } from "../../components/mastery-grid";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import { notifyModuleLocked } from "../../lib/notify";
 
 function FeaturedModul({
@@ -155,7 +165,7 @@ function LatihanCepat({
     <div className="grid grid-cols-4 gap-3">
       <button onClick={onOpenKb} className="group flex flex-col items-center gap-2">
         <div className="flex size-[4.25rem] items-center justify-center rounded-3xl bg-blue-500/15 text-blue-600 shadow-sm transition-transform active:scale-95 group-hover:-translate-y-1 dark:bg-blue-500/20 dark:text-blue-400">
-          <Library className="size-6" strokeWidth={2.5} />
+          <LibraryBig className="size-6" strokeWidth={2.5} />
         </div>
         <span className="text-[11px] font-bold text-muted-foreground">Kamus</span>
       </button>
@@ -167,7 +177,7 @@ function LatihanCepat({
       </button>
       <button onClick={onOpenGuru} className="group flex flex-col items-center gap-2">
         <div className="flex size-[4.25rem] items-center justify-center rounded-3xl bg-emerald-500/15 text-emerald-600 shadow-sm transition-transform active:scale-95 group-hover:-translate-y-1 dark:bg-emerald-500/20 dark:text-emerald-400">
-          <Bot className="size-6" strokeWidth={2.5} />
+          <MessageCircleQuestion className="size-6" strokeWidth={2.5} />
         </div>
         <span className="text-[11px] font-bold text-muted-foreground">Guru AI</span>
       </button>
@@ -204,6 +214,8 @@ export function Dashboard({
     activeIdx >= 0 ? "aktif" : (statuses[statuses.length - 1] ?? "terkunci");
 
   const userName = profile?.name ? profile.name.split(" ")[0] : "Penjelajah";
+  const reduceMotion = usePrefersReducedMotion();
+  const streakPulse = (profile?.streak ?? 0) > 0 && !reduceMotion;
 
   return (
     <div className="mx-auto w-full max-w-md px-5 pt-6 pb-28 font-sans bg-background/50">
@@ -218,7 +230,10 @@ export function Dashboard({
           </p>
         </div>
         <div className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 shadow-sm">
-          <Flame className="size-[18px] text-warning" strokeWidth={2.5} />
+          <Flame
+            className={`size-[18px] text-warning${streakPulse ? " animate-pulse" : ""}`}
+            strokeWidth={2.5}
+          />
           <span className="text-sm font-bold text-warning">{profile?.streak ?? 0}</span>
         </div>
       </header>
@@ -273,6 +288,11 @@ export function Dashboard({
           </p>
         </div>
         <LatihanCepat onOpenKb={() => onOpenKb("")} onOpenGuru={onOpenGuru} onStart={onStart} />
+      </section>
+
+      {/* Mastery 18 Wresastra */}
+      <section className="mt-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500 fill-mode-both rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
+        <MasteryGrid mastery={profile?.mastery} />
       </section>
     </div>
   );

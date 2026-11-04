@@ -6,6 +6,7 @@ import { Bedawang } from "../../components/bedawang";
 import { AnimatedNumber } from "../../components/animated-number";
 import { Confetti } from "../../components/confetti";
 import { playCue, playFanfare } from "../../lib/sound";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import { XP_PER_CORRECT } from "../../lib/game-rules";
 import type { CourseModule } from "../module/module-data";
 
@@ -30,6 +31,7 @@ export function QuizResult({
 }: QuizResultProps) {
   const percentage = Math.round((score.correct / score.total) * 100);
   const passed = percentage >= 70;
+  const reduceMotion = usePrefersReducedMotion();
   const xpGained = score.correct * XP_PER_CORRECT;
   const R = 54;
   const C = 2 * Math.PI * R;
@@ -42,7 +44,7 @@ export function QuizResult({
 
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center px-4 md:max-w-xl py-8">
-      <Confetti active={passed} />
+      <Confetti active={passed && !reduceMotion} />
       <Bedawang
         mood={passed ? "semangat" : "sedih"}
         className={cn("size-20", !passed && "grayscale-[35%]")}
