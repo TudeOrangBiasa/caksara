@@ -7,7 +7,7 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 - TypeScript strict, no `any` tanpa alasan di komentar.
 - Satu sumber kebenaran untuk skema: `src/lib/zod/*` — validasi di FE & Edge (Zod di semua batas).
 - Jangan expose `GEMINI_API_KEY` di frontend; hanya di Edge Function.
-- **Max LOC < 1000** — satu file jangan lebih dari 1000 baris (termasuk komentar & blank). Lewat → split by feature/seam, bukan tambah file `utils.ts` raksasa. CI `check` akan fail jika ada file >1000 LOC.
+- **Max LOC < 1000** — satu file jangan lebih dari 1000 baris (termasuk komentar & blank). Lewat → split by feature/seam, bukan tambah file `utils.ts` raksasa. `bun run check:loc` (pre-commit) akan fail jika ada file >1000 LOC.
 - **No hardcoded fallback for env/API keys** — `process.env.X` wajib, `if (!process.env.X) throw` kalau missing. Jangan `process.env.VITE_SUPABASE_URL || "https://..."` atau `|| "api_key"` (axios/rpc fallback). `bun run check:secrets` akan fail kalau ada `|| "https://` atau hardcoded `*.supabase.co` tanpa env. Trivy gak perlu — ini lint-time check, bukan vuln scan.
 
 ## 2. Lint & Format
@@ -63,7 +63,7 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 - **Branch per tiket, push hanya via PR.** Setiap fitur/fix tiket = branch baru
   `feat/<nama-fitur>` (fix kecil: `fix/<nama>`, chores/ci: `chore/<nama>`) dari
   `develop` yang sudah sync ke `origin/main`. Push langsung ke `develop`/`main`
-  dilarang — semua perubahan masuk lewat PR + review + CI hijau.
+  dilarang — semua perubahan masuk lewat PR + review + `bun run verify` hijau.
 - **PR wajib pakai template** (`.github/pull_request_template.md`): What/Why,
   Test plan (perintah + hasil), Screenshots (bila UI), Risk & rollback.
   PR tanpa bagian Test plan diisi = belum siap review.

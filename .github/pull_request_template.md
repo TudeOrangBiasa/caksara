@@ -14,7 +14,7 @@
 
 - [ ] `bun test <file>.test.ts` → hasil
 - [ ] `bunx oxlint <file>` → 0 error
-- [ ] `bun run build` → exit 0
+- [ ] `bun run verify` → `verify: all gates passed` (pre-push juga menjalankan; jangan skip hook)
 
 ## Screenshots
 

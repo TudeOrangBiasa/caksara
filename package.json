@@ -44,7 +44,8 @@
     "db:apply-sql": "bun scripts/apply-sql.ts",
     "db:seed": "bun --env-file=apps/web/.env scripts/seed-kb.ts",
     "db:studio": "drizzle-kit studio",
-    "prepare": "husky"
+    "prepare": "husky",
+    "verify": "bash scripts/verify.sh"
   },
   "dependencies": {
     "@caksara/env": "workspace:*",
