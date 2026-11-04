@@ -84,6 +84,10 @@ async function passOnboarding(ctx: DriveCtx): Promise<void> {
   await shot(ctx, "00-onboarding.png");
   await page.getByRole("button", { name: "Lewati" }).click();
   await page.getByRole("button", { name: /Mulai Petualangan/u }).click();
+  await page.waitForTimeout(1500);
+  // Post-nickname Google-save offer (#89) is non-blocking: dismiss when shown.
+  const skipSave = page.getByRole("button", { name: "Lewati dulu" });
+  if ((await skipSave.count()) > 0) await skipSave.click();
   await page.waitForTimeout(1200);
   ctx.samples.push(await sampleOverflow(page, "home"));
   await shot(ctx, "01-home.png");
