@@ -1,6 +1,7 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { getTeacherReply, QUICK_REPLIES } from "./teacher-data";
+import { getTeacherReply, QUICK_REPLIES, TEACHER_OUTSIDE_REPLY } from "./teacher-data";
+import { GEMINI_DOWN_MESSAGE } from "../../lib/notify";
 
 describe("guru virtual #26 — jawab dari KB + sourceRef", () => {
   test("tanya dalam KB → jawaban + sumber + entryId", () => {
@@ -17,26 +18,33 @@ describe("guru virtual #26 — jawab dari KB + sourceRef", () => {
     assert.equal(reply.entryId, "kb_galungan");
   });
 
-  test("tanya luar KB → tolak halus + pills saran", () => {
+  test("tanya luar KB → kalimat tolak exact #90 + pills saran", () => {
     const reply = getTeacherReply("Siapa presiden Indonesia?");
     assert.equal(reply.outside, true);
-    assert.match(reply.answer.toLowerCase(), /di luar materi/);
-    assert.match(reply.answer.toLowerCase(), /aksara|bahasa|budaya/);
+    assert.equal(reply.answer, TEACHER_OUTSIDE_REPLY);
+    assert.equal(
+      reply.answer,
+      "Maaf itu di luar materi Caksara. Saya hanya jawab dari 27 materi yang ada.",
+    );
     assert.ok(reply.sources.length === 0);
     assert.ok(reply.suggestions && reply.suggestions.length > 0, "fallback tanpa pills");
   });
 
-  test("input kosong → tolak halus + pills saran", () => {
+  test("input kosong → kalimat tolak exact #90 + pills saran", () => {
     const reply = getTeacherReply("   ");
     assert.equal(reply.outside, true);
+    assert.equal(reply.answer, TEACHER_OUTSIDE_REPLY);
     assert.ok(reply.suggestions && reply.suggestions.length > 0);
   });
 
-  test("cabang hint (topik dikenal, jawaban tak ada) tetap berfrasa 'di luar materi'", () => {
+  test("topik dikenal tapi jawaban tak ada → tetap kalimat tolak exact #90", () => {
     const reply = getTeacherReply("penjor warna apa ya");
     assert.equal(reply.outside, true);
-    assert.match(reply.answer.toLowerCase(), /di luar materi/);
-    assert.match(reply.answer.toLowerCase(), /aksara|bahasa|budaya/);
+    assert.equal(reply.answer, TEACHER_OUTSIDE_REPLY);
+  });
+
+  test("pesan AI gangguan exact #90 terkunci di notify", () => {
+    assert.equal(GEMINI_DOWN_MESSAGE, "AI sedang gangguan. Materi dan kuis tetap bisa dibuka.");
   });
 });
 

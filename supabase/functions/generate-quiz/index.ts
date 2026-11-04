@@ -7,6 +7,7 @@
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
 // pernah macet, API key tidak pernah bocor ke klien.
 
+import { allQuestionsGrounded } from "./quiz-grounding.ts";
 import { quizSchema } from "./question.ts";
 import type { Question } from "./question.ts";
 import { secretFromJsonPlural } from "./secret-keys.ts";
@@ -301,7 +302,7 @@ function responseSchema(): Record<string, unknown> {
                 type: { type: "STRING", enum: ["dengar_pilih"] },
                 choices: { type: "ARRAY", minItems: 2, items: choice },
               },
-              required: ["type", "prompt", "choices"],
+              required: ["type", "prompt", "choices", "sourceRef"],
             },
             {
               type: "OBJECT",
@@ -310,7 +311,7 @@ function responseSchema(): Record<string, unknown> {
                 type: { type: "STRING", enum: ["kenali_visual"] },
                 choices: { type: "ARRAY", minItems: 2, items: choice },
               },
-              required: ["type", "prompt", "choices"],
+              required: ["type", "prompt", "choices", "sourceRef"],
             },
             {
               type: "OBJECT",
@@ -319,7 +320,7 @@ function responseSchema(): Record<string, unknown> {
                 type: { type: "STRING", enum: ["checkpoint_budaya"] },
                 choices: { type: "ARRAY", minItems: 2, items: choice },
               },
-              required: ["type", "prompt", "choices"],
+              required: ["type", "prompt", "choices", "sourceRef"],
             },
             {
               type: "OBJECT",
@@ -328,7 +329,7 @@ function responseSchema(): Record<string, unknown> {
                 type: { type: "STRING", enum: ["susun_aksara"] },
                 tiles: { type: "ARRAY", minItems: 2, items: { type: "STRING" } },
               },
-              required: ["type", "prompt", "tiles"],
+              required: ["type", "prompt", "tiles", "sourceRef"],
             },
             {
               type: "OBJECT",
@@ -345,7 +346,7 @@ function responseSchema(): Record<string, unknown> {
                   },
                 },
               },
-              required: ["type", "prompt", "pairs"],
+              required: ["type", "prompt", "pairs", "sourceRef"],
             },
           ],
         },
@@ -357,7 +358,7 @@ function responseSchema(): Record<string, unknown> {
 
 function kbContext(rows: KbRow[], wrongTopics: string[]): string {
   const lines = rows.map(
-    (r) => `- [${r.category}/L${r.level}] ${r.title}: ${r.body} (sumber: ${r.source})`,
+    (r) => `- KB#${r.id} [${r.category}/L${r.level}] ${r.title}: ${r.body} (sumber: ${r.source})`,
   );
   const wrong =
     wrongTopics.length > 0 ? `\nTopik yang sering salah: ${wrongTopics.join(", ")}.` : "";
@@ -370,8 +371,8 @@ function buildPrompt(req: GenerateQuizRequest, context: string): string {
     `Buat ${req.count} soal untuk modul ${req.moduleId} pada level ${req.level}.`,
     "Syarat: tepat 2-3 tipe berbeda dari [dengar_pilih, susun_aksara, kenali_visual, checkpoint_budaya, cocokkan],",
     "wajib ada 1 soal dengar_pilih (audioUrl boleh kosong; isi latinText bila audio belum ada — jangan pura-pura TTS aksara),",
-    "setiap soal memakai tepat satu KB Entry di atas (cantumkan sourceRef 'id · Basis Pengetahuan' dan level KB),",
-    "choices tepat 4 dengan satu isCorrect true bila tipe pilihan.",
+    "setiap soal memakai tepat satu KB Entry di atas dan WAJIB cantumkan sourceRef persis 'KB#<id> · Basis Pengetahuan' dengan <id> salah satu id di atas (soal tanpa kutipan valid DITOLAK — jangan tulis id lain),",
+    "cantumkan level KB tiap soal; choices tepat 4 dengan satu isCorrect true bila tipe pilihan.",
     context,
     "Balas hanya JSON sesuai responseSchema: { moduleId, questions }.",
   ].join("\n");
@@ -461,7 +462,12 @@ function extractJson(raw: string): unknown {
   return JSON.parse(raw.slice(start, end + 1));
 }
 
-async function callGemini(apiKey: string, req: GenerateQuizRequest, context: string) {
+async function callGemini(
+  apiKey: string,
+  req: GenerateQuizRequest,
+  context: string,
+  kbIds: ReadonlySet<string>,
+) {
   let lastError = "unknown";
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -489,10 +495,16 @@ async function callGemini(apiKey: string, req: GenerateQuizRequest, context: str
       };
       const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
       const parsed = quizSchema.safeParse(extractJson(text));
-      if (parsed.success && parsed.data.questions.length >= 3) {
+      if (
+        parsed.success &&
+        parsed.data.questions.length >= 3 &&
+        allQuestionsGrounded(parsed.data.questions, kbIds)
+      ) {
         return { quiz: parsed.data, rateLimited: false as const };
       }
-      lastError = "validasi Zod gagal";
+      lastError = parsed.success
+        ? "soal tanpa sourceRef KB valid (grounding #97)"
+        : "validasi Zod gagal";
     } catch (e) {
       lastError = e instanceof Error ? e.message : "fetch gagal";
     }
@@ -577,7 +589,8 @@ export async function handler(req: Request): Promise<Response> {
     );
   }
 
-  const result = await callGemini(apiKey, { moduleId, level, count, wrongTopics }, context);
+  const kbIds = new Set(kb.map((r) => String(r.id)));
+  const result = await callGemini(apiKey, { moduleId, level, count, wrongTopics }, context, kbIds);
   if ("rateLimited" in result && result.rateLimited) {
     return json(429, { error: "terlalu banyak permintaan, coba lagi sebentar" });
   }

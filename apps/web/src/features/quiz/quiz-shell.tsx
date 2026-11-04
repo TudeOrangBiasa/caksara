@@ -401,10 +401,7 @@ export function QuizShell({
         {session.showFeedback && (
           <QuizFeedback
             isCorrect={isAnswerCorrect(current, session.answers.get(session.currentIndex) ?? {})}
-            explanation={
-              current.explanation ??
-              (current.sourceRef ? `Sumber: ${current.sourceRef}` : undefined)
-            }
+            explanation={current.explanation}
             sourceRef={current.sourceRef}
             onOpenKbEntry={onOpenKbEntry}
             onNext={handleNext}

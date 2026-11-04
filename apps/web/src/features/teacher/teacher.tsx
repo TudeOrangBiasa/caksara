@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
+import { GEMINI_DOWN_MESSAGE } from "../../lib/notify";
 import { getTeacherReply, QUICK_REPLIES } from "./teacher-data";
 import type { TeacherReply } from "./teacher-data";
 
@@ -18,9 +19,22 @@ interface Message {
   entryId?: string;
   suggestions?: string[];
   streaming?: boolean;
+  isError?: boolean;
 }
 let msgId = 0;
 const nextId = () => ++msgId;
+
+/** #90: Guru menjawab lokal; bila gagal, banner AI-down exact (bukan toast). */
+function resolveTeacherReply(trimmed: string): { reply: TeacherReply; isError: boolean } {
+  try {
+    return { reply: getTeacherReply(trimmed), isError: false };
+  } catch {
+    return {
+      reply: { answer: GEMINI_DOWN_MESSAGE, sources: [], outside: true },
+      isError: true,
+    };
+  }
+}
 
 const GREETING =
   "Rahajeng! Aku Bedawang Nala, guru virtual CAKSARA. Tanya apa aja seputar aksara, bahasa, atau budaya Bali, jawabanmu selalu kutunjukkan sumbernya biar tidak asal.";
@@ -45,7 +59,7 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
     setThinking(true);
     window.setTimeout(() => {
       setThinking(false);
-      const reply = getTeacherReply(trimmed);
+      const { reply, isError } = resolveTeacherReply(trimmed);
       const id = nextId();
       setMessages((m) => [
         ...m,
@@ -60,6 +74,7 @@ export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) =
           entryId: reply.entryId,
           suggestions: reply.suggestions,
           streaming: true,
+          isError,
         },
       ]);
       const stream = setInterval(() => {
@@ -257,21 +272,23 @@ function Bubble({
 }) {
   const isUser = msg.role === "user";
   const isDone = !msg.streaming;
+  const mood = msg.isError && isDone ? "sedih" : isDone ? "senang" : "semangat";
 
   return (
     <div
       className={cn("flex gap-2.5 animate-bubble-in", isUser ? "justify-end" : "justify-start")}
       style={{ animationDelay: `${Math.min(index * 30, 240)}ms` }}
     >
-      {!isUser && (
-        <Bedawang className="size-7 shrink-0 self-end" mood={isDone ? "senang" : "semangat"} />
-      )}
+      {!isUser && <Bedawang className="size-7 shrink-0 self-end" mood={mood} />}
       <div
+        role={msg.isError ? "alert" : undefined}
         className={cn(
           "max-w-[82%] px-4 py-2.5",
           isUser
             ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
+            : msg.isError
+              ? "rounded-3xl rounded-bl-sm bg-destructive/10 text-sm ring-1 ring-destructive/30"
+              : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
         )}
       >
         {msg.title && (

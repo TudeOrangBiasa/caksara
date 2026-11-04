@@ -53,14 +53,19 @@ export function QuizFeedback({
             )}
           </div>
           {explanation && <p className="mt-1 text-sm text-muted-foreground">{explanation}</p>}
-          {sourceRef && onOpenKbEntry && (
-            <button
-              type="button"
-              onClick={() => onOpenKbEntry(sourceRef.split("·")[0]?.trim() ?? sourceRef)}
-              className="mt-1 text-[11px] font-semibold text-primary underline-offset-2 hover:underline"
-            >
-              Buka di Basis Pengetahuan →
-            </button>
+          {sourceRef && (
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Sumber: {sourceRef}
+              {onOpenKbEntry && (
+                <button
+                  type="button"
+                  onClick={() => onOpenKbEntry(sourceRef.split("·")[0]?.trim() ?? sourceRef)}
+                  className="ml-1 font-semibold text-primary underline-offset-2 hover:underline"
+                >
+                  Buka di Basis Pengetahuan →
+                </button>
+              )}
+            </p>
           )}
           {!isCorrect && (
             <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">

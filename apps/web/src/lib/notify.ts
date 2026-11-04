@@ -13,9 +13,10 @@ export function notifyRateLimited(onRetry?: () => void) {
   });
 }
 
+export const GEMINI_DOWN_MESSAGE = "AI sedang gangguan. Materi dan kuis tetap bisa dibuka.";
+
 export function notifyGeminiDown(onRetry?: () => void) {
-  toast.error("Guru Virtual sedang gangguan", {
-    description: "Jawaban dari sumber KB tetap bisa dibaca manual.",
+  toast.error(GEMINI_DOWN_MESSAGE, {
     action: onRetry ? { label: "Coba lagi", onClick: onRetry } : undefined,
     duration: 5000,
   });
