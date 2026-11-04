@@ -86,9 +86,9 @@ function storeCachedQuiz(moduleId: string, level: number, quiz: Quiz, source: Qu
 }
 
 /**
- * Ambil sesi kuis modul (#23): Edge generate-quiz dulu (Gemini temp 0.3,
- * bulk 3-8, cache TTL pendek), 429/Gemini down/offline → fallback bank
- * statis + info offline. Tidak pernah melempar — selalu kembalikan kuis.
+ * Ambil sesi kuis modul: Edge generate-quiz dulu (Gemini temp 0.3,
+ * tepat 3 soal #85, cache TTL pendek), 429/Gemini down/offline → fallback
+ * bank statis + info offline. Tidak pernah melempar — selalu kembalikan kuis.
  */
 export async function fetchGeneratedQuiz(
   moduleId: string,
@@ -103,7 +103,7 @@ export async function fetchGeneratedQuiz(
   },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
-  const count = Math.min(8, Math.max(3, opts?.count ?? 5));
+  const count = 3; // Digifest #85: sesi selalu 3 soal offline maupun online.
   const buildFallback = (failure: QuizFailureReason): GeneratedQuiz => {
     let fallback: Quiz | null = null;
     try {

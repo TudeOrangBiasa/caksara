@@ -42,7 +42,7 @@ describe("v11b font: Noto Sans Balinese self-host tanpa tofu (ADR-0009)", () => 
   });
 });
 
-describe("v11b edge: 429 sebelum Gemini, bulk 3-8 Zod, kunci server-only", () => {
+describe("v11b edge: 429 sebelum Gemini, tepat 3 soal Zod, kunci server-only", () => {
   test("rate-limit 429 early-return sebelum efek samping (record/query/Gemini)", () => {
     // Kontrak perilaku: limit terlampaui → 429 tanpa recordCall/queryKb/callGemini.
     // Diverifikasi di level sumber (pola rls-policy.test.ts, jalan di CI tanpa
@@ -59,10 +59,10 @@ describe("v11b edge: 429 sebelum Gemini, bulk 3-8 Zod, kunci server-only", () =>
     assert.ok(edge.includes("429"));
   });
 
-  test("bulk dijepit 3-8 soal (FE + Edge + Zod selaras)", () => {
-    assert.ok(edge.includes("Math.min(8, Math.max(3"));
+  test("sesi Digifest tepat 3 soal (FE + Edge + Zod selaras #85)", () => {
+    assert.ok(edge.includes("const count = 3;"));
     assert.ok(edge.includes("minItems: 3"));
-    assert.ok(edge.includes("maxItems: 8"));
+    assert.ok(edge.includes("maxItems: 3"));
     assert.ok(edge.includes("quizSchema"));
   });
 

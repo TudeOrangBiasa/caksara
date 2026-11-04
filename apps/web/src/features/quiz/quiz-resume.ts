@@ -3,7 +3,7 @@ import { z } from "zod";
 const storedAnswerSchema = z.object({
   selectedIndex: z.number().int().optional(),
   ordered: z.array(z.string()).optional(),
-  match: z.object({ left: z.string(), right: z.string() }).optional(),
+  matches: z.record(z.string(), z.string()).optional(),
 });
 
 const resumeSchema = z.object({
