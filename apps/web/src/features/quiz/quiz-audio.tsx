@@ -3,18 +3,23 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
 
+import { speakLatin, useSpeechSupported } from "../../lib/speech";
+
 interface QuizAudioProps {
   audioUrl?: string;
   label?: string;
   audioType?: "original" | "latin";
   /** Teks Latin yang dibaca saat audio asli belum terkurasi (ADR-0005). */
   latinText?: string;
+  /** True setelah jawaban dikunci — jawaban Latin baru boleh tampil. */
+  showFeedback?: boolean;
 }
 
-export function QuizAudio({ audioUrl, label, audioType, latinText }: QuizAudioProps) {
+export function QuizAudio({ audioUrl, label, audioType, latinText, showFeedback }: QuizAudioProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState(false);
+  const speech = useSpeechSupported();
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -34,6 +39,11 @@ export function QuizAudio({ audioUrl, label, audioType, latinText }: QuizAudioPr
 
   const isFallback = error || !audioUrl || audioType === "latin";
   const latin = label ?? latinText;
+  const hasAudio = Boolean(audioUrl) && !error;
+  const canSpeak = speech && Boolean(latin);
+  const showLatin = showFeedback && Boolean(latin);
+
+  if (!hasAudio && !canSpeak) return null;
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -41,24 +51,28 @@ export function QuizAudio({ audioUrl, label, audioType, latinText }: QuizAudioPr
         type="button"
         variant="outline"
         size="lg"
-        disabled={!audioUrl && !latin}
         onClick={() => {
-          const audio = audioRef.current;
-          if (!audio) return;
-          if (playing) {
-            audio.pause();
-            setPlaying(false);
-          } else {
-            void audio.play().catch(() => setError(true));
-            setPlaying(true);
+          if (hasAudio) {
+            const audio = audioRef.current;
+            if (!audio) return;
+            if (playing) {
+              audio.pause();
+              setPlaying(false);
+            } else {
+              void audio.play().catch(() => setError(true));
+              setPlaying(true);
+            }
+          } else if (latin) {
+            speakLatin(latin);
           }
         }}
-        aria-label={latin ? `Dengarkan: ${latin}` : "Putar audio"}
+        // Label generik pra-jawaban: aria-label berisi jawaban ikut bocor ke DOM.
+        aria-label={showLatin ? `Dengarkan: ${latin}` : "Putar audio"}
       >
         <Volume2 className={playing ? "size-5 animate-pulse" : "size-5"} aria-hidden />
         {playing ? "Memutar…" : "Putar"}
       </Button>
-      {latin && (
+      {showLatin && (
         <span lang={isFallback ? "id" : "ban"} className="font-balinese text-3xl">
           {latin}
         </span>

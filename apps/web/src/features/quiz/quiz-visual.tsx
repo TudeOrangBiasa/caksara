@@ -12,6 +12,12 @@ interface KenaliVisualPromptProps {
 
 export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: KenaliVisualPromptProps) {
   const isAudio = question.audioUrl || question.type === "dengar_pilih";
+  // Soal dengar tak pernah menaruh prompt mentah ke bubble pra-jawaban:
+  // prompt bank ("Dengarkan kata …") aman, tapi prompt Gemini bisa berisi jawaban.
+  const safePrompt =
+    question.type === "dengar_pilih" && !showFeedback
+      ? "Dengar, lalu pilih jawaban yang benar…"
+      : question.prompt;
   return (
     <div className="mb-4 flex gap-3">
       <Bedawang mood="semangat" className="size-12 shrink-0" />
@@ -32,11 +38,15 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
           )}
         />
         {isAudio ? (
-          <QuizAudio
-            audioUrl={question.audioUrl}
-            audioType={question.audioType}
-            latinText={question.latinText}
-          />
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-center text-sm font-medium text-card-foreground">{safePrompt}</p>
+            <QuizAudio
+              audioUrl={question.audioUrl}
+              audioType={question.audioType}
+              latinText={question.latinText}
+              showFeedback={showFeedback}
+            />
+          </div>
         ) : (
           <p
             lang="ban"
