@@ -67,9 +67,7 @@ Lihat `../CONTEXT.md` — Wresastra, Modul, Sesi Kuis, Hati, XP, Streak, KB Entr
 
 Maskot produk = **Bedawang Nala** (aset lokal `apps/web/public/assets/bedawang-*.png`, dipakai di favicon/splash/header).
 
-## ADRs
-
-`../docs/adr/0001..0009` — stack lock, anon auth, KB seed, audio Mendeley, bulk+cache, dll.
+`../docs/adr/0001..0014` — stack lock, anon auth, KB seed, audio Mendeley, bulk+cache, dll. Native final: Capacitor Android + Electron, tanpa iOS/Tauri (ADR-0014, #99).
 
 ## Deploy
 

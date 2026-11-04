@@ -1,3 +1,4 @@
+// Final-round native shell (#99, ADR-0014): Capacitor Android + Electron, tanpa iOS/Tauri.
 import { getSupabase } from "./supabase";
 import { loadProfile } from "./profile-store";
 import type { UserProfile } from "./zod/profile";
