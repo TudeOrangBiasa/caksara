@@ -6,7 +6,16 @@ Edutainment 4 Modul (Sapaan & Adat → Wresastra → Andap/Alus → Tradisi) den
 
 ## Stack
 
-React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · Drizzle ORM · Supabase (Postgres + Auth Anonymous + Edge Function + Storage + RLS + Cron) · Gemini Flash temp 0.3 · Noto Sans Balinese (U+1B00–U+1B7F self-host) · Deployed Vercel (FE) + Supabase (DB/Edge).
+React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · Drizzle ORM · Supabase (Postgres + Auth Anonymous + Edge Function + Storage + RLS + Cron) · `gemini-3.1-flash-lite` temp 0.3 · Noto Sans Balinese (U+1B00–U+1B7F self-host) · Deployed Vercel (FE) + Supabase (DB/Edge).
+
+## AI: kuis & Guru
+
+Sesi Kuis digenerate Edge Function `supabase/functions/generate-quiz/index.ts`
+(model `gemini-3.1-flash-lite`, temp 0.3, `responseSchema` JSON + Zod `quizSchema`).
+Soal Gemini wajib mengutip KB Entry yang di-inject (`sourceRef` "KB#id · Basis
+Pengetahuan"); soal tanpa kutipan valid ditolak ke fallback bank + header
+`x-quiz-source: gemini|fallback` yang jujur. Guru Virtual menjawab lokal dari
+27 materi KB (`teacher-data.ts`); varian Edge/RAG menyusul (#94).
 
 ## Struktur
 

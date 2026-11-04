@@ -1,6 +1,9 @@
 import { KB_ENTRIES } from "../kb/kb-data";
 import type { KbEntry, KbSource } from "../kb/kb-data";
 
+export const TEACHER_OUTSIDE_REPLY =
+  "Maaf itu di luar materi Caksara. Saya hanya jawab dari 27 materi yang ada.";
+
 export interface TeacherReply {
   answer: string;
   sources: KbSource[];
@@ -11,7 +14,6 @@ export interface TeacherReply {
   outside: boolean;
   suggestions?: string[];
 }
-
 export interface QuickReply {
   label: string;
   text: string;
@@ -45,59 +47,6 @@ export const QUICK_REPLIES: QuickReply[] = [
   { label: "Cara pakai kalimat halus", text: "Kapan saya pakai bahasa halus?" },
   { label: "Filosofi aksara", text: "Apa filosofi di balik aksara Bali?" },
   { label: "Kapan Nyepi", text: "Kapan Nyepi dirayakan?" },
-];
-
-const SEMANTIC_HINTS: {
-  tokens: string[];
-  text: string;
-  category: "kosakata" | "budaya" | "wresastra";
-  exact?: string;
-}[] = [
-  {
-    tokens: ["galungan", "kuningan", "nyepi", "hari raya", "tradisi", "penjor", "canang"],
-    text: "hari raya atau tradisi Bali",
-    category: "budaya",
-  },
-  {
-    tokens: [
-      "sapaan",
-      "terima kasih",
-      "maaf",
-      "suksma",
-      "ampura",
-      "swastiastu",
-      "makan",
-      "tidur",
-      "titiang",
-      "pules",
-      "sirep",
-      "madaar",
-      "ngajeng",
-      "kosakata",
-      "kata",
-      "arti",
-    ],
-    text: "kosakata atau sapaan sehari-hari",
-    category: "kosakata",
-  },
-  {
-    tokens: [
-      "aksara",
-      "wresastra",
-      "huruf",
-      "bentuk",
-      "latin",
-      "ha",
-      "na",
-      "ca",
-      "ra",
-      "ka",
-      "nyanya",
-      "filosofi aksara",
-    ],
-    text: "aksara wresastra dasar",
-    category: "wresastra",
-  },
 ];
 
 const STOPWORDS = new Set([
@@ -197,8 +146,7 @@ export function getTeacherReply(input: string): TeacherReply {
   const tokens = tokenize(input);
   if (tokens.length === 0) {
     return {
-      answer:
-        "Tanya apa aja seputar aksara, bahasa, atau budaya Bali ya. Kalau di luar itu, aku belum bisa jawab.",
+      answer: TEACHER_OUTSIDE_REPLY,
       sources: [],
       outside: true,
       suggestions: SUGGESTIONS,
@@ -226,14 +174,8 @@ export function getTeacherReply(input: string): TeacherReply {
     };
   }
 
-  const q = clean(input);
-  const hint = SEMANTIC_HINTS.find((h) => h.tokens.some((t) => q.includes(t)));
-  const fallback = hint
-    ? `Maaf, itu masih di luar materi yang aku pelajari. Coba tanya lebih spesifik seputar ${hint.text} ya, atau seputar aksara, bahasa, dan budaya Bali lainnya.`
-    : "Maaf, itu masih di luar materi yang aku pelajari. Coba tanya seputar aksara, bahasa, atau budaya Bali ya, atau pilih pertanyaan cepat di bawah.";
-
   return {
-    answer: fallback,
+    answer: TEACHER_OUTSIDE_REPLY,
     sources: [],
     outside: true,
     suggestions: SUGGESTIONS,
