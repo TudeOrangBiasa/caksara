@@ -240,7 +240,13 @@ export function applyOvernightReset(): boolean {
   return didReset;
 }
 
-export function updateStreak(): void {
+/**
+ * Catat aktivitas hari ini (WITA). Kembalikan true hanya bila streak
+ * bertambah — pemanggil (#102) membunyikan cue streak dari nilai ini,
+ * bukan dari menebak tanggal.
+ */
+export function updateStreak(): boolean {
+  let grew = false;
   update((profile) => {
     const today = witaTodayStr();
     if (profile.lastActiveDate === today) return;
@@ -250,7 +256,9 @@ export function updateStreak(): void {
       profile.streak = 1;
     }
     profile.lastActiveDate = today;
+    grew = true;
   });
+  return grew;
 }
 
 export function recordAnswerStats(

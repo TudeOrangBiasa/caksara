@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { fetchGeneratedQuiz, isRateLimitedError } from "./quiz-generate";
+import type { GenerateQuizRequestBody } from "./quiz-generate";
+import { getAdaptiveLevel, recordSessionLevel } from "./quiz-data";
 import type { Quiz } from "../../lib/zod/question";
 
 function quizTiga(): Quiz {
@@ -105,5 +107,31 @@ describe("fetchGeneratedQuiz — klasifikasi failure #29", () => {
     } finally {
       Object.assign(globalThis, { navigator: nav });
     }
+  });
+});
+
+describe("fetchGeneratedQuiz — body adaptif #96", () => {
+  test("sesi buruk → body berisi wrongTopics non-kosong + level adaptif", async () => {
+    const mod = "mod_test_body96";
+    recordSessionLevel(mod, 5, 5);
+    recordSessionLevel(mod, 1, 5, ["wre_01", "wre_02"]);
+    let seen: GenerateQuizRequestBody | null = null;
+    const out = await fetchGeneratedQuiz(mod, {
+      localFallback: quizTiga,
+      wrongTopics: ["wre_01", "wre_02"],
+      onRequestBody: (body) => {
+        seen = body;
+      },
+      invokeRemote: () =>
+        Promise.resolve({
+          data: { moduleId: mod, questions: quizTiga().questions },
+          error: null,
+        }),
+    });
+    expect(out.quiz).not.toBeNull();
+    expect(seen).not.toBeNull();
+    const body = seen as unknown as GenerateQuizRequestBody;
+    expect(body.wrongTopics.length).toBeGreaterThan(0);
+    expect(body.level).toBe(getAdaptiveLevel(mod));
   });
 });
