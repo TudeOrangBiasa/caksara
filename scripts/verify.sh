@@ -6,4 +6,5 @@ step "bun install (frozen lockfile)"; bun install --frozen-lockfile
 step "oxlint"; bunx oxlint
 step "oxfmt --check"; bunx oxfmt --check
 step "build"; bun run build
+step "verify:caksara (Playwright 3 viewport)"; bun run verify:caksara
 printf '\nverify: all gates passed\n'
