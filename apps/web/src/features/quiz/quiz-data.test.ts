@@ -1,13 +1,16 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildMixedQuiz,
   buildSessionQuiz,
   getAdaptiveLevel,
   hasVariety,
   pickSessionQuestions,
   QUIZ_BANK,
   recordSessionLevel,
+  validateQuizBank,
 } from "./quiz-data";
+import type { Question } from "../../lib/zod/question";
 
 describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
   test("setiap modul punya soal dengar_pilih dengan badge Latin (bukan TTS aksara)", () => {
@@ -85,5 +88,54 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     assert.equal(getAdaptiveLevel(mod), 2);
     recordSessionLevel(mod, 4, 4, ["kb_sapaan"]);
     assert.equal(getAdaptiveLevel(mod), 2);
+  });
+});
+
+describe("debt #42 — bank tervalidasi Zod saat dimuat", () => {
+  test("semua modul lolos parse dengan pesan modul bernama", () => {
+    for (const [moduleId, bank] of Object.entries(QUIZ_BANK)) {
+      assert.ok(validateQuizBank(moduleId, bank).length > 0, `${moduleId} kosong`);
+    }
+  });
+
+  test("entri invalid ditolak dengan nama modul", () => {
+    const bad = [
+      {
+        type: "kenali_visual",
+        prompt: "",
+        choices: [{ text: "satu", isCorrect: true }],
+      },
+    ] as unknown as Question[];
+    assert.throws(() => validateQuizBank("mod_xx", bad), /QUIZ_BANK\.mod_xx invalid/u);
+  });
+});
+
+describe("debt #43 — buildMixedQuiz deterministik per seed", () => {
+  const mods = ["mod_01", "mod_02"];
+
+  test("seed sama → urutan sama", () => {
+    const a = buildMixedQuiz(mods, 7).questions.map((q) => q.prompt);
+    const b = buildMixedQuiz(mods, 7).questions.map((q) => q.prompt);
+    assert.deepEqual(a, b);
+  });
+
+  test("seed beda → himpunan sama, urutan berputar", () => {
+    const first = buildMixedQuiz(mods, 0).questions.map((q) => q.prompt);
+    const second = buildMixedQuiz(mods, 1).questions.map((q) => q.prompt);
+    assert.deepEqual([...first].sort(), [...second].sort());
+    if (first.length > 1) assert.notDeepEqual(first, second);
+  });
+
+  test("tanpa argumen / tanpa seed jalan dengan default deterministik", () => {
+    const zero = buildMixedQuiz().questions.map((q) => q.prompt);
+    const one = buildMixedQuiz(mods).questions.map((q) => q.prompt);
+    const two = buildMixedQuiz(mods, 3).questions.map((q) => q.prompt);
+    assert.ok(zero.length >= 3 && zero.length <= 8, `campuran default ${zero.length} soal`);
+    assert.ok(one.length >= 3 && one.length <= 8, `campuran 1-arg ${one.length} soal`);
+    assert.ok(two.length >= 3 && two.length <= 8, `campuran 2-arg ${two.length} soal`);
+    assert.deepEqual(
+      one,
+      buildMixedQuiz(mods).questions.map((q) => q.prompt),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { quizSchema } from "../../lib/zod/question";
+import { questionSchema, quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
 
 export const QUIZ_BANK: Record<string, Question[]> = {
@@ -312,6 +312,19 @@ export const QUIZ_BANK: Record<string, Question[]> = {
   ],
 };
 
+/** Batas Zod bank (#42): tiap modul diparse sekali saat dimuat; gagal cepat bila invalid. */
+export function validateQuizBank(moduleId: string, bank: readonly Question[]): Question[] {
+  const result = questionSchema.array().min(1).safeParse(bank);
+  if (!result.success) {
+    throw new Error(`[quiz-data] QUIZ_BANK.${moduleId} invalid: ${result.error.message}`);
+  }
+  return result.data;
+}
+
+for (const [moduleId, bank] of Object.entries(QUIZ_BANK)) {
+  QUIZ_BANK[moduleId] = validateQuizBank(moduleId, bank);
+}
+
 const SESSION_COUNT = 3;
 const MIN_TYPES = 2;
 
@@ -519,16 +532,54 @@ export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptio
   return picked.slice(rot).concat(picked.slice(0, rot));
 }
 
-export function buildMixedQuiz(moduleIds: string[]): Quiz {
+/** FNV-1a 32-bit: seed default campuran modul (#43). */
+function hashModuleIds(moduleIds: readonly string[]): number {
+  let h = 2166136261;
+  const sep = "|".codePointAt(0) ?? 124;
+  for (const id of moduleIds) {
+    for (const ch of id) {
+      h ^= ch.codePointAt(0) ?? 0;
+      h = Math.imul(h, 16777619);
+    }
+    // Pemisah antar id agar ["ab", "c"] dan ["a", "bc"] tak bertabrakan.
+    h ^= sep;
+  }
+  return h >>> 0;
+}
+
+/** PRNG deterministik (mulberry32): seed sama → urutan sama (#43). */
+function mulberry32(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 2 ** 32;
+  };
+}
+
+/**
+ * Kuis latihan lintas modul: kocok deterministik dari hash daftar modul
+ * bila seed tak diisi, lalu putar urutan per seed (semantik seed sama
+ * seperti pickSessionQuestions: himpunan tetap, urutan berputar).
+ */
+export function buildMixedQuiz(moduleIds: string[] = Object.keys(QUIZ_BANK), seed?: number): Quiz {
   const questions = moduleIds.flatMap((id) => QUIZ_BANK[id] ?? []);
-  const shuffled = questions
-    .map((q) => ({ q, r: Math.random() }))
-    .toSorted((a, b) => a.r - b.r)
-    .map((x) => x.q)
-    .slice(0, 8);
-  // Debt #43: Math.random tanpa seed — rotasi acak tiap render; stabilkan
-  // dengan PRNG seed sesi bila blok ini disentuh lagi.
-  return quizSchema.parse({ moduleId: "latihan", questions: shuffled });
+  const baseSeed = hashModuleIds(moduleIds);
+  const rand = mulberry32(baseSeed);
+  const shuffled = [...questions];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = shuffled[i] as Question;
+    shuffled[i] = shuffled[j] as Question;
+    shuffled[j] = tmp;
+  }
+  const picked = shuffled.slice(0, 8);
+  const rotSeed = Math.max(0, Math.round(seed ?? baseSeed));
+  const rot = picked.length === 0 ? 0 : rotSeed % picked.length;
+  const rotated = picked.slice(rot).concat(picked.slice(0, rot));
+  return quizSchema.parse({ moduleId: "latihan", questions: rotated });
 }
 
 /** Sesi kuis modul: 3 soal bervariasi, tervalidasi Zod di batas. */
