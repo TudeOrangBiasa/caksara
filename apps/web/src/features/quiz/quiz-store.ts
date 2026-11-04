@@ -7,7 +7,7 @@ export interface QuizAnswer {
   matches?: Record<string, string>;
 }
 
-export interface QuizSession {
+export interface QuizUiState {
   quiz: Quiz;
   currentIndex: number;
   answers: Map<number, QuizAnswer>;
@@ -20,7 +20,7 @@ export type QuizAction =
   | { type: "RESET" }
   | { type: "HYDRATE"; currentIndex: number; answers: [number, QuizAnswer][] };
 
-export function quizReducer(state: QuizSession, action: QuizAction): QuizSession {
+export function quizReducer(state: QuizUiState, action: QuizAction): QuizUiState {
   switch (action.type) {
     case "ANSWER": {
       const answers = new Map(state.answers);
@@ -50,7 +50,7 @@ export function quizReducer(state: QuizSession, action: QuizAction): QuizSession
   }
 }
 
-export function createSession(quiz: Quiz): QuizSession {
+export function createSession(quiz: Quiz): QuizUiState {
   return {
     quiz,
     currentIndex: 0,
@@ -81,7 +81,7 @@ export function isAnswerCorrect(question: Question, answer: QuizAnswer): boolean
   }
 }
 
-export function getScore(session: QuizSession): { correct: number; total: number } {
+export function getScore(session: QuizUiState): { correct: number; total: number } {
   let correct = 0;
   const { questions } = session.quiz;
   session.answers.forEach((answer, qIdx) => {
@@ -91,7 +91,7 @@ export function getScore(session: QuizSession): { correct: number; total: number
   return { correct, total: questions.length };
 }
 
-export function isSessionComplete(session: QuizSession): boolean {
+export function isSessionComplete(session: QuizUiState): boolean {
   return session.answers.size === session.quiz.questions.length;
 }
 
