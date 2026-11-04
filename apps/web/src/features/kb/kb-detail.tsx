@@ -1,7 +1,8 @@
-import { ArrowLeft, BookMarked, ShieldCheck } from "lucide-react";
+import { ArrowLeft, BookMarked, ShieldCheck, Volume2 } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
 
+import { speakLatin, useSpeechSupported } from "../../lib/speech";
 import { LevelBadge } from "./kb-list";
 import { KB_CATEGORY_META } from "./kb-data";
 import type { KbEntry } from "./kb-data";
@@ -12,6 +13,8 @@ interface KbDetailProps {
 }
 
 export function KbDetail({ entry, onBack }: KbDetailProps) {
+  const speech = useSpeechSupported();
+  const latin = entry.latin;
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 md:max-w-2xl lg:max-w-5xl py-5">
       <div className="mb-4 flex items-center gap-3">
@@ -42,7 +45,21 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         <h1 className="mt-4 text-[28px] font-extrabold tracking-tight md:text-[32px]">
           {entry.title}
         </h1>
-        {entry.latin && <p className="mt-1 text-sm text-white/80">{entry.latin}</p>}
+        {latin && (
+          <p className="mt-1 flex items-center justify-center gap-2 text-sm text-white/80">
+            {latin}
+            {speech && (
+              <button
+                type="button"
+                onClick={() => speakLatin(latin)}
+                aria-label={`Dengarkan: ${latin}`}
+                className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-colors hover:bg-white/25"
+              >
+                <Volume2 className="size-4" aria-hidden />
+              </button>
+            )}
+          </p>
+        )}
         <p className="mt-2 text-[11px] font-medium text-white/70">ID {entry.id}</p>
       </div>
 
