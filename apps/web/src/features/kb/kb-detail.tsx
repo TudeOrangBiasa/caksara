@@ -5,6 +5,7 @@ import { Button } from "@caksara/ui/components/button";
 import { speakLatin, useSpeechSupported } from "../../lib/speech";
 import { LevelBadge } from "./kb-list";
 import { KB_CATEGORY_META } from "./kb-data";
+import { TransliterateStrip } from "./transliterate-strip";
 import type { KbEntry } from "./kb-data";
 
 interface KbDetailProps {
@@ -70,6 +71,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
           </p>
           <p className="mt-2 text-sm leading-relaxed">{entry.body}</p>
         </div>
+        <TransliterateStrip />
 
         <div className="mt-4 space-y-6 rounded-3xl bg-card p-5 shadow-sm border-t border-border/60">
           <p className="flex items-center gap-2 text-sm font-semibold">
