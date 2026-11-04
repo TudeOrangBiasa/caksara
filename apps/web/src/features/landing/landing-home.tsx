@@ -1,12 +1,17 @@
-import { BookOpen, Gamepad2, Library, Bot, Sparkles, ChevronDown } from "lucide-react";
+import {
+  BookOpen,
+  Gamepad2,
+  LibraryBig,
+  MessageCircleQuestion,
+  Sparkles,
+  ChevronDown,
+} from "lucide-react";
 
 import { useState } from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
 import type { NavTab } from "../../components/nav-tabs";
-
-/* Nama & kutipan di bawah ini placeholder untuk demo, ganti dengan testimoni asli. */
 
 const FAQS = [
   {
@@ -90,20 +95,13 @@ export function LandingHome({
             Temukan kekayaan warisan budaya Bali melalui modul interaktif dan kuis seru. Dari sapaan
             sehari-hari hingga wresastra yang bermakna.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="mt-10 flex justify-center lg:justify-start">
             <button
               type="button"
               onClick={onStart}
               className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
             >
               Mulai Belajar
-            </button>
-            <button
-              type="button"
-              onClick={onOpenKb}
-              className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-card ring-1 ring-border px-8 text-base font-bold text-foreground transition-all hover:bg-muted active:scale-95"
-            >
-              Jelajahi KB
             </button>
           </div>
         </div>
@@ -173,12 +171,12 @@ export function LandingHome({
               desc: "Belajar lewat kuis seru dan interaktif.",
             },
             {
-              icon: <Library className="size-8 text-success" />,
+              icon: <LibraryBig className="size-8 text-success" />,
               title: "Kamus Lengkap",
               desc: "Lebih dari 27+ entri budaya dan aksara.",
             },
             {
-              icon: <Bot className="size-8 text-destructive" />,
+              icon: <MessageCircleQuestion className="size-8 text-destructive" />,
               title: "Pendamping",
               desc: "Guru virtual siap membantu kapan saja.",
             },
@@ -231,12 +229,12 @@ export function LandingHome({
                 desc: "Uji kemampuan membaca dan menyusun aksara dengan gamifikasi.",
               },
               {
-                icon: <Bot className="size-6 text-primary" />,
+                icon: <MessageCircleQuestion className="size-6 text-primary" />,
                 title: "Guru Virtual Cerdas",
                 desc: "Tanya apa saja seputar aksara dan budaya, kapan saja.",
               },
               {
-                icon: <Library className="size-6 text-success" />,
+                icon: <LibraryBig className="size-6 text-success" />,
                 title: "Kamus Budaya",
                 desc: "Eksplorasi entri kebudayaan dan filosofi Bali terdalam.",
               },
@@ -255,95 +253,6 @@ export function LandingHome({
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* REVIEW */}
-      <section className="mt-32 border-t border-border/60 pt-24 pb-12">
-        <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-primary">Testimoni</p>
-          <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Apa Kata Mereka?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Bergabunglah dengan ratusan pelajar dan pengajar yang sudah merasakan mudahnya belajar
-            aksara Bali.
-          </p>
-        </div>
-
-        <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-16 px-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              name: "Bli Agung",
-              role: "Guru SMA",
-              text: "Akhirnya ada cara mengajar aksara yang bikin murid betah. Modulnya runtut, kuisnya bikin nagih banget buat anak-anak!",
-              img: "/assets/Userpics/PNG/Circle/3DDD-1.png",
-              color: "bg-primary/10",
-              ring: "ring-primary/20",
-              textRole: "text-primary",
-            },
-            {
-              name: "Ayu Saraswati",
-              role: "Mahasiswi",
-              text: "Awalnya mikir aksara itu susah dan kaku, tapi kuisnya bikin berasa main game. Seru banget buat isi waktu luang!",
-              img: "/assets/Userpics/PNG/Circle/Afterclap-1.png",
-              color: "bg-warning/10",
-              ring: "ring-warning/20",
-              textRole: "text-warning-foreground",
-            },
-            {
-              name: "Bapak Wayan",
-              role: "Pekerja",
-              text: "Pulang kerja sempatkan buka satu materi. Sangat membantu dan UI-nya sangat ramah mata. Luar biasa inovasinya.",
-              img: "/assets/Userpics/PNG/Circle/OSLO-1.png",
-              color: "bg-success/10",
-              ring: "ring-success/20",
-              textRole: "text-success-foreground",
-            },
-            {
-              name: "Ibu Putu",
-              role: "Guru SD",
-              text: "Anak-anak kelas 4 sekarang sangat antusias kalau jam pelajaran bahasa Bali. Fitur gamifikasinya juara!",
-              img: "/assets/Userpics/PNG/Circle/Cranks-1.png",
-              color: "bg-destructive/10",
-              ring: "ring-destructive/20",
-              textRole: "text-destructive",
-            },
-            {
-              name: "Dek Made",
-              role: "Siswa SMP",
-              text: "Suka banget sama karakter dan warnanya. Nggak bosenin sama sekali, malah pengen ngerjain modul terus.",
-              img: "/assets/Userpics/PNG/Circle/Guacamole-1.png",
-              color: "bg-accent/40",
-              ring: "ring-accent/50",
-              textRole: "text-accent-foreground",
-            },
-            {
-              name: "Gede Budi",
-              role: "Desainer Grafis",
-              text: "Kamus budayanya sangat membantu saya mencari referensi filosofi untuk karya seni. Sangat rapi dan terstruktur.",
-              img: "/assets/Userpics/PNG/Circle/3DDD-2.png",
-              color: "bg-secondary/40",
-              ring: "ring-secondary/50",
-              textRole: "text-secondary-foreground",
-            },
-          ].map((r, i) => (
-            <div
-              key={i}
-              className={`relative mt-6 flex flex-col rounded-[2.5rem] p-8 pt-12 shadow-sm ring-1 transition-transform hover:-translate-y-2 ${r.color} ${r.ring}`}
-            >
-              <img
-                src={r.img}
-                alt={r.name}
-                className="absolute -top-10 left-8 size-20 rounded-full border-[6px] border-background shadow-lg transition-transform hover:scale-110 hover:rotate-3"
-              />
-              <p className="mb-8 flex-1 text-lg font-medium leading-relaxed text-foreground/90">
-                "{r.text}"
-              </p>
-              <div>
-                <p className="font-extrabold text-foreground">{r.name}</p>
-                <p className={`text-sm font-bold ${r.textRole}`}>{r.role}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -458,46 +367,6 @@ export function LandingHome({
                 Platform web edukasi interaktif untuk mempelajari aksara dan budaya kuno Bali dengan
                 metode modern, langkah demi langkah, dan gratis untuk semua kalangan.
               </p>
-              <div className="mt-8 flex gap-4">
-                {/* Facebook */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-                  </svg>
-                </a>
-                {/* X (formerly Twitter) */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.95H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </a>
-                {/* Instagram */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                </a>
-              </div>
             </div>
 
             {/* Column 2: Belajar */}
@@ -585,67 +454,12 @@ export function LandingHome({
                 </li>
               </ul>
             </div>
-
-            {/* Column 4: Kontak */}
-            <div className="flex flex-col gap-4">
-              <h3 className="font-bold text-foreground">Kontak Kami</h3>
-              <ul className="flex flex-col gap-4 mt-2">
-                <li className="flex items-center gap-3">
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">(0361) 123 456</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect width="20" height="16" x="2" y="4" rx="2" />
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">halo@caksara.id</span>
-                </li>
-              </ul>
-            </div>
           </div>
 
           <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row">
             <p className="text-sm font-medium text-muted-foreground">
               © 2026 CAKSARA. Seluruh hak cipta dilindungi.
             </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Kebijakan Privasi
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Syarat Penggunaan
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Peta Situs
-              </a>
-            </div>
           </div>
         </footer>
       </div>

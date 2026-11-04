@@ -51,6 +51,8 @@ Lihat `caksara-docs/README.md` untuk viewer verifikasi aksara/soal.
 
 Lihat `../CONTEXT.md` — Wresastra, Modul, Sesi Kuis, Hati, XP, Streak, KB Entry, Guru Virtual, Mastery, Profil Anon.
 
+Maskot produk = **Bedawang Nala** (aset lokal `apps/web/public/assets/bedawang-*.png`, dipakai di favicon/splash/header).
+
 ## ADRs
 
 `../docs/adr/0001..0009` — stack lock, anon auth, KB seed, audio Mendeley, bulk+cache, dll.

@@ -88,6 +88,7 @@ function QuestionBody({
           question={question}
           selectedIndex={answer?.selectedIndex ?? null}
           showFeedback={session.showFeedback}
+          shakeIndex={answer?.selectedIndex ?? null}
           onSelect={(i) => setAnswer({ selectedIndex: i })}
         />
       </div>
@@ -99,6 +100,7 @@ function QuestionBody({
       question={question}
       selectedIndex={answer?.selectedIndex ?? null}
       showFeedback={session.showFeedback}
+      shakeIndex={answer?.selectedIndex ?? null}
       onSelect={(i) => setAnswer({ selectedIndex: i })}
     />
   );
@@ -356,7 +358,7 @@ export function QuizShell({
             <span
               key={i}
               className={cn(
-                "h-2 flex-1 rounded-full transition-all duration-200 ease-out",
+                "h-2 flex-1 rounded-full transition-colors duration-300 ease-out",
                 i < session.currentIndex
                   ? "bg-primary"
                   : i === session.currentIndex

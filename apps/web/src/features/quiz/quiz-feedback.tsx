@@ -3,6 +3,7 @@ import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 import { Bedawang } from "../../components/bedawang";
 import { XP_PER_CORRECT } from "../../lib/game-rules";
+import { XpTick } from "./xp-tick";
 interface QuizFeedbackProps {
   isCorrect: boolean;
   explanation?: string;
@@ -25,7 +26,7 @@ export function QuizFeedback({
       role="status"
       aria-live="polite"
       className={cn(
-        "mt-4 rounded-3xl p-4",
+        "sticky bottom-0 mt-4 rounded-3xl p-4",
         isCorrect ? "animate-card-pop bg-success/15" : "animate-shake bg-destructive/10",
       )}
     >
@@ -48,7 +49,7 @@ export function QuizFeedback({
             </p>
             {isCorrect && (
               <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground dark:text-accent">
-                <Sparkles className="size-3" aria-hidden /> +{XP_PER_CORRECT} XP
+                <Sparkles className="size-3" aria-hidden /> <XpTick from={0} to={XP_PER_CORRECT} />
               </span>
             )}
           </div>

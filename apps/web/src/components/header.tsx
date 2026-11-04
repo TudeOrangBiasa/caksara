@@ -3,8 +3,8 @@ import { Moon, Sun } from "lucide-react";
 
 import { loadProfile, subscribeProfile } from "@/lib/profile-store";
 import { useTheme } from "./theme-provider";
+import { Bedawang } from "./bedawang";
 import { ProfileAvatar } from "./profile-avatar";
-
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
@@ -44,10 +44,8 @@ export default function Header() {
 
         {/* Tengah — branding + stats ringkas */}
         <div className="flex min-w-0 flex-col items-center">
-          <p className="flex items-center gap-1 text-sm font-bold leading-none tracking-tight">
-            <span aria-hidden className="font-balinese text-lg leading-none text-primary">
-              ᬳ
-            </span>
+          <p className="flex items-center gap-1.5 text-sm font-bold leading-none tracking-tight">
+            <Bedawang mood="semangat" className="size-6" />
             CAKSARA
           </p>
           <p className="mt-0.5 truncate text-[10px] font-semibold tabular-nums text-muted-foreground">
