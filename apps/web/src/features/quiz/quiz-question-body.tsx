@@ -3,12 +3,12 @@ import { SusunAksara } from "./quiz-susun";
 import { QuizChoice } from "./quiz-choice";
 import { KenaliVisualPrompt } from "./quiz-visual";
 import { isAnswerCorrect } from "./quiz-store";
-import type { QuizAnswer, QuizSession } from "./quiz-store";
+import type { QuizAnswer, QuizUiState } from "./quiz-store";
 import type { Question } from "../../lib/zod/question";
 
 interface QuestionBodyProps {
   question: Question;
-  session: QuizSession;
+  session: QuizUiState;
   setAnswer: (answer: QuizAnswer) => void;
 }
 
