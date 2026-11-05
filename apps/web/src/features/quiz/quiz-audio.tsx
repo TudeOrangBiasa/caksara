@@ -49,7 +49,6 @@ export function QuizAudio({ audioUrl, label, audioType, latinText, showFeedback 
     <div className="flex flex-col items-center gap-2">
       <Button
         type="button"
-        variant="outline"
         size="lg"
         onClick={() => {
           if (hasAudio) {
@@ -68,12 +67,16 @@ export function QuizAudio({ audioUrl, label, audioType, latinText, showFeedback 
         }}
         // Label generik pra-jawaban: aria-label berisi jawaban ikut bocor ke DOM.
         aria-label={showLatin ? `Dengarkan: ${latin}` : "Putar audio"}
+        className="h-11 gap-2 rounded-full bg-sky-600 px-5 text-sm font-extrabold text-white shadow-sm hover:bg-sky-700"
       >
         <Volume2 className={playing ? "size-5 animate-pulse" : "size-5"} aria-hidden />
         {playing ? "Memutar…" : "Putar"}
       </Button>
       {showLatin && (
-        <span lang={isFallback ? "id" : "ban"} className="font-balinese text-3xl">
+        <span
+          lang={isFallback ? "id" : "ban"}
+          className="font-balinese text-center text-2xl font-bold break-words"
+        >
           {latin}
         </span>
       )}

@@ -32,15 +32,15 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
   // Debt: drag-and-drop sesungguhnya belum ada — tap-to-place ini jalur
   // utama (tap usable, aria jelas). Jangan implementasi drag di sini.
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div
-        className="min-h-20 rounded-lg border border-dashed p-3"
+        className="flex min-h-24 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/40 p-3"
         role="status"
         aria-live="polite"
         aria-label="Susunan jawaban sementara"
       >
         {draft.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm font-medium text-muted-foreground">
             Susun aksara sesuai urutan yang benar
           </p>
         ) : (
@@ -48,7 +48,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
             {draft.map((tile, i) => (
               <span
                 key={`${tile}-${i}`}
-                className="font-balinese rounded-md bg-primary px-3 py-2 text-2xl text-primary-foreground"
+                className="font-balinese rounded-xl border-2 border-primary bg-primary px-3 py-2 text-2xl text-primary-foreground shadow-sm"
               >
                 {tile}
               </span>
@@ -69,7 +69,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
             disabled={disabled}
             onClick={() => take(i)}
             aria-label={`Pilih ubin ${tile}`}
-            className="tile-duo font-balinese rounded-xl border-2 border-border bg-card px-3 py-2 text-2xl transition-all duration-150 ease-out hover:border-cta/60 hover:bg-muted/50 focus-visible:border-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
+            className="tile-duo font-balinese rounded-2xl border-2 border-border bg-card px-4 py-2.5 text-2xl transition-all duration-150 ease-out hover:border-cta/60 hover:bg-muted/50 focus-visible:border-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
           >
             {tile}
           </button>
@@ -82,13 +82,16 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
           variant="outline"
           onClick={undo}
           disabled={disabled || draft.length === 0}
+          className="h-11 rounded-full px-5 font-bold"
         >
           <ArrowLeft className="size-4" /> Batal
         </Button>
         <Button
           type="button"
+          variant="cta"
           onClick={() => onAnswer(draft)}
           disabled={disabled || draft.length !== tiles.length}
+          className="h-11 px-6 text-sm font-bold tracking-wide"
         >
           <Check className="size-4" /> Cek
         </Button>

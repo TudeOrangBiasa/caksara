@@ -216,9 +216,9 @@ export function QuizShell({
           type="button"
           onClick={onBack}
           aria-label="Keluar dari kuis"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          <ArrowLeft className="size-4" />
+          <ArrowLeft className="size-5" />
         </button>
         <div
           className="flex flex-1 gap-1"
@@ -232,7 +232,7 @@ export function QuizShell({
             <span
               key={i}
               className={cn(
-                "h-2 flex-1 rounded-full transition-colors duration-300 ease-out",
+                "h-2.5 flex-1 rounded-full transition-colors duration-300 ease-out",
                 i < session.currentIndex
                   ? "bg-primary"
                   : i === session.currentIndex
@@ -247,7 +247,7 @@ export function QuizShell({
           aria-live="polite"
           aria-label={`Sisa ${hearts} Hati`}
           className={cn(
-            "flex shrink-0 items-center gap-1 rounded-full bg-card px-2.5 py-1 text-sm font-bold tabular-nums text-destructive",
+            "flex shrink-0 items-center gap-1 rounded-full bg-card px-2.5 py-1 text-sm font-bold tabular-nums text-destructive ring-1 ring-border/60",
             hearts <= 2 && "animate-heart-pulse",
           )}
         >
@@ -257,14 +257,16 @@ export function QuizShell({
       </div>
 
       <div className="flex-1">
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
             Soal {session.currentIndex + 1} / {quiz.questions.length}
           </p>
           <SessionLevelBadge level={level} />
         </div>
         {current.type !== "kenali_visual" && (
-          <h2 className="mb-4 text-lg font-medium">{current.prompt}</h2>
+          <h2 className="mb-4 text-xl font-extrabold tracking-tight text-foreground">
+            {current.prompt}
+          </h2>
         )}
         <div key={session.currentIndex} className="animate-slide-up">
           <QuestionBody

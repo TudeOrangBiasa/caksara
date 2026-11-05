@@ -37,7 +37,7 @@ export function QuestionBody({ question, session, setAnswer }: QuestionBodyProps
 
   if (question.type === "dengar_pilih" || question.type === "kenali_visual") {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <KenaliVisualPrompt
           question={question}
           showFeedback={session.showFeedback}

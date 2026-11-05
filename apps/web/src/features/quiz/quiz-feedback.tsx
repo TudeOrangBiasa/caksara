@@ -45,17 +45,17 @@ export function QuizFeedback({
       role="status"
       aria-live="polite"
       className={cn(
-        "sticky bottom-0 mt-4 rounded-3xl p-4",
+        "sticky bottom-0 mt-4 rounded-3xl p-4 shadow-md",
         isCorrect ? "animate-card-pop bg-success/15" : "animate-shake bg-destructive/10",
       )}
     >
       <div className="flex items-start gap-3">
-        <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-12 shrink-0" />
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
+        <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-14 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
             <p
               className={cn(
-                "flex items-center gap-1.5 font-bold",
+                "flex items-center gap-1.5 text-lg font-extrabold",
                 isCorrect ? "text-cta" : "text-destructive",
               )}
             >
@@ -67,7 +67,7 @@ export function QuizFeedback({
               {isCorrect ? "Bener banget!" : "Belum tepat — baca dulu ya"}
             </p>
             {isCorrect && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground dark:text-accent">
+              <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-xs font-bold text-accent-foreground shadow-sm ring-1 ring-border/60 dark:text-accent">
                 <Sparkles className="size-3" aria-hidden /> <XpTick from={0} to={XP_PER_CORRECT} />
               </span>
             )}
@@ -123,7 +123,7 @@ export function QuizFeedback({
                 <button
                   type="button"
                   onClick={() => onOpenKbEntry(sourceRef.split("·")[0]?.trim() ?? sourceRef)}
-                  className="ml-1 font-semibold text-primary underline-offset-2 hover:underline"
+                  className="ml-1 font-bold text-primary underline-offset-2 hover:underline"
                 >
                   Buka di Basis Pengetahuan →
                 </button>
