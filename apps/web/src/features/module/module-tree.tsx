@@ -1,4 +1,4 @@
-import { Check, Clock, ListChecks, Lock, Play, Repeat } from "lucide-react";
+import { Check, Play, Repeat } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 import { Progress } from "@caksara/ui/components/progress";
@@ -10,32 +10,7 @@ import type { CourseModule, ModuleStatus } from "./module-data";
 import { MasteryGrid } from "../../components/mastery-grid";
 import { BannerBudaya, SumberList, TipsBelajar } from "./belajar-extra";
 
-import { notifyModuleLocked } from "../../lib/notify";
-
-const statusMeta: Record<ModuleStatus, { label: string; dot: string }> = {
-  selesai: { label: "Selesai", dot: "bg-success" },
-  aktif: { label: "Aktif", dot: "bg-primary" },
-  terkunci: { label: "Terkunci", dot: "bg-muted-foreground/40" },
-};
-
-function StatusBadge({ status, onHero }: { status: ModuleStatus; onHero?: boolean }) {
-  const meta = statusMeta[status];
-  return (
-    <span
-      className={cn(
-        "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold",
-        onHero
-          ? "bg-white/20 text-white"
-          : status === "aktif" && "bg-primary text-primary-foreground",
-        !onHero && status === "selesai" && "bg-success/15 text-success",
-        !onHero && status === "terkunci" && "bg-secondary text-muted-foreground",
-      )}
-    >
-      {!onHero && <span className={cn("size-1.5 rounded-full", meta.dot)} />}
-      {meta.label}
-    </span>
-  );
-}
+import { ModulCard } from "./modul-card";
 
 function ProgresCard({ totalSelesai, progress }: { totalSelesai: number; progress: number }) {
   const percentage = Math.round(progress * 100);
@@ -67,100 +42,6 @@ function ProgresCard({ totalSelesai, progress }: { totalSelesai: number; progres
   );
 }
 
-function NodeButton({
-  mod,
-  status,
-  onOpenDetail,
-}: {
-  mod: CourseModule;
-  status: ModuleStatus;
-  onOpenDetail: (mod: CourseModule) => void;
-}) {
-  const disabled = status === "terkunci";
-  const isHero = status === "aktif";
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        if (disabled) {
-          notifyModuleLocked();
-          return;
-        }
-        onOpenDetail(mod);
-      }}
-      aria-disabled={disabled}
-      className={cn(
-        "group relative z-10 flex w-full items-center gap-3 overflow-hidden border-2 p-4 text-left transition-all duration-150 ease-out",
-        isHero
-          ? "rounded-[1.25rem] border-transparent bg-cta text-primary-foreground"
-          : status === "selesai"
-            ? "tile-duo rounded-2xl border-border bg-card hover:bg-muted/60"
-            : "rounded-2xl border-border bg-card",
-        !disabled && !isHero && "transition-all duration-200",
-        !disabled && !isHero && status === "selesai" && "hover:-translate-y-0.5",
-        !disabled && isHero && "transition-transform active:scale-[0.99]",
-      )}
-    >
-      <span
-        className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-full relative z-10",
-          isHero
-            ? "bg-white/20 text-white"
-            : status === "selesai"
-              ? "bg-success/15 text-success"
-              : "bg-muted text-muted-foreground",
-        )}
-      >
-        {status === "terkunci" ? (
-          <Lock className="size-4" />
-        ) : status === "selesai" ? (
-          <Check className="size-4.5" strokeWidth={2.5} />
-        ) : (
-          <span className="text-sm font-bold">{mod.order}</span>
-        )}
-      </span>
-
-      <span className="min-w-0 flex-1 relative z-10">
-        <span className="flex items-center justify-between gap-2">
-          <span className={cn("truncate text-[15px]", isHero ? "font-extrabold" : "font-bold")}>
-            {mod.title}
-          </span>
-          <StatusBadge status={status} onHero={isHero} />
-        </span>
-        <span
-          className={cn(
-            "mt-0.5 block truncate text-xs",
-            isHero ? "text-white/80" : "text-muted-foreground",
-          )}
-        >
-          {mod.theme}
-        </span>
-        <span
-          className={cn(
-            "mt-2 flex items-center gap-3 text-[11px]",
-            isHero ? "text-white/80" : "text-muted-foreground",
-          )}
-        >
-          <span className="inline-flex items-center gap-1">
-            <ListChecks className="size-3" /> {mod.jumlahSoal} soal
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock className="size-3" /> ±{mod.estimasiMenit} mnt
-          </span>
-        </span>
-      </span>
-
-      {status === "selesai" ? (
-        <Play className="relative z-10 size-4 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-primary/60" />
-      ) : status === "aktif" ? (
-        <span className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-cta">
-          <Play className="size-4 fill-current" />
-        </span>
-      ) : null}
-    </button>
-  );
-}
-
 function ModuleNode({
   mod,
   status,
@@ -174,7 +55,7 @@ function ModuleNode({
 }) {
   return (
     <li>
-      <NodeButton mod={mod} status={status} onOpenDetail={onOpenDetail} />
+      <ModulCard variant="tree" mod={mod} status={status} onOpenDetail={onOpenDetail} />
       {!isLast && (
         <span aria-hidden className="flex flex-col items-center gap-1.5 py-0.5">
           <span
