@@ -2,8 +2,14 @@ import { Trophy, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { formatLeaderboardName } from "../../lib/auth-google";
-import { LEADERBOARD_LIMIT, supabaseLeaderboardSource, topEntries } from "./leaderboard-data";
-import type { LeaderboardEntry, LeaderboardSource } from "./leaderboard-data";
+import { witaTodayStr } from "../../lib/profile-store";
+import { parseWitaDate } from "../../lib/zod/game-state";
+import {
+  LEADERBOARD_LIMIT,
+  isResetMingguIni,
+  supabaseLeaderboardSource,
+  topEntries,
+} from "./leaderboard-data";
 
 function rankStyle(rank: number): string {
   if (rank === 1) return "bg-[#FFC800] text-[#8a6100]";
@@ -50,11 +56,11 @@ export function LeaderboardCard({
           </span>
           <div>
             <p className="text-xl font-extrabold tracking-tight">TOP {LEADERBOARD_LIMIT}</p>
-            <p className="text-xs font-medium text-muted-foreground">Liga mingguan</p>
+            <p className="text-xs font-medium text-muted-foreground">Reset tiap Senin</p>
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100]">
-          {LEADERBOARD_LIMIT} teratas
+          {isResetMingguIni(parseWitaDate(witaTodayStr())) ? "Reset hari ini" : "Liga mingguan"}
         </span>
       </div>
       <div className="p-3">

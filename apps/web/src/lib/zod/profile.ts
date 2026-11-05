@@ -62,6 +62,7 @@ export const userProfileSchema = z.object({
   hearts: z.number().int().min(0).max(MAX_HEARTS),
   lastActiveDate: z.string().optional(),
   heartsRefilledAt: z.string().optional(),
+  streakBonusClaimedAt: z.string().optional(),
   mastery: z.record(z.string(), z.enum(["belum", "dipahami", "ahli"])).optional(),
   aksaraStats: aksaraStatsSchema.optional(),
   avatar: profileAvatarSchema.optional(),

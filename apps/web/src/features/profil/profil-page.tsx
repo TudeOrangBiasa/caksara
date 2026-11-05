@@ -14,6 +14,7 @@ import { ProfileAvatar } from "../../components/profile-avatar";
 import { AnimatedNumber } from "../../components/animated-number";
 import { MasteryGrid } from "../../components/mastery-grid";
 import { LeaderboardCard } from "../leaderboard/leaderboard";
+import { XP_STREAK_BONUS } from "../../lib/game-rules";
 import { loadProfile, subscribeProfile, witaTodayStr } from "../../lib/profile-store";
 import { courseModules } from "../module/module-data";
 
@@ -91,7 +92,7 @@ export function ProfilPage({
   const unlockedCount = badges.filter((b) => b.unlocked).length;
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-6xl lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-8 animate-in fade-in duration-500">
+    <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-[1216px] lg:px-0 lg:pt-7 lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-8 animate-in fade-in duration-500">
       <div className="flex flex-col gap-4 lg:sticky lg:top-24">
         <header className="relative flex min-h-[280px] flex-col justify-between overflow-hidden rounded-[20px] p-6">
           <img
@@ -147,32 +148,34 @@ export function ProfilPage({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-5 lg:mt-0">
+      <div className="mt-6 flex flex-col gap-5 lg:mt-0 lg:gap-5">
         <StreakCard streak={profile?.streak ?? 0} lastActive={profile?.lastActiveDate} />
 
         <section
           aria-label="Progres belajar"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
         >
-          <div className="mb-3 flex items-center gap-3">
+          <div className="mb-3 flex items-center gap-3 lg:mb-0">
             <span className="flex size-[52px] items-center justify-center rounded-full bg-[#FFF3C4] text-[#FFC800]">
               <Trophy className="size-6" aria-hidden />
             </span>
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground lg:leading-[12px]">
                 Progres Belajar
               </p>
-              <h2 className="text-lg font-extrabold tracking-tight">Level {level}</h2>
+              <h2 className="text-lg font-extrabold tracking-tight lg:leading-[22px]">
+                Level {level}
+              </h2>
             </div>
           </div>
-          <div className="mt-1 flex items-center justify-between text-xs">
-            <span className="font-bold">{intoLevel} XP</span>
-            <span className="font-medium text-muted-foreground">
+          <div className="mt-1 flex items-center justify-between text-xs lg:mt-0">
+            <span className="font-bold lg:leading-[15px]">{intoLevel} XP</span>
+            <span className="font-medium text-muted-foreground lg:leading-[15px]">
               Butuh {50 - intoLevel} XP lagi
             </span>
           </div>
           <div
-            className="mt-2 h-3.5 overflow-hidden rounded-full bg-muted p-0.5"
+            className="mt-2 h-3.5 overflow-hidden rounded-full bg-muted p-0.5 lg:mt-0 lg:h-[14px] lg:p-0"
             role="progressbar"
             aria-valuenow={intoLevel}
             aria-valuemin={0}
@@ -184,7 +187,7 @@ export function ProfilPage({
               style={{ width: `${(intoLevel / 50) * 100}%` }}
             />
           </div>
-          <p className="mt-3 text-xs font-medium text-muted-foreground">
+          <p className="mt-3 text-xs font-medium text-muted-foreground lg:mt-0 lg:leading-[15px]">
             <span className="font-bold text-foreground">
               {selesaiCount} dari {courseModules.length}
             </span>{" "}
@@ -194,7 +197,7 @@ export function ProfilPage({
             <button
               type="button"
               onClick={onContinue}
-              className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta px-4 py-3 text-[13px] font-extrabold uppercase tracking-widest text-white shadow-[0_4px_0_0_var(--color-cta-edge)] transition-all duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none"
+              className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta px-4 py-3 text-[13px] font-extrabold uppercase tracking-widest text-white shadow-[0_4px_0_0_var(--color-cta-edge)] transition-all duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:mt-0 lg:py-2.5 lg:leading-[16px]"
             >
               <Play className="size-4 fill-current" aria-hidden />
               Lanjutkan Belajar
@@ -204,24 +207,26 @@ export function ProfilPage({
 
         <section
           aria-label="Koleksi lencana"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
         >
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between lg:mb-0">
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground lg:leading-[12px]">
                 Pencapaian
               </p>
-              <h2 className="text-lg font-extrabold tracking-tight">Koleksi Lencana</h2>
+              <h2 className="text-lg font-extrabold tracking-tight lg:leading-[22px]">
+                Koleksi Lencana
+              </h2>
             </div>
-            <span className="rounded-full bg-[#DDF4FF] px-3 py-1.5 text-xs font-bold text-[#1CB0F6]">
+            <span className="rounded-full bg-[#DDF4FF] px-3 py-1.5 text-xs font-bold text-[#1CB0F6] lg:leading-[15px]">
               {unlockedCount} / {badges.length}
             </span>
           </div>
-          <ul className="grid grid-cols-3 gap-3">
+          <ul className="grid grid-cols-3 gap-3 lg:gap-3">
             {badges.map((b) => (
               <li
                 key={b.title}
-                className={`flex flex-col items-center gap-1.5 rounded-2xl border-2 border-b-4 px-2 py-4 text-center ${
+                className={`flex flex-col items-center gap-1.5 rounded-2xl border-2 border-b-4 px-2 py-4 text-center lg:border lg:shadow-[0_2px_0_0_var(--border)] ${
                   b.unlocked ? "border-cta bg-cta/10" : "border-border/60 bg-muted/30 opacity-70"
                 }`}
               >
@@ -232,8 +237,8 @@ export function ProfilPage({
                 >
                   {b.icon}
                 </span>
-                <p className="text-xs font-bold leading-tight">{b.title}</p>
-                <p className="text-[10px] font-medium leading-snug text-muted-foreground">
+                <p className="text-xs font-bold leading-tight lg:leading-[15px]">{b.title}</p>
+                <p className="text-[10px] font-medium leading-snug text-muted-foreground lg:leading-[15px]">
                   {b.desc}
                 </p>
               </li>
@@ -243,10 +248,10 @@ export function ProfilPage({
 
         <section
           aria-label="Mastery aksara"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
         >
           <MasteryGrid mastery={profile?.mastery} />
-          <p className="mt-3 text-[11px] font-medium text-muted-foreground">
+          <p className="mt-3 text-[11px] font-medium text-muted-foreground lg:mt-0 lg:leading-[13px]">
             Status dihitung dari riwayat jawabanmu.
           </p>
         </section>
@@ -343,23 +348,23 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
   return (
     <section
       aria-label="Streak harian"
-      className="overflow-hidden rounded-[20px] bg-gradient-to-br from-[#FFA726] to-[#FF7A00] p-5 text-white shadow-[0_4px_0_0_#E87500]"
+      className="overflow-hidden rounded-[20px] bg-gradient-to-br from-[#FFA726] to-[#FF7A00] p-5 text-white shadow-[0_4px_0_0_#E87500] lg:rounded-3xl lg:p-[22px] lg:shadow-none"
     >
-      <div className="mb-3 flex items-center gap-3">
+      <div className="mb-3 flex items-center gap-3 lg:mb-0">
         <span className="flex size-[60px] items-center justify-center rounded-full bg-white">
           <Flame className="size-7 fill-[#FF7A00] text-[#FF7A00]" aria-hidden />
         </span>
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-white/85">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest text-white/85 lg:text-white lg:leading-[12px]">
             Streak Harian
           </p>
-          <h2 className="text-[26px] font-extrabold leading-tight tracking-tight">
+          <h2 className="text-[26px] font-extrabold leading-tight tracking-tight lg:leading-[31px]">
             <AnimatedNumber value={streak} /> Hari
           </h2>
         </div>
       </div>
       <div
-        className="grid grid-cols-7 gap-1.5"
+        className="grid grid-cols-7 gap-1.5 lg:gap-2"
         role="img"
         aria-label={`Streak ${streak} hari${lastActive === today ? ", sudah belajar hari ini" : ""}`}
       >
@@ -378,23 +383,27 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
                   : "border-white/30 bg-white/25 text-white"
               }`}
             >
-              <span className="text-[9px] font-extrabold uppercase">{weekday}</span>
-              <span className="text-xs font-extrabold tabular-nums">
+              <span className="text-[9px] font-extrabold uppercase lg:text-[10px] lg:leading-[12px]">
+                {weekday}
+              </span>
+              <span className="text-xs font-extrabold tabular-nums lg:leading-[15px]">
                 {lit ? `${dayNum} ✓` : dayNum}
               </span>
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-[13px] font-medium text-white/90">
+      <p className="mt-3 text-[13px] font-medium text-white/90 lg:mt-0 lg:text-white lg:leading-[16px]">
         {lastActive === today
           ? "Sudah belajar hari ini. Balik lagi besok biar streak jalan terus."
           : "Selesaikan 1 kuis untuk menyalakan streak hari ini."}
       </p>
       {streak > 0 && litCount < 7 && (
-        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-extrabold text-[#B4622D]">
+        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-extrabold text-[#B4622D] lg:mt-0 lg:px-4 lg:py-2">
           <Flame className="size-3.5 fill-current" aria-hidden />
-          Belajar tiap hari jaga streakmu
+          {lastActive === today
+            ? `+${XP_STREAK_BONUS} XP bonus streak diklaim`
+            : `Besok: +${XP_STREAK_BONUS} XP bonus streak`}
         </p>
       )}
     </section>
