@@ -22,11 +22,11 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
           type="button"
           onClick={onBack}
           aria-label="Kembali ke daftar KB"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card ring-1 ring-border transition-colors hover:bg-muted"
         >
           <ArrowLeft className="size-4" />
         </button>
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="text-[10px] font-extrabold uppercase tracking-[1.2px] text-muted-foreground">
           {KB_CATEGORY_META[entry.category].label}
         </p>
         <span className="ml-auto">
@@ -34,7 +34,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         </span>
       </div>
 
-      <div className="hero-texture surface-raised rounded-3xl bg-primary px-5 py-8 text-center text-primary-foreground">
+      <div className="hero-texture surface-raised rounded-3xl border-2 border-primary bg-primary px-5 py-8 text-center text-primary-foreground">
         {entry.glyph ? (
           <p lang="ban" className="font-balinese wresastra-flow leading-none">
             {entry.glyph}
@@ -62,7 +62,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
       </div>
 
       <div className="space-y-6 lg:max-w-3xl">
-        <div className="mt-4 rounded-3xl bg-card p-5 shadow-sm">
+        <div className="mt-4 rounded-2xl border-2 border-border bg-card p-5 shadow-sm">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             Isi entri
           </p>
@@ -70,7 +70,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         </div>
         <TransliterateStrip />
 
-        <div className="mt-4 space-y-6 rounded-3xl bg-card p-5 shadow-sm border-t border-border/60">
+        <div className="mt-4 rounded-2xl border-2 border-border bg-card p-5 shadow-sm">
           <p className="flex items-center gap-2 text-sm font-semibold">
             <BookMarked className="size-4 text-primary" />
             Sumber rujukan
@@ -119,7 +119,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
       </div>
 
       <div className="mt-auto pt-4 lg:max-w-3xl">
-        <Button className="h-12 w-full rounded-full text-base font-semibold" onClick={onBack}>
+        <Button variant="cta" size="lg" className="h-12 w-full text-base" onClick={onBack}>
           Kembali ke Daftar KB
         </Button>
       </div>

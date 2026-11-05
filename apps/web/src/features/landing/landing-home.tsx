@@ -1,17 +1,28 @@
 import {
+  ArrowRight,
   BookOpen,
-  Gamepad2,
-  LibraryBig,
-  MessageCircleQuestion,
-  Sparkles,
   ChevronDown,
+  ChevronUp,
+  Feather,
+  Gamepad2,
+  Heart,
+  Layers,
+  LibraryBig,
+  MessageCircle,
+  MessageCircleQuestion,
+  Mic,
+  Sparkles,
+  X,
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
+import { Bedawang } from "../../components/bedawang";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import type { NavTab } from "../../components/nav-tabs";
+import { ArtGuru, ArtLontar, ArtQuiz } from "./approach-art";
 
 const FAQS = [
   {
@@ -48,29 +59,200 @@ function FaqItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="rounded-3xl border border-border/50 bg-card shadow-sm transition-colors hover:border-primary/50">
+    <div
+      className={cn(
+        "rounded-2xl border-2 bg-card transition-colors",
+        open
+          ? "border-primary shadow-[0_4px_0_0_var(--primary)]"
+          : "border-border shadow-[0_4px_0_0_var(--border)]",
+      )}
+    >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:px-8 lg:py-6"
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:px-[26px] lg:py-[22px]"
       >
-        <span className="text-base font-bold text-foreground lg:text-lg">{q}</span>
-        <ChevronDown
-          className={cn(
-            "size-5 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180 text-primary",
-          )}
-        />
+        <span className="text-[15px] font-extrabold text-foreground">{q}</span>
+        {open ? (
+          <ChevronUp className="size-[18px] shrink-0 text-primary" />
+        ) : (
+          <ChevronDown className="size-[18px] shrink-0 text-muted-foreground" />
+        )}
       </button>
       {open && (
-        <p className="px-6 pb-6 text-base leading-relaxed text-muted-foreground lg:px-8 lg:pb-8 lg:text-lg">
-          {a}
-        </p>
+        <p className="px-6 pb-6 text-sm leading-relaxed text-foreground/75 lg:px-[26px]">{a}</p>
       )}
     </div>
   );
 }
+
+function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
+  const floatCls = (dur: string) =>
+    reduceMotion ? undefined : `animate-[bounce_${dur}_infinite_alternate]`;
+  return (
+    <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-1/2 size-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full ring-8 ring-primary/15"
+      />
+      <div className="absolute left-1/2 top-1/2 w-[46%] max-w-60 -translate-x-1/2 -translate-y-1/2 rotate-6 rounded-[36px] bg-foreground p-3 shadow-lg">
+        <div className="flex flex-col items-center gap-3 rounded-[26px] bg-card p-4">
+          <div className="flex w-full items-center gap-2">
+            <X className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            <div className="h-2 flex-1 rounded-full bg-muted" aria-hidden />
+            <Heart className="size-3.5 shrink-0 fill-destructive text-destructive" aria-hidden />
+          </div>
+          <p className="text-[11px] font-extrabold tracking-[1px] text-muted-foreground">
+            TEBAK AKSARA
+          </p>
+          <p className="text-center text-[15px] font-extrabold text-foreground">Bunyi apa ini?</p>
+          <div className="w-full rounded-2xl border-2 border-border bg-card p-3 text-center shadow-md">
+            <span
+              lang="ban"
+              className="font-balinese text-[38px] font-bold leading-none text-primary"
+            >
+              ᬩ
+            </span>
+          </div>
+          <div className="flex w-full flex-col gap-1.5">
+            <span className="rounded-full bg-cta px-3 py-1.5 text-center text-xs font-bold text-primary-foreground">
+              Ba
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1.5 text-center text-xs font-semibold text-muted-foreground">
+              Da
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1.5 text-center text-xs font-semibold text-muted-foreground">
+              Ga
+            </span>
+          </div>
+        </div>
+      </div>
+      {[
+        { Icon: Mic, cls: "left-[6%] top-[12%]" },
+        { Icon: BookOpen, cls: "right-[6%] top-[8%]" },
+        { Icon: Feather, cls: "right-[8%] bottom-[10%]" },
+        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]" },
+      ].map(({ Icon, cls }, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={cn(
+            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-border bg-card shadow-sm",
+            cls,
+            floatCls(i % 2 ? "5s" : "6s"),
+          )}
+        >
+          <Icon className="size-6 text-primary" />
+        </span>
+      ))}
+      <Sparkles aria-hidden className="absolute left-[36%] top-[10%] size-6 text-accent" />
+      <Sparkles aria-hidden className="absolute right-[26%] top-[52%] size-8 text-accent" />
+      <Sparkles aria-hidden className="absolute left-[40%] top-[54%] size-4 text-accent" />
+      <Bedawang
+        mood="semangat"
+        className={cn("absolute bottom-[6%] left-[16%] size-20", floatCls("7s"))}
+      />
+    </div>
+  );
+}
+
+function ZigzagRow({
+  title,
+  desc,
+  art,
+  artFirst,
+  reduceMotion,
+  action,
+}: {
+  title: string;
+  desc: string;
+  art: React.ReactNode;
+  artFirst: boolean;
+  reduceMotion: boolean;
+  action?: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(reduceMotion);
+  useEffect(() => {
+    if (reduceMotion) {
+      setVisible(true);
+      return;
+    }
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduceMotion]);
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex flex-col items-center gap-10 lg:flex-row",
+        !reduceMotion && "transition-all duration-700 ease-out",
+        !reduceMotion && !visible && "translate-y-8 opacity-0",
+      )}
+    >
+      <div className={cn("flex flex-1 flex-col gap-3", artFirst && "lg:order-2")}>
+        <h3 className="text-4xl font-extrabold tracking-tight text-foreground lg:text-5xl">
+          {title}
+        </h3>
+        <p className="text-lg leading-relaxed text-muted-foreground lg:text-[21px] lg:leading-[34px]">
+          {desc}
+        </p>
+        {action}
+      </div>
+      <div className={cn("w-full max-w-[460px] flex-col items-center", artFirst && "lg:order-1")}>
+        <div className="w-full rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+          <div className="h-56 w-full overflow-hidden rounded-2xl">{art}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const APPROACH = [
+  {
+    icon: Layers,
+    title: "Terstruktur",
+    desc: "Alur 4 modul dari nol sampai mahir tradisi.",
+    tilt: "lg:rotate-3",
+    dark: false,
+  },
+  {
+    icon: Gamepad2,
+    title: "Menyenangkan",
+    desc: "Belajar lewat kuis seru dan interaktif.",
+    tilt: "lg:-rotate-2",
+    dark: true,
+  },
+  {
+    icon: LibraryBig,
+    title: "Kamus Lengkap",
+    desc: "Lebih dari 27+ entri budaya dan aksara.",
+    tilt: "lg:-rotate-2",
+    dark: false,
+  },
+  {
+    icon: MessageCircleQuestion,
+    title: "Pendamping",
+    desc: "Guru virtual siap membantu kapan saja.",
+    tilt: "lg:rotate-2",
+    dark: true,
+  },
+];
 
 export function LandingHome({
   onStart,
@@ -82,190 +264,137 @@ export function LandingHome({
   onOpenTab: (t: NavTab) => void;
 }) {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
+  const reduceMotion = usePrefersReducedMotion();
+  const floatCls = (dur: string, reverse = false) =>
+    reduceMotion
+      ? undefined
+      : `animate-[bounce_${dur}_infinite_alternate${reverse ? "-reverse" : ""}]`;
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 pt-12 pb-16 md:max-w-2xl lg:max-w-7xl lg:px-8">
       {/* HERO */}
-      <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="text-center lg:text-left">
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl lg:text-[4rem] lg:leading-[1.1]">
+      <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-12">
+        <div className="flex flex-col gap-7 text-center lg:text-left">
+          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-5xl lg:leading-[53px] lg:tracking-[-1.6px]">
             Pelajari Aksara Bali, Pelan tapi Pasti.
           </h1>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground lg:text-lg">
+          <p className="text-base leading-relaxed text-muted-foreground lg:text-[17px] lg:leading-[28px]">
             Temukan kekayaan warisan budaya Bali melalui modul interaktif dan kuis seru. Dari sapaan
             sehari-hari hingga wresastra yang bermakna.
           </p>
-          <div className="mt-10 flex justify-center lg:justify-start">
+          <div className="flex justify-center lg:justify-start">
             <button
               type="button"
               onClick={onStart}
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
+              className="inline-flex items-center justify-center rounded-full bg-cta px-16 py-4 text-[15px] font-bold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none"
             >
               Mulai Belajar
             </button>
           </div>
         </div>
 
-        {/* Hero Interactive Hanacaraka - Clean, Consistent, No Gradients */}
-        <div className="relative hidden w-full lg:flex items-center justify-center">
-          <div className="w-full max-w-lg rounded-[2.5rem] border border-border/60 bg-secondary/30 p-6 shadow-sm">
-            <div className="grid grid-cols-6 gap-3">
-              {[
-                { bal: "ᬳ", lat: "Ha" },
-                { bal: "ᬦ", lat: "Na" },
-                { bal: "ᬘ", lat: "Ca" },
-                { bal: "ᬭ", lat: "Ra" },
-                { bal: "ᬓ", lat: "Ka" },
-                { bal: "ᬤ", lat: "Da" },
-                { bal: "ᬢ", lat: "Ta" },
-                { bal: "ᬲ", lat: "Sa" },
-                { bal: "ᬯ", lat: "Wa" },
-                { bal: "ᬮ", lat: "La" },
-                { bal: "ᬫ", lat: "Ma" },
-                { bal: "ᬕ", lat: "Ga" },
-                { bal: "ᬩ", lat: "Ba" },
-                { bal: "ᬗ", lat: "Nga" },
-                { bal: "ᬧ", lat: "Pa" },
-                { bal: "ᬚ", lat: "Ja" },
-                { bal: "ᬬ", lat: "Ya" },
-                { bal: "ᬜ", lat: "Nya" },
-              ].map((aksara, i) => (
-                <div
-                  key={i}
-                  className="group relative flex aspect-square cursor-pointer items-center justify-center rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-primary hover:shadow-md"
-                >
-                  <span className="absolute font-balinese text-3xl font-bold text-foreground transition-all duration-200 group-hover:scale-75 group-hover:opacity-0 lg:text-4xl">
-                    {aksara.bal}
-                  </span>
-                  <span className="absolute text-lg font-bold text-primary-foreground opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 lg:text-xl">
-                    {aksara.lat}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PhoneMock reduceMotion={reduceMotion} />
       </section>
 
       {/* WHY US */}
-      <section className="mt-32 border-t border-border/60 pt-20">
-        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">Pendekatan Kami</h2>
-          <button
-            onClick={onStart}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
-          >
-            Jelajahi modul
-          </button>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              icon: <BookOpen className="size-8 text-primary" />,
-              title: "Terstruktur",
-              desc: "Alur 4 modul dari nol sampai mahir tradisi.",
-            },
-            {
-              icon: <Gamepad2 className="size-8 text-warning" />,
-              title: "Menyenangkan",
-              desc: "Belajar lewat kuis seru dan interaktif.",
-            },
-            {
-              icon: <LibraryBig className="size-8 text-success" />,
-              title: "Kamus Lengkap",
-              desc: "Lebih dari 27+ entri budaya dan aksara.",
-            },
-            {
-              icon: <MessageCircleQuestion className="size-8 text-destructive" />,
-              title: "Pendamping",
-              desc: "Guru virtual siap membantu kapan saja.",
-            },
-          ].map((w, i) => (
+      <section className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8">
+        <h2 className="text-center text-[30px] font-extrabold text-cta">Pendekatan Kami</h2>
+        <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row md:flex-wrap lg:flex-nowrap">
+          {APPROACH.map((w) => (
             <div
-              key={i}
-              className="group flex flex-col rounded-[2rem] bg-card p-8 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50 hover:-translate-y-1"
+              key={w.title}
+              className={cn(
+                "flex h-[184px] w-full max-w-57 flex-col gap-2 rounded-[20px] border-2 p-[18px] transition-transform hover:-translate-y-1",
+                w.tilt,
+                w.dark
+                  ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_0_0_var(--primary)]"
+                  : "border-border bg-card shadow-[0_4px_0_0_var(--border)]",
+              )}
             >
-              <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-background shadow-sm ring-1 ring-border/30">
-                {w.icon}
-              </div>
-              <h3 className="text-xl font-bold">{w.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+              <span
+                className={cn(
+                  "flex size-11 items-center justify-center rounded-full",
+                  w.dark ? "bg-white/20" : "bg-primary/10",
+                )}
+              >
+                <w.icon className={cn("size-5", w.dark ? "text-white" : "text-primary")} />
+              </span>
+              <h3 className={cn("text-sm font-extrabold", w.dark ? undefined : "text-foreground")}>
+                {w.title}
+              </h3>
+              <p
+                className={cn(
+                  "text-xs leading-relaxed",
+                  w.dark ? "text-primary-foreground/80" : "text-foreground/80",
+                )}
+              >
+                {w.desc}
+              </p>
             </div>
           ))}
         </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="mt-32 border-t border-border/60 pt-20">
-        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">
-            Kenapa Belajar di Sini?
-          </h2>
+        <div className="mt-10 flex justify-center">
           <button
-            onClick={onOpenKb}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
+            type="button"
+            onClick={onStart}
+            className="inline-flex items-center justify-center rounded-full bg-cta px-11 py-3.5 text-sm font-extrabold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none"
           >
-            Lihat semua fitur
+            Mulai Perjalananmu
           </button>
         </div>
+      </section>
 
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-          <div className="group flex flex-col justify-center rounded-[2.5rem] bg-primary/5 p-10 lg:col-span-7 lg:p-14">
-            <Sparkles className="mb-6 size-10 text-primary" />
-            <h3 className="text-3xl font-extrabold tracking-tight lg:text-4xl">
-              Modul Interaktif yang Runtut
-            </h3>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Belajar tidak melompat-lompat. Mulai dari pengenalan wresastra hingga mahir, dirancang
-              khusus agar mudah dipahami oleh siapa saja, kapan saja.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-6 lg:col-span-5">
-            {[
-              {
-                icon: <Gamepad2 className="size-6 text-warning" />,
-                title: "Kuis Seru & Menantang",
-                desc: "Uji kemampuan membaca dan menyusun aksara dengan gamifikasi.",
-              },
-              {
-                icon: <MessageCircleQuestion className="size-6 text-primary" />,
-                title: "Guru Virtual Cerdas",
-                desc: "Tanya apa saja seputar aksara dan budaya, kapan saja.",
-              },
-              {
-                icon: <LibraryBig className="size-6 text-success" />,
-                title: "Kamus Budaya",
-                desc: "Eksplorasi entri kebudayaan dan filosofi Bali terdalam.",
-              },
-            ].map((f, i) => (
-              <div
-                key={i}
-                className="group flex flex-1 items-center gap-6 rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50"
+      {/* ZIGZAG */}
+      <section className="mt-12 px-2 pt-14 pb-16 lg:px-8">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-cta">
+          Kenapa Belajar di Sini?
+        </h2>
+        <div className="mt-16 flex flex-col gap-16 lg:mt-24 lg:gap-32">
+          <ZigzagRow
+            title="Kuis Seru & Menantang"
+            desc="Uji kemampuan membaca dan menyusun aksara dengan gamifikasi."
+            art={<ArtQuiz />}
+            artFirst={false}
+            reduceMotion={reduceMotion}
+          />
+          <ZigzagRow
+            title="Guru Virtual Cerdas"
+            desc="Tanya apa saja seputar aksara dan budaya, kapan saja."
+            art={<ArtGuru />}
+            artFirst
+            reduceMotion={reduceMotion}
+          />
+          <ZigzagRow
+            title="Kamus Budaya"
+            desc="Eksplorasi entri kebudayaan dan filosofi Bali terdalam."
+            art={<ArtLontar />}
+            artFirst={false}
+            reduceMotion={reduceMotion}
+            action={
+              <button
+                type="button"
+                onClick={onOpenKb}
+                className="mt-2 inline-flex w-fit items-center gap-2 text-[15px] font-bold text-primary transition-colors hover:text-cta"
               >
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-background ring-1 ring-border/30">
-                  {f.icon}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold">{f.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+                Jelajahi Kamus Budaya <ArrowRight className="size-4" />
+              </button>
+            }
+          />
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="mt-32 grid gap-8 border-t border-border/60 pt-16 lg:grid-cols-[350px_minmax(0,1fr)] lg:gap-16">
-        <div>
-          <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Sering Ditanyakan</h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground lg:text-lg">
+      <section className="mt-12 flex flex-col gap-8 bg-background px-2 pt-16 lg:flex-row lg:gap-[90px] lg:px-8">
+        <div className="flex flex-col gap-5 lg:w-[340px] lg:shrink-0">
+          <h2 className="text-[40px] leading-[46px] font-extrabold tracking-[-1px] text-cta">
+            Sering Ditanyakan
+          </h2>
+          <p className="text-[15px] leading-[25px] text-muted-foreground">
             Masih ragu? Jawaban singkat untuk hal yang paling sering ditanyakan saat memulai belajar
             bersama CAKSARA.
           </p>
         </div>
-        <div className="space-y-3">
+        <div className="flex flex-1 flex-col gap-4">
           {FAQS.map((f, i) => (
             <FaqItem
               key={f.q}
@@ -282,66 +411,87 @@ export function LandingHome({
       <div className="relative mt-32 w-full">
         {/* CTA - Scattered Avatars Design */}
         <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6">
-          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:py-28">
+          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:rounded-[48px] lg:p-[84px_64px]">
             {/* Scattered Floating Avatars (Desktop only) */}
             <div className="pointer-events-none absolute inset-0 hidden md:block">
-              {/* Kiri */}
               <img
                 src="/assets/Userpics/PNG/Circle/3DDD-1.png"
                 alt=""
-                className="absolute left-[8%] top-[25%] size-20 rounded-full shadow-md transition-transform duration-700 hover:scale-110 animate-[bounce_6s_infinite_alternate]"
+                className={cn(
+                  "absolute left-[8%] top-[25%] size-20 rounded-full shadow-md transition-transform duration-700 hover:scale-110",
+                  floatCls("6s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Afterclap-1.png"
                 alt=""
-                className="absolute left-[22%] top-[55%] size-12 rounded-full shadow-sm animate-[bounce_5s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute left-[22%] top-[55%] size-12 rounded-full shadow-sm",
+                  floatCls("5s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/OSLO-1.png"
                 alt=""
-                className="absolute left-[12%] bottom-[15%] size-16 rounded-full shadow-md animate-[bounce_7s_infinite_alternate]"
+                className={cn(
+                  "absolute left-[12%] bottom-[15%] size-16 rounded-full shadow-md",
+                  floatCls("7s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Cranks-1.png"
                 alt=""
-                className="absolute left-[4%] top-[65%] size-10 rounded-full shadow-sm animate-[bounce_4s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute left-[4%] top-[65%] size-10 rounded-full shadow-sm",
+                  floatCls("4s", true),
+                )}
               />
-
-              {/* Kanan */}
               <img
                 src="/assets/Userpics/PNG/Circle/Guacamole-1.png"
                 alt=""
-                className="absolute right-[8%] top-[20%] size-16 rounded-full shadow-md animate-[bounce_6s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute right-[8%] top-[20%] size-16 rounded-full shadow-md",
+                  floatCls("6s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/3DDD-2.png"
                 alt=""
-                className="absolute right-[24%] top-[40%] size-10 rounded-full shadow-sm animate-[bounce_5s_infinite_alternate]"
+                className={cn(
+                  "absolute right-[24%] top-[40%] size-10 rounded-full shadow-sm",
+                  floatCls("5s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Juicy-1.png"
                 alt=""
-                className="absolute right-[14%] bottom-[18%] size-20 rounded-full shadow-md animate-[bounce_7s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute right-[14%] bottom-[18%] size-20 rounded-full shadow-md",
+                  floatCls("7s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Cranks-2.png"
                 alt=""
-                className="absolute right-[5%] bottom-[45%] size-12 rounded-full shadow-sm animate-[bounce_4s_infinite_alternate]"
+                className={cn(
+                  "absolute right-[5%] bottom-[45%] size-12 rounded-full shadow-sm",
+                  floatCls("4s"),
+                )}
               />
             </div>
 
             {/* Center Content */}
-            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center px-6">
-              <h2 className="text-4xl font-extrabold tracking-tight text-foreground lg:text-[4rem] lg:leading-tight">
+            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-[22px] px-6">
+              <h2 className="text-4xl font-extrabold tracking-tight text-foreground lg:w-[520px] lg:text-5xl lg:leading-[55px] lg:tracking-[-1.5px]">
                 Siap Untuk Mulai Belajar?
               </h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground lg:text-xl">
+              <p className="text-base leading-relaxed text-muted-foreground lg:w-[540px]">
                 Bergabung bersama pengguna lainnya dan mulai langkah pertamamu mempelajari aksara
                 Bali dengan mudah.
               </p>
               <button
                 onClick={onStart}
-                className="mt-10 inline-flex h-14 items-center justify-center rounded-full bg-primary px-10 text-lg font-bold text-primary-foreground shadow-xl transition-transform hover:-translate-y-1 hover:shadow-2xl active:scale-95 lg:h-16 lg:text-xl"
+                className="inline-flex items-center justify-center rounded-full bg-cta px-[34px] py-[17px] text-[15px] font-bold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none"
               >
                 Mulai Belajar Sekarang
               </button>
@@ -350,7 +500,7 @@ export function LandingHome({
         </div>
 
         {/* FOOTER */}
-        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:px-20 lg:pt-64">
+        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:rounded-[48px] lg:px-16 lg:pb-11 lg:pt-[170px]">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr] lg:gap-12">
             {/* Column 1: Brand */}
             <div className="max-w-sm">
