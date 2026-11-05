@@ -6,6 +6,8 @@ export type { GameState, WitaDate };
 /** Spec constants (#24). Read these; do not restate 5 or 10 in UI code. */
 export const MAX_HEARTS = 5;
 export const XP_PER_CORRECT = 10;
+/** Bonus XP sekali per hari saat Streak bertambah. Copy Profil ikut aturan ini. */
+export const XP_STREAK_BONUS = 20;
 
 const WITA_OFFSET_MS = 8 * 3_600_000;
 
@@ -75,6 +77,23 @@ export function touchStreakOnActivity(state: GameState, today: WitaDate): GameSt
     lastActiveDate: today,
   };
 }
+
+export interface StreakBonusResult {
+  state: GameState;
+  granted: boolean;
+}
+
+/** Streak bonus. Grants XP_STREAK_BONUS only when the streak just grew today; same-day repeats pass through untouched. */
+export function applyStreakBonus(state: GameState, today: WitaDate): StreakBonusResult {
+  if (state.lastActiveDate !== today) return { state, granted: false };
+  if (state.streak <= 0) return { state, granted: false };
+  if (state.streakBonusClaimedAt === today) return { state, granted: false };
+  return {
+    state: { ...state, xp: state.xp + XP_STREAK_BONUS, streakBonusClaimedAt: today },
+    granted: true,
+  };
+}
+
 export type Mastery = "belum" | "dipahami" | "ahli";
 
 export interface MasteryInput {

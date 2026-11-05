@@ -2,12 +2,14 @@ import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import {
   applyCorrectAnswer,
+  applyStreakBonus,
   applyWrongAnswer,
   deriveMastery,
   refillHeartsForNewDay,
   resetStreakForMissedDay,
   touchStreakOnActivity,
   witaDateString,
+  XP_STREAK_BONUS,
 } from "./game-rules";
 import { parseWitaDate } from "./zod/game-state";
 import type { GameState } from "./game-rules";
@@ -85,6 +87,37 @@ describe("Streak", () => {
     assert.equal(lapsed.streak, 0);
     assert.equal(live.streak, 6);
     assert.equal(today.streak, 2);
+  });
+});
+
+describe("Bonus Streak +20 XP", () => {
+  test("streak bertambah memberi bonus sekali per hari", () => {
+    const grown = touchStreakOnActivity({ ...fresh(), xp: 40 }, parseWitaDate("2026-09-05"));
+    const first = applyStreakBonus(grown, parseWitaDate("2026-09-05"));
+    assert.equal(first.granted, true);
+    assert.equal(first.state.xp, 40 + XP_STREAK_BONUS);
+    assert.equal(XP_STREAK_BONUS, 20);
+    const second = applyStreakBonus(first.state, parseWitaDate("2026-09-05"));
+    assert.equal(second.granted, false);
+    assert.equal(second.state.xp, 40 + XP_STREAK_BONUS);
+  });
+
+  test("streak putus tidak dapat bonus", () => {
+    const lapsed = resetStreakForMissedDay(
+      { ...fresh(), xp: 40, streak: 6 },
+      parseWitaDate("2026-09-10"),
+    );
+    assert.equal(lapsed.streak, 0);
+    const denied = applyStreakBonus(lapsed, parseWitaDate("2026-09-10"));
+    assert.equal(denied.granted, false);
+    assert.equal(denied.state.xp, 40);
+  });
+
+  test("tanpa aktivitas hari ini tidak dapat bonus", () => {
+    const idle = { ...fresh(), xp: 40, streak: 3 };
+    const denied = applyStreakBonus(idle, parseWitaDate("2026-09-05"));
+    assert.equal(denied.granted, false);
+    assert.equal(denied.state.xp, 40);
   });
 });
 

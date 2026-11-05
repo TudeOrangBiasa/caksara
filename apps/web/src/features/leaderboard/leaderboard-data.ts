@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { getSupabase } from "../../lib/supabase";
+import type { WitaDate } from "../../lib/zod/game-state";
 
 export const leaderboardEntrySchema = z.object({
   profile_id: z.string().min(1),
@@ -12,6 +13,22 @@ export const leaderboardEntrySchema = z.object({
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
 export const LEADERBOARD_LIMIT = 20;
+
+/** Awal pekan liga: Senin 00:00 WITA. Copy Leaderboard ikut aturan ini. */
+export function weekStartSenin(today: WitaDate): WitaDate {
+  const [y, m, d] = today.split("-").map(Number) as [number, number, number];
+  const day = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const back = (day + 6) % 7;
+  const monday = new Date(Date.UTC(y, m - 1, d) - back * 86_400_000);
+  const mm = String(monday.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(monday.getUTCDate()).padStart(2, "0");
+  return `${monday.getUTCFullYear()}-${mm}-${dd}` as WitaDate;
+}
+
+/** True hanya pada hari Senin: pekan liga direset tiap Senin WITA. */
+export function isResetMingguIni(today: WitaDate): boolean {
+  return weekStartSenin(today) === today;
+}
 
 export interface LeaderboardSource {
   list: (limit: number) => Promise<LeaderboardEntry[]>;
