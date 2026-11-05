@@ -48,9 +48,10 @@ disembunyikan saat freeze (elemen transien, bukan konten layar).
 
 1. RMSE profil <= 0,22
 2. Beda nyata profil (difference threshold 5%) <= 500.000 px
-3. Spot-check (`bun .parity/spotcheck-profil.ts`): 10/10 probe batas
-   geometri cocok (2 profil same-coord + 8 league offset +179/+35
-   tercatat; bentuknya harus sama persis, toleransi 0)
+   geometri cocok (2 profil same-coord + 8 league offset
+   (dx +179 konsisten; dy aktual per baris R1 +15, R2 +19, R3 +23,
+   R4 +27, R5 +31, R6 +35, R7 +39, R8 +43, cermin gap baris app vs
+   Pencil; bentuknya harus sama persis, toleransi 0))
 
 League RMSE/fuzz informatif saja, bukan gate. Kartu leaderboard
 hidup di dalam halaman Profil (opsi B, keputusan Main), bukan
