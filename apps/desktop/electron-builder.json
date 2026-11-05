@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "id.caksara.app",
+  "productName": "CAKSARA",
+  "directories": {
+    "output": "release"
+  },
+  "files": ["dist/**/*", "../web/build/client/**/*", "package.json"],
+  "protocols": [
+    {
+      "name": "CAKSARA Auth",
+      "schemes": ["caksara"]
+    }
+  ],
+  "linux": {
+    "category": "Education",
+    "target": ["AppImage", "deb"],
+    "desktop": {
+      "MimeType": "x-scheme-handler/caksara"
+    }
+  }
+}
