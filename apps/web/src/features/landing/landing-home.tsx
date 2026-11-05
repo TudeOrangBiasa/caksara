@@ -67,19 +67,19 @@ function FaqItem({
   return (
     <div
       className={cn(
-        "rounded-2xl border-2 bg-card transition-colors",
+        "rounded-2xl border-2 bg-card transition-colors lg:flex lg:flex-col lg:gap-3.5 lg:[row-gap:14px]",
         open
-          ? "border-primary shadow-[0_4px_0_0_var(--primary)]"
-          : "border-border shadow-[0_4px_0_0_var(--border)]",
+          ? "border-primary shadow-[0_4px_0_0_var(--primary)] lg:shadow-none"
+          : "border-border shadow-[0_4px_0_0_var(--border)] lg:shadow-none",
       )}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:px-[26px] lg:py-[22px]"
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:gap-4 lg:px-[26px] lg:py-[22px] lg:[padding:22px_26px]"
       >
-        <span className="text-[15px] font-extrabold text-foreground">{q}</span>
+        <span className="text-[15px] font-extrabold text-foreground lg:leading-[20px]">{q}</span>
         {open ? (
           <ChevronUp className="size-[18px] shrink-0 text-primary" />
         ) : (
@@ -87,7 +87,9 @@ function FaqItem({
         )}
       </button>
       {open && (
-        <p className="px-6 pb-6 text-sm leading-relaxed text-foreground/75 lg:px-[26px]">{a}</p>
+        <p className="px-6 pb-6 text-sm leading-relaxed text-foreground/75 lg:px-[26px] lg:pb-6 lg:leading-[22px] lg:[padding:0_26px_22px]">
+          {a}
+        </p>
       )}
     </div>
   );
