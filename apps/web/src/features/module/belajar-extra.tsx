@@ -4,19 +4,16 @@ import { WRESASTRA_AKSARA } from "./aksara-data";
 
 export function BannerBudaya() {
   return (
-    <div className="relative overflow-hidden rounded-[1.75rem] shadow-xl shadow-primary/10 min-h-[220px] flex flex-col justify-end p-6 group">
+    <div className="group relative flex min-h-[220px] flex-col justify-end overflow-hidden rounded-[1.25rem] p-6">
       <img
         src="/assets/bali_penjor_2d_1788968300643.jpg"
         alt=""
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/60 to-transparent" />
 
       <div className="relative z-10 flex flex-col items-start justify-end">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-white/70">
-          Tentang kurikulum
-        </p>
-        <h2 className="mt-1 text-[22px] font-extrabold tracking-tight text-white leading-tight">
+        <h2 className="text-[22px] font-extrabold leading-tight tracking-tight text-white">
           Warisan Leluhur Bali
         </h2>
         <p className="mt-1.5 max-w-[40ch] text-[13px] font-medium leading-relaxed text-white/80">
@@ -40,14 +37,14 @@ export function AksaraGrid() {
           {WRESASTRA_AKSARA.length} aksara
         </span>
       </div>
-      <div className="grid grid-cols-6 gap-1.5 md:grid-cols-9">
+      <div className="grid grid-cols-6 gap-1.5">
         {WRESASTRA_AKSARA.map((a) => (
           <div
             key={a.id}
-            className="flex aspect-square flex-col items-center justify-center rounded-3xl bg-card text-center"
+            className="flex aspect-square flex-col items-center justify-center rounded-[10px] bg-secondary text-center"
           >
-            <span className="font-balinese text-xl leading-none text-primary">{a.glyph}</span>
-            <span className="mt-1 text-[10px] text-muted-foreground">{a.latin}</span>
+            <span className="font-balinese text-lg leading-none text-foreground">{a.glyph}</span>
+            <span className="mt-0.5 text-[9px] text-muted-foreground">{a.latin}</span>
           </div>
         ))}
       </div>
@@ -62,18 +59,18 @@ export function SumberList() {
     { nama: "Unicode Consortium", ket: "Standar aksara U+1B00-U+1B7F" },
   ];
   return (
-    <section className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
-      <p className="flex items-center gap-2 text-sm font-semibold">
+    <section className="rounded-[1.25rem] bg-card p-6 shadow-sm ring-1 ring-border">
+      <p className="flex items-center gap-2 text-[13px] font-bold">
         <BookMarked className="size-4 text-primary" />
         Sumber & rujukan materi
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="mt-1 text-[11px] text-muted-foreground">
         Konten belajar disusun dari sumber resmi agar akurat dan bisa dipercaya.
       </p>
       <ul className="mt-3 space-y-2">
         {sumbers.map((s) => (
-          <li key={s.nama} className="flex items-baseline justify-between gap-3 text-xs">
-            <span className="font-medium">{s.nama}</span>
+          <li key={s.nama} className="flex items-baseline justify-between gap-3 text-[11px]">
+            <span className="font-semibold">{s.nama}</span>
             <span className="text-right text-muted-foreground">{s.ket}</span>
           </li>
         ))}
@@ -89,18 +86,18 @@ export function TipsBelajar() {
     "Salah itu hal biasa. Ulangi pelan-pelan, enggak usah dikejar.",
   ];
   return (
-    <section className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
-      <p className="flex items-center gap-2 text-sm font-semibold">
-        <Lightbulb className="size-4 text-accent" />
+    <section className="rounded-[1.25rem] bg-card p-6 shadow-sm ring-1 ring-border">
+      <p className="flex items-center gap-2 text-[13px] font-bold">
+        <Lightbulb className="size-4 text-primary" />
         Tips belajar
       </p>
       <ul className="mt-3 space-y-2">
         {tips.map((tip) => (
           <li
             key={tip}
-            className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"
+            className="flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground"
           >
-            <span className="mt-1 size-1.5 shrink-0 rounded-full bg-accent" />
+            <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
             {tip}
           </li>
         ))}
