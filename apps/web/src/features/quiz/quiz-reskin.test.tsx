@@ -45,7 +45,7 @@ const CHOICES = [
   { text: "Matur suksma", isCorrect: false },
 ];
 
-describe("Reskin T3 #142 — semua tipe soal dirender", () => {
+describe("Reskin T3 #142 - semua tipe soal dirender", () => {
   test("dengar_pilih: ask row + tombol Putar + opsi", () => {
     const html = renderBody({
       type: "dengar_pilih",
