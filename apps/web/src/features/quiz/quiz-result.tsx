@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@caksara/ui/components/button";
 import { cn } from "@caksara/ui/lib/utils";
 import { Bedawang } from "../../components/bedawang";
@@ -36,9 +36,9 @@ export function QuizResult({
   const passed = percentage >= 70;
   const reduceMotion = usePrefersReducedMotion();
   const xpGained = score.correct * XP_PER_CORRECT;
-  const R = 54;
-  const C = 2 * Math.PI * R;
-  const dashOffset = C * (1 - percentage / 100);
+  // Pencil Z8nXI/HK0rs: ring solid, hijau lulus dan merah gagal.
+  const ringTone = passed ? "bg-cta" : "bg-destructive";
+  const scoreTone = passed ? "text-cta" : "text-destructive";
 
   useEffect(() => {
     if (passed) playFanfare();
@@ -52,16 +52,16 @@ export function QuizResult({
   }, [passed, level, prevLevel]);
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center px-4 md:max-w-xl py-8">
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center px-4 py-8 md:max-w-xl">
       <Confetti active={passed && !reduceMotion} />
       <Bedawang
         mood={passed ? "semangat" : "sedih"}
         className={cn("size-20", !passed && "grayscale-[35%]")}
       />
-      <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+      <p className="mt-3 text-[13px] font-extrabold uppercase tracking-[0.12em] text-accent-foreground">
         Hasil Kuis
       </p>
-      <h1 className="mt-1 text-center text-[28px] leading-tight font-extrabold tracking-tight md:text-[32px]">
+      <h1 className="mt-1 text-center text-[28px] font-extrabold leading-tight tracking-tight text-foreground md:text-[32px]">
         {isLatihan
           ? passed
             ? "Mantap, latihan beres!"
@@ -70,7 +70,7 @@ export function QuizResult({
             ? "Mantap, modul beres!"
             : "Belum lulus, semangat ya"}
       </h1>
-      <p className="mt-1 text-sm text-muted-foreground">{mod.title}</p>
+      <p className="mt-1 text-sm font-bold text-muted-foreground">{mod.title}</p>
       {level !== undefined && (
         <p
           role="status"
@@ -81,49 +81,28 @@ export function QuizResult({
         </p>
       )}
 
-      <div className="relative mt-6">
-        <svg
-          width="140"
-          height="140"
-          viewBox="0 0 140 140"
+      <div className="mt-6 flex items-center gap-4">
+        <div
           role="img"
           aria-label={`${percentage}% benar`}
+          className={cn("flex size-[120px] items-center justify-center rounded-full p-3", ringTone)}
         >
-          <circle cx="70" cy="70" r={R} fill="none" strokeWidth="12" className="stroke-muted" />
-          <circle
-            cx="70"
-            cy="70"
-            r={R}
-            fill="none"
-            strokeWidth="12"
-            strokeLinecap="round"
-            strokeDasharray={C}
-            strokeDashoffset={dashOffset}
-            transform="rotate(-90 70 70)"
-            className={cn(
-              "transition-[stroke-dashoffset] duration-[1200ms] ease-out",
-              passed ? "stroke-primary" : "stroke-muted-foreground",
-            )}
-            style={{ "--tw-stroke-dashoffset-from": String(C) } as React.CSSProperties}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-2xl font-bold">
-            <AnimatedNumber value={score.correct} />
-            {score.total > 0 ? `/${score.total}` : ""}
-          </p>
-          <p className="text-[11px] text-muted-foreground">{percentage}% benar</p>
+          <div className="flex size-full flex-col items-center justify-center rounded-full bg-card">
+            <p className={cn("text-2xl font-extrabold tabular-nums", scoreTone)}>
+              <AnimatedNumber value={score.correct} />
+              {score.total > 0 ? `/${score.total}` : ""}
+            </p>
+            <p className="text-[11px] text-muted-foreground">{percentage}% benar</p>
+          </div>
         </div>
+        {passed && (
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-foreground animate-card-pop">
+            +<AnimatedNumber value={xpGained} /> XP
+          </div>
+        )}
       </div>
-
-      {passed && (
-        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-sm font-semibold text-accent-foreground dark:text-accent animate-card-pop">
-          <Sparkles className="size-4" /> +<AnimatedNumber value={xpGained} /> XP
-        </div>
-      )}
-
       {passed && !isLatihan && (
-        <div className="mt-5 w-full rounded-3xl bg-card p-5 text-left shadow-sm">
+        <div className="mt-5 w-full rounded-2xl border-2 border-b-4 border-border bg-card p-5 text-left">
           <span className="font-balinese text-xl leading-none text-primary">ᬲᬧᬢ</span>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Seru! Kamu berhasil menuntaskan {mod.title}. Pelan-pelan aja, tanpa terasa aksara &amp;
@@ -137,32 +116,41 @@ export function QuizResult({
           )}
         </div>
       )}
+      {!passed && (
+        <div className="mt-5 w-full rounded-2xl border-2 border-b-4 border-border bg-card p-5 text-left">
+          <p className="text-sm font-bold text-destructive">Jangan menyerah!</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            Kamu sudah benar {score.correct} dari {score.total}. Ulangi bagian yang sulit dan kamu
+            pasti lulus.
+          </p>
+        </div>
+      )}
 
-      <div className="mt-auto flex w-full gap-2 border-t-2 border-border pt-6">
+      <div className="mt-auto flex w-full gap-3 pt-6">
         {passed ? (
           <>
-            <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onRetry}>
-              <RotateCcw className="size-4 mr-1.5" />
+            <Button
+              variant="outline"
+              className="h-12 flex-1 rounded-pill border-2 border-b-4"
+              onClick={onRetry}
+            >
+              <RotateCcw className="mr-1.5 size-4" />
               Ulangi
             </Button>
-            <Button
-              variant="cta"
-              className="h-12 flex-1 gap-2 text-base font-bold tracking-wide"
-              onClick={onBack}
-            >
+            <Button variant="cta" className="h-12 flex-1 text-base font-bold" onClick={onBack}>
               Kembali
             </Button>
           </>
         ) : (
           <>
-            <Button variant="outline" className="h-12 flex-1 rounded-full" onClick={onBack}>
+            <Button
+              variant="outline"
+              className="h-12 flex-1 rounded-pill border-2 border-b-4"
+              onClick={onBack}
+            >
               Kembali
             </Button>
-            <Button
-              variant="cta"
-              className="h-12 flex-1 gap-2 text-base font-bold tracking-wide"
-              onClick={onRetry}
-            >
+            <Button variant="cta" className="h-12 flex-1 text-base font-bold" onClick={onRetry}>
               <RotateCcw className="size-4" />
               Coba Lagi
             </Button>
