@@ -34,6 +34,29 @@ export interface LeaderboardSource {
   list: (limit: number) => Promise<LeaderboardEntry[]>;
 }
 
+const PARITY_KEY = "caksara.parity-league.v1";
+
+/** Fixture parity: 8 baris baseline t8BaKT dari localStorage (DEV + parity run saja). */
+export function parityLeagueSource(): LeaderboardSource | null {
+  if (!import.meta.env.DEV) return null;
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(PARITY_KEY);
+  if (!raw) return null;
+  let json: unknown;
+  try {
+    json = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  const parsed = z.array(leaderboardEntrySchema).safeParse(json);
+  if (!parsed.success) return null;
+  return {
+    async list(limit: number): Promise<LeaderboardEntry[]> {
+      return topEntries(parsed.data, limit);
+    },
+  };
+}
+
 /** Sumber Supabase: top-N diurut XP desc (RLS publik baca). */
 export function supabaseLeaderboardSource(): LeaderboardSource | null {
   const supabase = getSupabase();

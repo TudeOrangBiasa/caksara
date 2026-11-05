@@ -92,8 +92,8 @@ export function ProfilPage({
   const unlockedCount = badges.filter((b) => b.unlocked).length;
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-[1216px] lg:px-0 lg:pt-7 lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-8 animate-in fade-in duration-500">
-      <div className="flex flex-col gap-4 lg:sticky lg:top-24">
+    <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-[1216px] lg:px-0 lg:pt-7 lg:pb-12 lg:grid lg:grid-cols-[340px_1fr] lg:items-start lg:gap-8 animate-in fade-in duration-500">
+      <div className="flex flex-col gap-4 lg:gap-4">
         <header className="relative flex min-h-[280px] flex-col justify-between overflow-hidden rounded-[20px] p-6">
           <img
             src="/assets/review_family_2d_1788968477297.jpg"
@@ -153,9 +153,9 @@ export function ProfilPage({
 
         <section
           aria-label="Progres belajar"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:gap-3 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)] lg:flex lg:flex-col"
         >
-          <div className="mb-3 flex items-center gap-3 lg:mb-0">
+          <div className="mb-3 flex items-center gap-3 lg:mb-0 lg:gap-3">
             <span className="flex size-[52px] items-center justify-center rounded-full bg-[#FFF3C4] text-[#FFC800]">
               <Trophy className="size-6" aria-hidden />
             </span>
@@ -175,7 +175,7 @@ export function ProfilPage({
             </span>
           </div>
           <div
-            className="mt-2 h-3.5 overflow-hidden rounded-full bg-muted p-0.5 lg:mt-0 lg:h-[14px] lg:p-0"
+            className="mt-2 h-3.5 overflow-hidden rounded-full bg-muted p-0.5 lg:mt-0 lg:h-[14px] lg:p-0.5"
             role="progressbar"
             aria-valuenow={intoLevel}
             aria-valuemin={0}
@@ -197,7 +197,7 @@ export function ProfilPage({
             <button
               type="button"
               onClick={onContinue}
-              className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta px-4 py-3 text-[13px] font-extrabold uppercase tracking-widest text-white shadow-[0_4px_0_0_var(--color-cta-edge)] transition-all duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:mt-0 lg:py-2.5 lg:leading-[16px]"
+              className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta px-4 py-3 text-[13px] font-extrabold uppercase tracking-widest text-white shadow-[0_4px_0_0_var(--color-cta-edge)] transition-all duration-150 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:mt-0 lg:h-10 lg:py-0 lg:leading-[16px]"
             >
               <Play className="size-4 fill-current" aria-hidden />
               Lanjutkan Belajar
@@ -207,7 +207,7 @@ export function ProfilPage({
 
         <section
           aria-label="Koleksi lencana"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:gap-3.5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)] lg:flex lg:flex-col"
         >
           <div className="mb-4 flex items-center justify-between lg:mb-0">
             <div>
@@ -248,7 +248,7 @@ export function ProfilPage({
 
         <section
           aria-label="Mastery aksara"
-          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)]"
+          className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:gap-2.5 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)] lg:flex lg:flex-col"
         >
           <MasteryGrid mastery={profile?.mastery} />
           <p className="mt-3 text-[11px] font-medium text-muted-foreground lg:mt-0 lg:leading-[13px]">
