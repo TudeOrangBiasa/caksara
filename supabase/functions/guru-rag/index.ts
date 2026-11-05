@@ -137,7 +137,7 @@ async function callGemini(
   prompt: string,
   kbIds: ReadonlySet<string>,
 ): Promise<GeminiVerdict | null> {
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const res = await fetch(`${GEMINI_ENDPOINT(GURU_RAG_MODEL)}?key=${apiKey}`, {
         method: "POST",
@@ -151,7 +151,7 @@ async function callGemini(
           },
           contents: [{ parts: [{ text: prompt }] }],
         }),
-        signal: AbortSignal.timeout(20_000),
+        signal: AbortSignal.timeout(30_000),
       });
       if (res.status === 429) return null;
       if (!res.ok) continue;
@@ -174,7 +174,7 @@ async function callGemini(
       if (parsed.data.answer.trim().length === 0 || valid.length === 0) continue;
       return { answer: parsed.data.answer.trim(), entryIds: valid, outside: false };
     } catch {
-      // Timeout/jaringan: coba sekali lagi, lalu 503 → fallback lokal FE.
+      // Timeout/jaringan: coba dua kali lagi, lalu 503 → fallback lokal FE.
     }
   }
   return null;
