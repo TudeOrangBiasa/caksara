@@ -495,33 +495,33 @@ export function LandingHome({
       </section>
 
       {/* TESTIMONI */}
-      <section data-parity="testimoni" className="mt-12 px-2 pt-14 pb-16 lg:px-8">
-        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-foreground lg:text-[44px]">
+      <section data-parity="testimoni" className="mt-12 px-2 pt-14 pb-16 lg:px-8 lg:pt-32 lg:pb-16">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-foreground lg:text-[44px] lg:leading-[52px]">
           Dipercaya 1200+ pelajar Indonesia
         </h2>
-        <p className="mt-3.5 text-center text-base text-muted-foreground">
+        <p className="mt-3.5 text-center text-base text-muted-foreground lg:mt-3.5 lg:leading-[24px]">
           Nilai 5.0 dari ribuan ulasan, gabung dan rasakan mudahnya belajar aksara Bali.
         </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-3 lg:mt-14 lg:gap-6 lg:[column-gap:24px]">
           {LANDING_TESTIMONIES.map((t, i) => (
             <figure
               key={t.id}
               className={
                 i === 1
-                  ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm"
-                  : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm"
+                  ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border-2 lg:bg-cta/10 lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
+                  : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
               }
             >
               <img
                 src={t.avatar}
                 alt=""
-                className="absolute -top-8 left-1/2 size-16 -translate-x-1/2 rounded-full border-2 border-card shadow-md"
+                className="absolute -top-8 left-1/2 size-16 -translate-x-1/2 rounded-full border-2 border-card shadow-md lg:size-16"
               />
-              <figcaption className="text-[15px] font-extrabold text-foreground">
+              <figcaption className="text-[15px] font-extrabold text-foreground lg:leading-[20px]">
                 {t.name}
               </figcaption>
-              <p className="text-[13px] text-muted-foreground">{t.role}</p>
-              <p className="mt-2.5 flex items-center justify-center gap-1.5">
+              <p className="text-[13px] text-muted-foreground lg:leading-[18px]">{t.role}</p>
+              <p className="mt-2.5 flex items-center justify-center gap-1.5 lg:mt-2.5">
                 <span className="flex gap-0.5" aria-label="Rating 5 dari 5">
                   {Array.from({ length: 5 }).map((_, s) => (
                     <Star key={s} className="size-[15px] fill-accent text-accent" aria-hidden />
@@ -529,7 +529,7 @@ export function LandingHome({
                 </span>
                 <span className="text-[13px] font-bold text-foreground">5.0</span>
               </p>
-              <blockquote className="mt-2.5 text-sm leading-relaxed text-foreground/85">
+              <blockquote className="mt-2.5 text-sm leading-relaxed text-foreground/85 lg:leading-[22px]">
                 {t.quote}
               </blockquote>
             </figure>
