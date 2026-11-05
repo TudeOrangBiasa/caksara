@@ -1,6 +1,6 @@
-import { RotateCcw } from "lucide-react";
-
 import { Button } from "@caksara/ui/components/button";
+
+import { Bedawang } from "../../components/bedawang";
 
 import type { QuizResume } from "./quiz-resume";
 
@@ -16,30 +16,46 @@ export function ResumeDialog({ resume, total, onResume, onRestart }: ResumeDialo
     day: "numeric",
     month: "short",
   });
+  const done = Math.min(resume.currentIndex, total);
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Lanjutkan kuis"
-      className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 md:max-w-xl text-center"
+      className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-6 py-8 text-center md:max-w-xl"
     >
-      <span className="flex size-20 items-center justify-center rounded-full bg-accent/20">
-        <RotateCcw className="size-10 text-accent" />
-      </span>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Lanjutkan kuis?</h1>
-      <p className="mt-2 max-w-[32ch] text-sm text-muted-foreground">
+      <Bedawang mood="senang" className="size-20" />
+      <h1 className="mt-4 text-[28px] font-extrabold tracking-tight">Lanjutkan kuis?</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Terakhir sampai soal ke-{resume.currentIndex + 1} dari {total} ({tanggal}).
       </p>
-      <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
+      <div
+        role="progressbar"
+        aria-label={`Progres kuis ${done} dari ${total}`}
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={done}
+        className="mt-5 flex w-full max-w-xs gap-2"
+      >
+        {Array.from({ length: total }, (_, i) => (
+          <span
+            key={i}
+            className={
+              i < done ? "h-3 flex-1 rounded-full bg-cta" : "h-3 flex-1 rounded-full bg-muted"
+            }
+          />
+        ))}
+      </div>
+      <div className="mt-6 flex w-full max-w-xs gap-3">
         <Button
-          variant="cta"
-          className="h-12 w-full text-base font-bold tracking-wide"
-          onClick={onResume}
+          variant="outline"
+          className="h-12 flex-1 rounded-pill border-2 border-b-4"
+          onClick={onRestart}
         >
-          Lanjut dari soal ke-{resume.currentIndex + 1}
-        </Button>
-        <Button variant="outline" className="h-12 w-full" onClick={onRestart}>
           Mulai ulang
+        </Button>
+        <Button variant="cta" className="h-12 flex-1 text-base font-bold" onClick={onResume}>
+          Lanjut dari soal ke-{resume.currentIndex + 1}
         </Button>
       </div>
     </div>
