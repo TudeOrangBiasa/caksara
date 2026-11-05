@@ -1,15 +1,32 @@
-import { Trophy } from "lucide-react";
+import { Trophy, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { formatLeaderboardName } from "../../lib/auth-google";
 import { LEADERBOARD_LIMIT, supabaseLeaderboardSource, topEntries } from "./leaderboard-data";
 import type { LeaderboardEntry, LeaderboardSource } from "./leaderboard-data";
 
-function rankBadge(rank: number): string {
-  if (rank === 1) return "🥇";
-  if (rank === 2) return "🥈";
-  if (rank === 3) return "🥉";
-  return String(rank);
+function nextMondayReset(now = Date.now()): Date {
+  const d = new Date(now);
+  const day = (d.getDay() + 6) % 7;
+  const reset = new Date(d);
+  reset.setHours(0, 0, 0, 0);
+  reset.setDate(reset.getDate() + (7 - day));
+  return reset;
+}
+
+function countdownLabel(now = Date.now()): string {
+  const diff = Math.max(0, nextMondayReset(now).getTime() - now);
+  const days = Math.floor(diff / (24 * 3600 * 1000));
+  const hours = Math.floor((diff % (24 * 3600 * 1000)) / (3600 * 1000));
+  if (days <= 0) return `Sisa ${hours} jam`;
+  return `Sisa ${days} hari`;
+}
+
+function rankStyle(rank: number): string {
+  if (rank === 1) return "bg-[#FFC800] text-[#8a6100]";
+  if (rank === 2) return "bg-muted text-muted-foreground";
+  if (rank === 3) return "bg-[#FFEED1] text-primary";
+  return "bg-transparent text-muted-foreground";
 }
 
 export function LeaderboardCard({
@@ -36,57 +53,76 @@ export function LeaderboardCard({
     };
   }, [source]);
 
+  const mineIndex = entries?.findIndex((e) => e.profile_id === currentProfileId) ?? -1;
+
   return (
     <section
       aria-label="Papan peringkat"
-      className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border/50 border border-border/40"
+      className="overflow-hidden rounded-[20px] border-2 border-b-[5px] border-border bg-card"
     >
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
-          <Trophy className="size-5" />
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-[#FFF3C4] text-[#FFC800]">
+            <Trophy className="size-7" aria-hidden />
+          </span>
+          <div>
+            <p className="text-xl font-extrabold tracking-tight">TOP {LEADERBOARD_LIMIT}</p>
+            <p className="text-xs font-medium text-muted-foreground">Reset tiap Senin</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-            Papan Peringkat
-          </p>
-          <h2 className="text-lg font-extrabold tracking-tight">Top {LEADERBOARD_LIMIT} XP</h2>
-        </div>
+        <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100]">
+          {countdownLabel()}
+        </span>
       </div>
-      {entries === null ? (
-        <p className="text-sm text-muted-foreground">Memuat peringkat…</p>
-      ) : entries.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Belum ada peringkat. Masuk pakai Google biar XP-mu tercatat di sini.
-        </p>
-      ) : (
-        <ol className="flex flex-col gap-2">
-          {entries.map((entry, idx) => {
-            const mine = entry.profile_id === currentProfileId;
-            return (
-              <li
-                key={entry.profile_id}
-                aria-current={mine ? "true" : undefined}
-                className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 ${
-                  mine ? "bg-primary/10 ring-1 ring-primary/20" : "bg-muted/40"
-                }`}
-              >
-                <span
-                  aria-hidden
-                  className="flex w-7 shrink-0 items-center justify-center text-sm font-extrabold tabular-nums"
+      <div className="p-3">
+        {entries === null ? (
+          <p className="px-2 py-4 text-sm text-muted-foreground">Memuat peringkat…</p>
+        ) : entries.length === 0 ? (
+          <p className="px-2 py-4 text-sm text-muted-foreground">
+            Belum ada peringkat. Masuk pakai Google biar XP-mu tercatat di sini.
+          </p>
+        ) : (
+          <ol className="flex flex-col gap-2">
+            {entries.map((entry, idx) => {
+              const rank = idx + 1;
+              const mine = entry.profile_id === currentProfileId;
+              return (
+                <li
+                  key={entry.profile_id}
+                  aria-current={mine ? "true" : undefined}
+                  className={`flex items-center gap-3.5 rounded-2xl border-2 px-4 py-3 ${
+                    mine
+                      ? "border-cta bg-cta/10"
+                      : rank <= 3
+                        ? "border-border/70 bg-muted/40"
+                        : "border-border/50 bg-card"
+                  }`}
                 >
-                  {rankBadge(idx + 1)}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-bold">
-                  {formatLeaderboardName(entry.display_name, entry.suffix)}
-                </span>
-                <span className="shrink-0 text-sm font-extrabold tabular-nums text-success">
-                  {entry.xp} XP
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+                  <span
+                    aria-hidden
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold tabular-nums ${rankStyle(rank)}`}
+                  >
+                    {rank}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-base font-semibold">
+                    {formatLeaderboardName(entry.display_name, entry.suffix)}
+                    {mine && <span className="ml-1.5 text-cta">• Kamu</span>}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-sm font-extrabold tabular-nums text-[#1CB0F6]">
+                    <Zap className="size-4 fill-current" aria-hidden />
+                    {entry.xp} XP
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        {mineIndex >= 0 && (
+          <p className="px-2 pb-1 pt-3 text-xs font-medium text-muted-foreground">
+            Posisimu peringkat #{mineIndex + 1} dari {entries?.length ?? 0} petualang.
+          </p>
+        )}
+      </div>
     </section>
   );
 }

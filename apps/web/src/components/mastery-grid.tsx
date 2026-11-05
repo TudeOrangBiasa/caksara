@@ -1,38 +1,53 @@
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
-const statusColor = {
-  belum: "bg-mastery-belum",
-  dipahami: "bg-mastery-dipahami",
-  ahli: "bg-mastery-ahli",
-};
+const statusBox = {
+  belum: "border-border/60 bg-card text-muted-foreground",
+  dipahami: "border-[#FFC800] bg-[#FFF3C4] shadow-[0_2px_0_0_#FFC800]",
+  ahli: "border-cta bg-cta/10 shadow-[0_2px_0_0_var(--color-cta-edge)]",
+} as const;
+
+const statusTag = {
+  belum: "bg-muted/60 text-muted-foreground",
+  dipahami: "bg-[#FFC800]/25 text-[#8a6100]",
+  ahli: "bg-cta/15 text-cta",
+} as const;
 
 const statusLabel = {
   belum: "Belum",
-  dipahami: "Dipahami",
-  ahli: "Ahli",
-};
+  dipahami: "Lv 1",
+  ahli: "Lv 2",
+} as const;
 
 export function MasteryGrid({
   mastery,
 }: {
   mastery: Record<string, "belum" | "dipahami" | "ahli"> | undefined;
 }) {
+  const unlocked = WRESASTRA_AKSARA.filter((a) => (mastery?.[a.id] ?? "belum") !== "belum").length;
   return (
     <div>
-      <h3 className="mb-2 text-sm font-semibold tracking-tight">Mastery 18 Wresastra</h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-extrabold tracking-tight">Mastery 18 Wresastra</h3>
+        <span className="rounded-full bg-[#DDF4FF] px-2.5 py-1 text-[10px] font-bold text-[#1CB0F6]">
+          {unlocked} / {WRESASTRA_AKSARA.length}
+        </span>
+      </div>
       <div className="grid grid-cols-6 gap-1.5 md:grid-cols-9">
         {WRESASTRA_AKSARA.map((a) => {
           const status = mastery?.[a.id] ?? "belum";
           return (
-            <button
+            <div
               key={a.id}
-              type="button"
-              title={`${a.latin} — ${statusLabel[status]}`}
-              className={`flex flex-col items-center gap-0.5 rounded-lg p-1.5 ${statusColor[status]} opacity-80 hover:opacity-100 transition-opacity`}
+              title={`${a.latin} - ${status === "belum" ? "Belum" : statusLabel[status]}`}
+              className={`flex flex-col items-center gap-1 rounded-xl border-2 px-1 py-2 ${statusBox[status]}`}
             >
               <span className="font-balinese text-lg leading-none">{a.glyph}</span>
-              <span className="text-[9px] font-medium">{statusLabel[status]}</span>
-            </button>
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[9px] font-extrabold ${statusTag[status]}`}
+              >
+                {statusLabel[status]}
+              </span>
+            </div>
           );
         })}
       </div>
