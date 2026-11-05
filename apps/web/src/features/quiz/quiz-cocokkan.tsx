@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@caksara/ui/components/button";
@@ -55,10 +55,14 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      <p className="col-span-2 text-xs text-muted-foreground" role="status" aria-live="polite">
+      <p
+        className="col-span-2 text-xs font-medium text-muted-foreground"
+        role="status"
+        aria-live="polite"
+      >
         {doneCount} dari {pairs.length} pasangan cocok
       </p>
-      <div className="space-y-2" aria-label="Kolom aksara">
+      <div className="flex flex-col gap-2" aria-label="Kolom aksara">
         {pairs.map((p) => {
           const locked = matched[p.left] !== undefined;
           return (
@@ -68,9 +72,9 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
               disabled={disabled || locked}
               onClick={() => setSelectedLeft(p.left)}
               className={cn(
-                "tile-duo font-balinese w-full rounded-xl border-2 p-3 text-2xl transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
+                "tile-duo font-balinese w-full rounded-2xl border-2 p-3 text-base font-bold transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
                 locked
-                  ? "border-cta/60 bg-cta/10 opacity-60"
+                  ? "border-success/60 bg-success/10 text-success opacity-70"
                   : selectedLeft === p.left
                     ? "border-cta bg-cta/10 ring-2 ring-cta/60 shadow-duo"
                     : "border-border bg-card hover:bg-muted/50",
@@ -79,14 +83,14 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
               aria-label={`Aksara ${p.left}${locked ? " (sudah cocok)" : ""}`}
             >
               <span className="inline-flex items-center justify-center gap-2">
-                {locked && <Check className="size-4 shrink-0 text-cta" aria-hidden />}
+                {locked && <Check className="size-4 shrink-0 text-success" aria-hidden />}
                 {p.left}
               </span>
             </button>
           );
         })}
       </div>
-      <div className="space-y-2" aria-label="Kolom arti">
+      <div className="flex flex-col gap-2" aria-label="Kolom arti">
         {rightsShuffled.map((right, i) => {
           const taken = matchedRightTaken[right] === true;
           return (
@@ -96,8 +100,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
               disabled={disabled || selectedLeft === null || taken}
               onClick={() => handleRight(right)}
               className={cn(
-                "tile-duo w-full rounded-xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
-                // Crossfade: kolom kanan menegaskan status tunggu vs siap dipasangkan.
+                "tile-duo w-full rounded-2xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
                 selectedLeft === null || taken ? "opacity-60" : "opacity-100",
               )}
               aria-label={`Arti ${right}${taken ? " (sudah terpasang)" : ""}`}
@@ -112,11 +115,11 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="h-11 w-full rounded-full font-bold"
             onClick={() => setSelectedLeft(null)}
             disabled={disabled}
           >
-            <Check className="size-4" /> Urutkan, pilih pasangan yang cocok
+            <X className="size-4" /> Batalkan pilihan
           </Button>
         </div>
       )}
