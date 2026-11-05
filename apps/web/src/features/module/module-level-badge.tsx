@@ -7,7 +7,7 @@ export function ModuleLevelBadge({ moduleId }: { moduleId: string }) {
     <p
       role="status"
       aria-label={`Level adaptif modul: Level ${level}`}
-      className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold"
+      className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold lg:leading-[14px]"
     >
       <span
         aria-hidden
