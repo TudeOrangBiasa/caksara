@@ -64,7 +64,7 @@ export function Confetti({ active }: { active: boolean }) {
   if (particles.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+    <div data-slot="confetti" className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
       {particles.map((p) => (
         <div
           key={p.id}
