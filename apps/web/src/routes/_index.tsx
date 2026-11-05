@@ -436,6 +436,7 @@ export default function Home() {
         selesai={selesai}
         onOpenSettings={() => setView({ kind: "settings" })}
         onOpenShare={() => setView({ kind: "share" })}
+        onContinue={() => setNavTab("belajar")}
       />
     );
   }
