@@ -95,6 +95,9 @@ beda-nyata 56.013 -> 26.725 (-52%).
 11. Tile kanan cocokkan: Pencil opacity penuh vs app redup
     pra-pilih; app opacity penuh di desktop agar grid cocok,
     stateulisasi lewat disabled + aria tetap jalan.
+12. Tautan "Buka di Basis Pengetahuan" dapat `text-[11px]`
+    (temuan verifier, benign): menyamakan ukuran teks tautan
+    dengan baris sumber 11px, bukan deviasi visual vs Pencil.
 
 ## Yang disamakan tracer ini (struktural, token-safe)
 
