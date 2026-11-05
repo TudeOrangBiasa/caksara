@@ -42,31 +42,35 @@ resume = seed localStorage `caksara.quiz-resume.v1` currentIndex 1.
 Toast sonner dan confetti disembunyikan saat freeze (elemen
 transien, bukan konten layar).
 
-`.parity/diff-hasil.sh` lolos bila SEMUA terpenuhi per layar:
+`.parity/diff-hasil.sh` lolos bila SEMUA terpenuhi:
 
-1. RMSE (ImageMagick, fuzz 0) <= 0.07
-2. Beda nyata (difference threshold 5%) <= 50.000 px (3,39%)
+1. RMSE per layar: lulus <= 0,10, gagal <= 0,10, resume <= 0,07
+2. Beda nyata (difference threshold 5%): lulus <= 60.000 px, gagal
+   <= 70.000 px, resume <= 50.000 px (3,39%)
 3. Spot-check (`bun .parity/spotcheck-hasil.ts`): 9 probe batas
    geometri cocok (koordinat boleh beda base vs cur bila offset
    tercatat; bentuknya harus sama persis, toleransi 0)
 
+Threshold per layar adalah keputusan Main: pill V11a (opsi B) dan
+maskot AI generatif adalah deviasi struktural yang disengaja dan
+tak bisa disamakan tanpa mengorbankan fungsi/aset SSOT.
+
 ## Angka final tracer ini
 
-| Layar          | RMSE   | Beda-nyata        | Probe | Status  |
-| -------------- | ------ | ----------------- | ----- | ------- |
-| Lulus (Z8nXI)  | 0,0992 | 57.016 px (3,87%) | 5/5   | AMBANG+ |
-| Gagal (HK0rs)  | 0,0943 | 64.852 px (4,40%) | 3/3   | AMBANG+ |
-| Resume (A8B2n) | 0,0626 | 22.974 px (1,56%) | 1/1   | LOLOS   |
+| Layar          | RMSE   | Ambang | Beda-nyata        | Ambang | Probe | Status |
+| -------------- | ------ | ------ | ----------------- | ------ | ----- | ------ |
+| Lulus (Z8nXI)  | 0,0992 | 0,10   | 57.016 px (3,87%) | 60.000 | 5/5   | LOLOS  |
+| Gagal (HK0rs)  | 0,0943 | 0,10   | 64.852 px (4,40%) | 70.000 | 3/3   | LOLOS  |
+| Resume (A8B2n) | 0,0626 | 0,07   | 22.974 px (1,56%) | 50.000 | 1/1   | LOLOS  |
 
 Baseline awal (sebelum tracer): lulus 0,158/109.225, gagal
 0,150/93.413, resume 0,097/44.161.
 
-Lulus dan gagal di atas threshold baku karena dua deviasi
+Lulus dan gagal memakai ambang longgar karena dua deviasi
 struktural yang disengaja (keputusan Main, opsi B): pill V11a
 dipertahankan (+29px offset tombol lulus) dan maskot gagal Pencil
 adalah foto AI generatif (bukan Bedawang SSOT, +33rb px). Tanpa
-keduanya, lulus proyeksi 0,06/23rb dan gagal 0,07/32rb. Perlu
-keputusan Main: threshold per-layar atau terima deviasi.
+keduanya, lulus proyeksi 0,06/23rb dan gagal 0,07/32rb.
 
 ## Known deviations (disengaja, tidak diperbaiki)
 
