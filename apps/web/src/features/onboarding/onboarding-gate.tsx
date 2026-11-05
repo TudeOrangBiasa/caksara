@@ -167,9 +167,9 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
       role="dialog"
       aria-modal="true"
       aria-label="Pemandu Mulai Belajar"
-      className="flex min-h-full flex-col justify-between px-4 py-6 sm:py-10"
+      className="flex min-h-full flex-col px-4 py-6 sm:py-10 lg:py-12 lg:pt-12"
     >
-      <div className="mx-auto flex w-full max-w-md flex-1 md:max-w-xl flex-col justify-between">
+      <div className="mx-auto flex w-full max-w-md flex-1 md:max-w-xl lg:max-w-[640px] flex-col">
         <div>
           {isReadyStep ? null : (
             <OnboardingTopBar
@@ -180,7 +180,7 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
             />
           )}
 
-          <main className="pt-2">
+          <main className="pt-2 lg:pt-0">
             {isReadyStep ? (
               offer === "google" ? (
                 <GoogleSaveOffer onGoogle={handleGoogle} onSkip={() => onComplete(resolvedName)} />
@@ -217,11 +217,11 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
         </div>
 
         {isReadyStep ? null : (
-          <footer className="w-full pt-4">
+          <footer className="w-full pt-4 lg:pt-4">
             <Button
               variant="cta"
               size="lg"
-              className="h-14 w-full flex-1 text-[15px] font-extrabold tracking-[0.8px]"
+              className="h-14 w-full flex-1 text-[15px] font-extrabold tracking-[0.8px] lg:h-[52px]"
               onClick={handleNext}
             >
               {step === TOTAL_STEPS - 1 ? "Selesai" : "Lanjut"}

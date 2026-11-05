@@ -23,7 +23,7 @@ export const ONBOARDING_GOALS: OnboardingOption[] = [
   {
     id: "wisata",
     label: "Persiapan Wisata / Tinggal di Bali",
-    desc: "Biar bisa baca plang jalan, pura, dan pura",
+    desc: "Biar bisa baca plang jalan, pura, dan lontar",
   },
 ];
 

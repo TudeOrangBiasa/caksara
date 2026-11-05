@@ -8,20 +8,36 @@ const src = (p: string) => readFileSync(join(webRoot, "src", p), "utf8");
 describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
   const landing = src("features/landing/landing-home.tsx");
 
-  test("tanpa testimoni palsu, href mati, kontak fiktif", () => {
+  test("tanpa href mati", () => {
     // Jarum dibangun saat runtime agar berkas uji ini sendiri tidak cocok
-    // dengan rg penerimaan pada kriteria #88 (nama/kontak/href fiktif).
-    const shame = [
+    // dengan rg penerimaan pada kriteria #88.
+    const shame = [["href=", '"#"'].join("")];
+    for (const needle of shame) {
+      expect(landing.includes(needle)).toBe(false);
+    }
+  });
+  test("testimoni + kontak lomba data-driven, bukan hardcode klaim (#160)", () => {
+    // Pengecualian #160 (keputusan Main): testimoni pitching + kontak footer
+    // tampil apa adanya dari Pencil T4HbK karena guidebook lomba melarang
+    // data asli. Guard: nama/kontak hidup di landing-data.ts, komponen hanya
+    // render via LANDING_TESTIMONIES/LANDING_CONTACTS.
+    expect(landing.includes("LANDING_TESTIMONIES")).toBe(true);
+    expect(landing.includes("LANDING_CONTACTS")).toBe(true);
+    const dataDriven = [
       ["Bapak", "Wayan"].join(" "),
       ["Ibu", "Putu"].join(" "),
       ["Dek", "Made"].join(" "),
       ["Bli", "Agung"].join(" "),
-      ["href=", '"#"'].join(""),
       ["123", "456"].join(" "),
       ["halo", "caksara"].join("@"),
     ];
-    for (const needle of shame) {
+    for (const needle of dataDriven) {
       expect(landing.includes(needle)).toBe(false);
+    }
+    const data = src("features/landing/landing-data.ts");
+    // Baris 1 tampil; baris 2 nonaktif di Pencil (row2 enabled=false).
+    for (const needle of dataDriven.filter((n) => !n.includes("Putu") && !n.includes("Made"))) {
+      expect(data.includes(needle)).toBe(true);
     }
   });
   test("hero satu CTA primary", () => {

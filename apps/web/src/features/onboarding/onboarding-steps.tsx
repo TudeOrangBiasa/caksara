@@ -49,9 +49,9 @@ export function MascotBubble({
   subtitle?: string;
 }) {
   return (
-    <div className="flex items-center gap-4 pt-4">
-      <Bedawang mood={mood} className="size-24 shrink-0 drop-shadow-xs" />
-      <div className="flex flex-1 flex-col gap-2 rounded-2xl border-2 border-border bg-card p-4 text-left shadow-sm">
+    <div className="flex items-center gap-4 pt-4 lg:pt-4">
+      <Bedawang mood={mood} className="size-24 shrink-0 drop-shadow-xs lg:size-[96px]" />
+      <div className="flex flex-1 flex-col gap-2 rounded-2xl border-2 border-border bg-card p-4 text-left shadow-sm lg:rounded-xl lg:p-4">
         <p className="text-[15px] font-bold text-foreground">{title}</p>
         {subtitle ? <p className="text-[15px] text-foreground">{subtitle}</p> : null}
       </div>
@@ -69,7 +69,7 @@ export function OptionPicker({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div role="radiogroup" className="flex flex-col gap-3 pt-4">
+    <div role="radiogroup" className="flex flex-col gap-3 pt-4 lg:gap-3 lg:pt-4 lg:[row-gap:12px]">
       {options.map((opt) => {
         const isSelected = opt.id === selectedId;
         const Icon = OPTION_ICONS[opt.id as keyof typeof OPTION_ICONS] ?? Sparkles;
@@ -81,9 +81,9 @@ export function OptionPicker({
             aria-checked={isSelected}
             onClick={() => onSelect(opt.id)}
             className={cn(
-              "flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]",
+              "flex w-full items-center gap-3 rounded-xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:gap-3 lg:rounded-xl lg:p-3.5 lg:[padding:14px]",
               isSelected
-                ? "border-cta bg-cta/10 text-foreground ring-2 ring-cta/60 shadow-duo"
+                ? "border-cta bg-cta/10 text-foreground ring-2 ring-cta/60 shadow-duo lg:bg-cta/10 lg:ring-0 lg:shadow-none"
                 : "border-border bg-card text-foreground hover:bg-muted/40",
             )}
           >
@@ -102,7 +102,7 @@ export function OptionPicker({
               <p className="text-[13px] text-muted-foreground">{opt.desc}</p>
             </div>
             {isSelected && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cta px-2.5 py-1 text-[11px] font-bold text-primary-foreground">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cta px-2.5 py-1 text-[11px] font-bold text-primary-foreground lg:hidden">
                 <Check className="size-3.5" aria-hidden /> Dipilih
               </span>
             )}
@@ -127,7 +127,7 @@ export function OnboardingTopBar({
   const progressPercent = Math.min(100, Math.round(((step + 1) / totalSteps) * 100));
 
   return (
-    <header className="flex items-center gap-3 pb-4">
+    <header className="flex items-center gap-3 pb-4 lg:gap-3 lg:pb-0">
       {step > 0 ? (
         <Button
           variant="ghost"
@@ -139,10 +139,10 @@ export function OnboardingTopBar({
           <ArrowLeft className="size-5" />
         </Button>
       ) : (
-        <div className="size-8 shrink-0" />
+        <div className="size-8 shrink-0 lg:hidden" />
       )}
-      <div className="flex-1">
-        <p className="mb-1.5 text-[13px] font-extrabold tracking-[0.8px] text-muted-foreground">
+      <div className="flex-1 lg:flex lg:flex-col lg:gap-1.5">
+        <p className="mb-1.5 text-[13px] font-extrabold tracking-[0.8px] text-muted-foreground lg:mb-0">
           LANGKAH {step + 1} DARI {totalSteps}
         </p>
         <div
@@ -151,7 +151,7 @@ export function OnboardingTopBar({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Langkah ${step + 1} dari ${totalSteps}`}
-          className="flex w-full gap-2"
+          className="flex w-full gap-2 lg:gap-2"
         >
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
@@ -175,9 +175,9 @@ export function OnboardingTopBar({
 
 function StepMeta({ label, question }: { label: string; question: string }) {
   return (
-    <div className="pt-5">
+    <div className="pt-5 lg:flex lg:flex-col lg:gap-2 lg:pt-5 lg:[padding-top:20px]">
       <p className="text-[13px] font-extrabold tracking-[0.8px] text-muted-foreground">{label}</p>
-      <p className="pt-2 text-[22px] font-extrabold text-foreground">{question}</p>
+      <p className="pt-2 text-[22px] font-extrabold text-foreground lg:pt-0">{question}</p>
     </div>
   );
 }
@@ -185,7 +185,7 @@ function StepMeta({ label, question }: { label: string; question: string }) {
 export function StepGoal({ goal, onSelect }: { goal: string; onSelect: (v: string) => void }) {
   return (
     <div>
-      <StepMeta label="PILIH SATU ALASAN" question="Kenapa ingin belajar Aksara Bali?" />
+      <StepMeta label="PILIH SATU ALASAN" question="Apa alasan utamamu belajar Aksara Bali?" />
       <MascotBubble
         mood="senang"
         title="Om Swastyastu! Aku Bedawang Nala."

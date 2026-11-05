@@ -2,16 +2,22 @@ import {
   ArrowRight,
   BookOpen,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Feather,
   Gamepad2,
   Heart,
   Layers,
   LibraryBig,
+  Mail,
   MessageCircle,
   MessageCircleQuestion,
   Mic,
+  Phone,
+  Search,
   Sparkles,
+  Star,
   X,
 } from "lucide-react";
 
@@ -22,7 +28,7 @@ import { cn } from "@caksara/ui/lib/utils";
 import { Bedawang } from "../../components/bedawang";
 import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import type { NavTab } from "../../components/nav-tabs";
-import { ArtGuru, ArtLontar, ArtQuiz } from "./approach-art";
+import { LANDING_CONTACTS, LANDING_TESTIMONIES } from "./landing-data";
 
 const FAQS = [
   {
@@ -156,6 +162,84 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
     </div>
   );
 }
+function DemoKuis() {
+  return (
+    <div className="flex w-full flex-col gap-3 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <p className="text-[15px] font-semibold text-foreground">Susun menjadi sapaan swastiastu</p>
+      <div className="flex min-h-12 items-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 p-2">
+        <span className="rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground">
+          swa
+        </span>
+        <span className="rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground">
+          stu
+        </span>
+      </div>
+      <div className="flex gap-2">
+        {["swa", "s", "ti"].map((t) => (
+          <span
+            key={t}
+            className="rounded-lg border-2 border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground"
+          >
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DemoChat() {
+  return (
+    <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <div className="flex items-center gap-2">
+        <Bedawang mood="senang" className="size-8 shrink-0" />
+        <div className="flex flex-col">
+          <p className="text-[11px] font-extrabold tracking-[0.8px] text-muted-foreground">
+            GURU VIRTUAL
+          </p>
+          <p className="text-base font-extrabold text-foreground">Bedawang Nala</p>
+        </div>
+        <span className="ml-auto rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
+          Online
+        </span>
+      </div>
+      <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm text-primary-foreground">
+        Jelaskan hari raya Nyepi
+      </p>
+      <div className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm leading-relaxed text-foreground">
+        <p className="font-bold">Nyepi</p>
+        <p className="text-muted-foreground">
+          Tahun Baru Saka. Sehari penuh hening: tidak menyalakan api, tidak bekerja, tidak
+          bepergian, dan tidak bersenang-senang.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function DemoKamus() {
+  return (
+    <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <div className="flex items-center gap-2 rounded-full bg-muted px-3.5 py-2.5">
+        <Search className="size-4 shrink-0 text-muted-foreground" />
+        <p className="text-[13px] text-muted-foreground">Cari: suksma...</p>
+      </div>
+      {[
+        { g: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬱ᭄ᬫ", l: "matur suksma" },
+        { g: "ᬒᬁ ᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ", l: "om swastiastu" },
+        { g: "ᬭᬳᬚᭂᬂ", l: "rahajeng" },
+      ].map((e) => (
+        <div key={e.l} className="flex items-center gap-3 rounded-2xl bg-muted/60 px-3 py-2.5">
+          <span lang="ban" className="font-balinese text-2xl leading-none text-primary">
+            {e.g}
+          </span>
+          <span className="text-sm font-semibold text-foreground">{e.l}</span>
+        </div>
+      ))}
+      <p className="text-xs text-muted-foreground">+ 24 entri lainnya dan masih banyak lagi</p>
+    </div>
+  );
+}
 
 function ZigzagRow({
   title,
@@ -215,9 +299,7 @@ function ZigzagRow({
         {action}
       </div>
       <div className={cn("w-full max-w-[460px] flex-col items-center", artFirst && "lg:order-1")}>
-        <div className="w-full rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
-          <div className="h-56 w-full overflow-hidden rounded-2xl">{art}</div>
-        </div>
+        {art}
       </div>
     </div>
   );
@@ -234,21 +316,21 @@ const APPROACH = [
   {
     icon: Gamepad2,
     title: "Menyenangkan",
-    desc: "Belajar lewat kuis seru dan interaktif.",
+    desc: "Kuis seru dan interaktif bikin ketagihan.",
     tilt: "lg:-rotate-2",
     dark: true,
   },
   {
     icon: LibraryBig,
     title: "Kamus Lengkap",
-    desc: "Lebih dari 27+ entri budaya dan aksara.",
+    desc: "Lebih dari 27 entri budaya dan aksara.",
     tilt: "lg:-rotate-2",
     dark: false,
   },
   {
     icon: MessageCircleQuestion,
     title: "Pendamping",
-    desc: "Guru virtual siap membantu kapan saja.",
+    desc: "Guru virtual siap membantumu kapan saja.",
     tilt: "lg:rotate-2",
     dark: true,
   },
@@ -273,14 +355,17 @@ export function LandingHome({
   return (
     <div className="mx-auto w-full max-w-lg px-4 pt-12 pb-16 md:max-w-2xl lg:max-w-7xl lg:px-8">
       {/* HERO */}
-      <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-12">
+      <section
+        data-parity="hero"
+        className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-12"
+      >
         <div className="flex flex-col gap-7 text-center lg:text-left">
           <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-5xl lg:leading-[53px] lg:tracking-[-1.6px]">
-            Pelajari Aksara Bali, Pelan tapi Pasti.
+            Cara paling seru belajar Aksara Bali!
           </h1>
           <p className="text-base leading-relaxed text-muted-foreground lg:text-[17px] lg:leading-[28px]">
-            Temukan kekayaan warisan budaya Bali melalui modul interaktif dan kuis seru. Dari sapaan
-            sehari-hari hingga wresastra yang bermakna.
+            Pelajaran singkat yang seru, dapat poin dan naik level sambil belajar komunikasi nyata
+            sehari-hari.
           </p>
           <div className="flex justify-center lg:justify-start">
             <button
@@ -297,7 +382,7 @@ export function LandingHome({
       </section>
 
       {/* WHY US */}
-      <section className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8">
+      <section data-parity="pendekatan" className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8">
         <h2 className="text-center text-[30px] font-extrabold text-cta">Pendekatan Kami</h2>
         <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row md:flex-wrap lg:flex-nowrap">
           {APPROACH.map((w) => (
@@ -345,29 +430,29 @@ export function LandingHome({
       </section>
 
       {/* ZIGZAG */}
-      <section className="mt-12 px-2 pt-14 pb-16 lg:px-8">
+      <section data-parity="zigzag" className="mt-12 px-2 pt-14 pb-16 lg:px-8">
         <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-cta">
           Kenapa Belajar di Sini?
         </h2>
         <div className="mt-16 flex flex-col gap-16 lg:mt-24 lg:gap-32">
           <ZigzagRow
             title="Kuis Seru & Menantang"
-            desc="Uji kemampuan membaca dan menyusun aksara dengan gamifikasi."
-            art={<ArtQuiz />}
+            desc="Belajar aksara Bali jadi lebih menyenangkan! Susun kata, kumpulkan XP, dan taklukkan bentuk gantungan yang rumit. Jaga streak harianmu dan lihat progresmu setiap hari!"
+            art={<DemoKuis />}
             artFirst={false}
             reduceMotion={reduceMotion}
           />
           <ZigzagRow
             title="Guru Virtual Cerdas"
-            desc="Tanya apa saja seputar aksara dan budaya, kapan saja."
-            art={<ArtGuru />}
+            desc="Punya pertanyaan? Tanya kapan saja! Guru virtual siap memberikan penjelasan praktis lengkap dengan contoh penggunaan sehari-hari, aktif 24/7."
+            art={<DemoChat />}
             artFirst
             reduceMotion={reduceMotion}
           />
           <ZigzagRow
             title="Kamus Budaya"
-            desc="Eksplorasi entri kebudayaan dan filosofi Bali terdalam."
-            art={<ArtLontar />}
+            desc="Bukan sekadar kamus biasa. Pelajari konteks kata, waktu pengucapan, hingga gestur yang tepat dari penutur asli Bali agar kamu makin percaya diri."
+            art={<DemoKamus />}
             artFirst={false}
             reduceMotion={reduceMotion}
             action={
@@ -383,8 +468,69 @@ export function LandingHome({
         </div>
       </section>
 
+      {/* TESTIMONI */}
+      <section data-parity="testimoni" className="mt-12 px-2 pt-14 pb-16 lg:px-8">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-foreground lg:text-[44px]">
+          Dipercaya 1200+ pelajar Indonesia
+        </h2>
+        <p className="mt-3.5 text-center text-base text-muted-foreground">
+          Nilai 5.0 dari ribuan ulasan, gabung dan rasakan mudahnya belajar aksara Bali.
+        </p>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {LANDING_TESTIMONIES.map((t, i) => (
+            <figure
+              key={t.id}
+              className={
+                i === 1
+                  ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm"
+                  : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm"
+              }
+            >
+              <img
+                src={t.avatar}
+                alt=""
+                className="absolute -top-8 left-1/2 size-16 -translate-x-1/2 rounded-full border-2 border-card shadow-md"
+              />
+              <figcaption className="text-[15px] font-extrabold text-foreground">
+                {t.name}
+              </figcaption>
+              <p className="text-[13px] text-muted-foreground">{t.role}</p>
+              <p className="mt-2.5 flex items-center justify-center gap-1.5">
+                <span className="flex gap-0.5" aria-label="Rating 5 dari 5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="size-[15px] fill-accent text-accent" aria-hidden />
+                  ))}
+                </span>
+                <span className="text-[13px] font-bold text-foreground">5.0</span>
+              </p>
+              <blockquote className="mt-2.5 text-sm leading-relaxed text-foreground/85">
+                {t.quote}
+              </blockquote>
+            </figure>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="flex gap-2" aria-hidden>
+            <span className="h-2 w-6 rounded-full bg-primary" />
+            <span className="size-2 rounded-full bg-muted" />
+            <span className="size-2 rounded-full bg-muted" />
+          </div>
+          <div className="flex gap-3">
+            <span className="flex size-12 items-center justify-center rounded-full border border-border bg-card">
+              <ChevronLeft className="size-5 text-muted-foreground" />
+            </span>
+            <span className="flex size-12 items-center justify-center rounded-full bg-foreground">
+              <ChevronRight className="size-5 text-background" />
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section className="mt-12 flex flex-col gap-8 bg-background px-2 pt-16 lg:flex-row lg:gap-[90px] lg:px-8">
+      <section
+        data-parity="faq"
+        className="mt-12 flex flex-col gap-8 bg-background px-2 pt-16 lg:flex-row lg:gap-[90px] lg:px-8"
+      >
         <div className="flex flex-col gap-5 lg:w-[340px] lg:shrink-0">
           <h2 className="text-[40px] leading-[46px] font-extrabold tracking-[-1px] text-cta">
             Sering Ditanyakan
@@ -408,7 +554,7 @@ export function LandingHome({
       </section>
 
       {/* OVERLAPPING CTA & FOOTER */}
-      <div className="relative mt-32 w-full">
+      <div data-parity="cta-footer" className="relative mt-32 w-full">
         {/* CTA - Scattered Avatars Design */}
         <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6">
           <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:rounded-[48px] lg:p-[84px_64px]">
@@ -604,12 +750,45 @@ export function LandingHome({
                 </li>
               </ul>
             </div>
+
+            {/* Column 4: Kontak Kami (data lomba, Pencil T4HbK) */}
+            <div className="flex flex-col gap-4">
+              <h3 className="font-bold text-foreground">Kontak Kami</h3>
+              <ul className="flex flex-col gap-3">
+                {LANDING_CONTACTS.map((c) => (
+                  <li key={c.id}>
+                    <a
+                      href={c.href}
+                      className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                        {c.id === "telp" ? (
+                          <Phone className="size-4 text-primary" />
+                        ) : (
+                          <Mail className="size-4 text-primary" />
+                        )}
+                      </span>
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row">
             <p className="text-sm font-medium text-muted-foreground">
               © 2026 CAKSARA. Seluruh hak cipta dilindungi.
             </p>
+            <div className="flex gap-6">
+              <span className="text-[13px] font-medium text-muted-foreground">
+                Kebijakan Privasi
+              </span>
+              <span className="text-[13px] font-medium text-muted-foreground">
+                Syarat Penggunaan
+              </span>
+              <span className="text-[13px] font-medium text-muted-foreground">Peta Situs</span>
+            </div>
           </div>
         </footer>
       </div>
