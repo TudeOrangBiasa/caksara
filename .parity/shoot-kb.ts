@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   await page.goto(BASE, { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Lewati" }).waitFor();
   for (let i = 0; i < 4; i++) {
-    await page.getByRole("button", { name: "Lewati" }).first().focus();
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.addStyleTag({ content: KILL_ANIM });
     await page.waitForTimeout(300);
     await page.screenshot({ path: `${DIR}onboarding-step${i}.png` });
@@ -48,13 +48,23 @@ async function main(): Promise<void> {
   if ((await skipSave.count()) > 0) await skipSave.click();
   await page.waitForTimeout(1200);
 
-  // KB list: full page (baseline 1440x1318).
+  // KB list: jahit 2 viewport (header statis + main scroll internal).
+  // Atas: viewport penuh (header 65 + konten 962). Bawah: scroll main ke
+  // dasar lalu crop konten saja, tempel di bawah.
   await page.getByRole("button", { name: "KB", exact: true }).click();
   await page.waitForSelector("text=Basis Pengetahuan");
   await page.waitForTimeout(1200);
   await page.addStyleTag({ content: KILL_ANIM });
   await page.waitForTimeout(300);
-  await page.screenshot({ path: `${DIR}kb-list.png`, fullPage: true });
+  await page.screenshot({ path: `${DIR}kb-list-top.png` });
+  await page.evaluate(() => {
+    document.querySelector("main.flex-1")?.scrollTo(0, 99999);
+  });
+  await page.waitForTimeout(400);
+  await page.locator("main.flex-1").screenshot({ path: `${DIR}kb-list-bot.png` });
+  await page.evaluate(() => {
+    document.querySelector("main.flex-1")?.scrollTo(0, 0);
+  });
 
   // Landing sections: scroll tiap seksi ke atas viewport lalu crop.
   await page.getByRole("button", { name: "Beranda", exact: true }).click();

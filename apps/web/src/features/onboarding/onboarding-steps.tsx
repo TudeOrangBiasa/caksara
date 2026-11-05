@@ -182,7 +182,7 @@ export function OnboardingTopBar({
         variant="ghost"
         size="sm"
         onClick={onSkip}
-        className="h-auto shrink-0 border-0 px-0 py-0 text-[13px] font-medium leading-4 text-muted-foreground/70 hover:bg-transparent hover:text-foreground"
+        className="h-auto shrink-0 border-0 px-0 py-0 text-[13px] font-medium leading-4 text-muted-foreground/70 hover:bg-transparent hover:text-foreground lg:font-normal"
       >
         Lewati
       </Button>
