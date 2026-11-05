@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronsRight, Clock, ListChecks, Play } from "lucide-react";
+import { ArrowLeft, Clock, ListChecks } from "lucide-react";
 
 import type { CourseModule } from "./module-data";
 import { ModuleLevelBadge } from "./module-level-badge";
@@ -28,49 +28,49 @@ export function ModuleDetail({
 
       {/* Left Column */}
       <div className="flex flex-col gap-6">
-        <div className="relative overflow-hidden rounded-[1.75rem] shadow-xl shadow-primary/20 min-h-[280px] flex flex-col justify-end p-6 group">
+        <div className="group relative flex min-h-[240px] flex-col justify-end overflow-hidden rounded-2xl">
           <img
-            src="/assets/study_mascot_2d_1788968332573.jpg"
+            src="/assets/hero-modul.jpg"
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
 
-          <div className="relative z-10 flex flex-col gap-3">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/70">
+          <div className="relative z-10 flex flex-col gap-2 p-6">
+            <div className="mb-1 flex items-center justify-between gap-3">
+              <p className="text-[13px] font-bold uppercase tracking-widest text-white/70">
                 Modul {mod.order} · {mod.theme}
               </p>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-sm font-bold text-white shadow-inner backdrop-blur-md">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-white/20 text-sm font-bold text-white shadow-inner backdrop-blur-md">
                 {mod.order}
               </span>
             </div>
 
             <div>
-              <h1 className="text-[28px] font-extrabold tracking-tight leading-tight text-white md:text-[32px]">
+              <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-white md:text-4xl">
                 {mod.title}
               </h1>
-              <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[95%]">
+              <p className="mt-1.5 max-w-[95%] text-sm leading-relaxed text-white/90">
                 {mod.description}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
-          <p className="mb-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="flex flex-col gap-5 rounded-2xl bg-card p-6 shadow-sm ring-1 ring-border">
+          <p className="text-[13px] font-extrabold uppercase tracking-widest text-muted-foreground">
             Yang akan kamu pelajari
           </p>
-          <div className="space-y-3">
+          <div className="space-y-5">
             {mod.poinBelajar.map((item, i) => (
               <div
                 key={item}
-                className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10 transition-colors hover:bg-primary/10"
+                className="flex items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-border"
               >
-                <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
                   <span className="text-[11px] font-bold">{i + 1}</span>
                 </div>
-                <span className="text-[13px] font-medium leading-relaxed">{item}</span>
+                <span className="text-sm font-bold leading-relaxed">{item}</span>
               </div>
             ))}
           </div>
@@ -78,17 +78,17 @@ export function ModuleDetail({
       </div>
 
       {/* Right Column (Sticky Sidebar on Desktop) */}
-      <div className="mt-8 lg:mt-0 lg:sticky lg:top-24 flex flex-col gap-5 bg-card lg:p-6 lg:rounded-[1.75rem] lg:shadow-sm lg:ring-1 lg:ring-border/50">
+      <div className="mt-8 flex flex-col gap-5 bg-card lg:sticky lg:top-24 lg:mt-0 lg:rounded-2xl lg:p-6 lg:shadow-sm lg:ring-1 lg:ring-border">
         <ModuleLevelBadge moduleId={mod.id} />
-        <div className="flex flex-col gap-3 mb-2">
-          <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+        <div className="mb-2 flex flex-col gap-3">
+          <span className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
               <ListChecks className="size-4" />
             </div>
             {mod.jumlahSoal} Pertanyaan Kuis
           </span>
-          <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <span className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Clock className="size-4" />
             </div>
             Estimasi ±{mod.estimasiMenit} Menit
@@ -99,21 +99,15 @@ export function ModuleDetail({
           type="button"
           onClick={onStart}
           aria-label="Mulai belajar"
-          className="hidden w-full cursor-pointer items-center gap-3 rounded-pill border-2 border-transparent bg-cta p-2 pr-5 text-left text-primary-foreground uppercase shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:flex"
+          className="hidden w-full cursor-pointer items-center justify-center rounded-pill bg-cta p-4 text-center text-base font-bold uppercase tracking-wide text-primary-foreground shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:flex"
         >
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-3xl bg-white/20 shadow-inner">
-            <Play className="size-6 fill-current translate-x-0.5" />
-          </span>
-          <span className="flex-1 text-center text-base font-bold tracking-wide">
-            Mulai Belajar
-          </span>
-          <ChevronsRight className="size-6 shrink-0 opacity-70" />
+          Mulai Belajar
         </button>
 
         <button
           type="button"
           onClick={onBack}
-          className="hidden lg:block mt-2 text-center text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-2 hidden text-center text-[13px] font-bold uppercase text-muted-foreground transition-colors hover:text-foreground lg:block"
         >
           Kembali ke Kurikulum
         </button>
@@ -124,15 +118,9 @@ export function ModuleDetail({
           type="button"
           onClick={onStart}
           aria-label="Mulai belajar"
-          className="flex w-full cursor-pointer items-center gap-3 rounded-pill border-2 border-transparent bg-cta p-2 pr-5 text-left text-primary-foreground uppercase shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none"
+          className="flex w-full cursor-pointer items-center justify-center rounded-pill bg-cta p-4 text-center text-base font-bold uppercase tracking-wide text-primary-foreground shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none"
         >
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-3xl bg-white/20 shadow-inner">
-            <Play className="size-6 fill-current translate-x-0.5" />
-          </span>
-          <span className="flex-1 text-center text-base font-bold tracking-wide">
-            Mulai Belajar
-          </span>
-          <ChevronsRight className="size-6 shrink-0 opacity-70" />
+          Mulai Belajar
         </button>
       </div>
     </div>
