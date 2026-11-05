@@ -398,18 +398,23 @@ export function LandingHome({
       </section>
 
       {/* WHY US */}
-      <section data-parity="pendekatan" className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8">
-        <h2 className="text-center text-[30px] font-extrabold text-cta">Pendekatan Kami</h2>
-        <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row md:flex-wrap lg:flex-nowrap">
+      <section
+        data-parity="pendekatan"
+        className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8 lg:pt-12 lg:pb-14"
+      >
+        <h2 className="text-center text-[30px] font-extrabold text-cta lg:leading-[36px]">
+          Pendekatan Kami
+        </h2>
+        <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row md:flex-wrap lg:flex-nowrap lg:mt-8 lg:gap-6">
           {APPROACH.map((w) => (
             <div
               key={w.title}
               className={cn(
-                "flex h-[184px] w-full max-w-57 flex-col gap-2 rounded-[20px] border-2 p-[18px] transition-transform hover:-translate-y-1",
+                "flex h-[184px] w-full max-w-57 flex-col gap-2 rounded-[20px] border-2 p-[18px] transition-transform hover:-translate-y-1 lg:h-[184px] lg:w-[228px] lg:max-w-none lg:gap-2 lg:rounded-[20px] lg:border-2 lg:p-[18px] lg:[row-gap:8px]",
                 w.tilt,
                 w.dark
-                  ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_0_0_var(--primary)]"
-                  : "border-border bg-card shadow-[0_4px_0_0_var(--border)]",
+                  ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_0_0_var(--primary)] lg:shadow-none"
+                  : "border-border bg-card shadow-[0_4px_0_0_var(--border)] lg:shadow-none",
               )}
             >
               <span
@@ -420,12 +425,17 @@ export function LandingHome({
               >
                 <w.icon className={cn("size-5", w.dark ? "text-white" : "text-primary")} />
               </span>
-              <h3 className={cn("text-sm font-extrabold", w.dark ? undefined : "text-foreground")}>
+              <h3
+                className={cn(
+                  "text-sm font-extrabold lg:text-sm lg:leading-[18px]",
+                  w.dark ? undefined : "text-foreground",
+                )}
+              >
                 {w.title}
               </h3>
               <p
                 className={cn(
-                  "text-xs leading-relaxed",
+                  "text-xs leading-relaxed lg:leading-[18px]",
                   w.dark ? "text-primary-foreground/80" : "text-foreground/80",
                 )}
               >
