@@ -394,7 +394,7 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
       {streak > 0 && litCount < 7 && (
         <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-extrabold text-[#B4622D]">
           <Flame className="size-3.5 fill-current" aria-hidden />
-          Besok: +20 XP bonus streak
+          Belajar tiap hari jaga streakmu
         </p>
       )}
     </section>

@@ -5,23 +5,6 @@ import { formatLeaderboardName } from "../../lib/auth-google";
 import { LEADERBOARD_LIMIT, supabaseLeaderboardSource, topEntries } from "./leaderboard-data";
 import type { LeaderboardEntry, LeaderboardSource } from "./leaderboard-data";
 
-function nextMondayReset(now = Date.now()): Date {
-  const d = new Date(now);
-  const day = (d.getDay() + 6) % 7;
-  const reset = new Date(d);
-  reset.setHours(0, 0, 0, 0);
-  reset.setDate(reset.getDate() + (7 - day));
-  return reset;
-}
-
-function countdownLabel(now = Date.now()): string {
-  const diff = Math.max(0, nextMondayReset(now).getTime() - now);
-  const days = Math.floor(diff / (24 * 3600 * 1000));
-  const hours = Math.floor((diff % (24 * 3600 * 1000)) / (3600 * 1000));
-  if (days <= 0) return `Sisa ${hours} jam`;
-  return `Sisa ${days} hari`;
-}
-
 function rankStyle(rank: number): string {
   if (rank === 1) return "bg-[#FFC800] text-[#8a6100]";
   if (rank === 2) return "bg-muted text-muted-foreground";
@@ -67,11 +50,11 @@ export function LeaderboardCard({
           </span>
           <div>
             <p className="text-xl font-extrabold tracking-tight">TOP {LEADERBOARD_LIMIT}</p>
-            <p className="text-xs font-medium text-muted-foreground">Reset tiap Senin</p>
+            <p className="text-xs font-medium text-muted-foreground">Liga mingguan</p>
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100]">
-          {countdownLabel()}
+          {LEADERBOARD_LIMIT} teratas
         </span>
       </div>
       <div className="p-3">
