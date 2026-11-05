@@ -29,6 +29,7 @@ async function main(): Promise<void> {
   await page.goto(BASE, { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Lewati" }).waitFor();
   for (let i = 0; i < 4; i++) {
+    await page.getByRole("button", { name: "Lewati" }).first().focus();
     await page.addStyleTag({ content: KILL_ANIM });
     await page.waitForTimeout(300);
     await page.screenshot({ path: `${DIR}onboarding-step${i}.png` });
