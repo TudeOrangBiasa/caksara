@@ -90,7 +90,7 @@ describe("Streak", () => {
   });
 });
 
-describe("Bonus Streak +20 XP", () => {
+describe("Bonus Streak harian", () => {
   test("streak bertambah memberi bonus sekali per hari", () => {
     const grown = touchStreakOnActivity({ ...fresh(), xp: 40 }, parseWitaDate("2026-09-05"));
     const first = applyStreakBonus(grown, parseWitaDate("2026-09-05"));
