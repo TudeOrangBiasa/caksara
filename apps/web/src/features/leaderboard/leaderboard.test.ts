@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
-import { topEntries } from "./leaderboard-data";
+import { isResetMingguIni, topEntries, weekStartSenin } from "./leaderboard-data";
 import type { LeaderboardEntry } from "./leaderboard-data";
+import { parseWitaDate } from "../../lib/zod/game-state";
 
 function entry(profile_id: string, xp: number): LeaderboardEntry {
   return { profile_id, display_name: profile_id, suffix: 100, xp };
@@ -36,5 +37,25 @@ describe("topEntries (#89: ≤20 baris, XP desc)", () => {
     const rows = [entry("a", 1), entry("b", 2)];
     topEntries(rows, 20);
     expect(rows[0]?.profile_id).toBe("a");
+  });
+});
+
+describe("pekan liga reset tiap Senin WITA", () => {
+  test("Senin membuka pekan baru", () => {
+    expect(weekStartSenin(parseWitaDate("2026-09-07"))).toBe("2026-09-07");
+    expect(isResetMingguIni(parseWitaDate("2026-09-07"))).toBe(true);
+  });
+
+  test("Selasa sampai Minggu ikut pekan Senin yang sama", () => {
+    expect(weekStartSenin(parseWitaDate("2026-09-08"))).toBe("2026-09-07");
+    expect(weekStartSenin(parseWitaDate("2026-09-13"))).toBe("2026-09-07");
+    expect(isResetMingguIni(parseWitaDate("2026-09-08"))).toBe(false);
+    expect(isResetMingguIni(parseWitaDate("2026-09-12"))).toBe(false);
+    expect(isResetMingguIni(parseWitaDate("2026-09-13"))).toBe(false);
+  });
+
+  test("Senin berikutnya membuka pekan baru lagi", () => {
+    expect(weekStartSenin(parseWitaDate("2026-09-14"))).toBe("2026-09-14");
+    expect(isResetMingguIni(parseWitaDate("2026-09-14"))).toBe(true);
   });
 });

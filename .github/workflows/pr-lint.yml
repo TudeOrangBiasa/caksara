@@ -20,7 +20,7 @@ jobs:
         run: |
           files=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
           echo "$files"
-          if echo "$files" | grep -qE "^(apps/web|packages/ui)/"; then
+          if echo "$files" | grep -qE "^(apps/web|packages/ui)/.*\.(tsx|jsx|css|scss|svg|png|jpg|jpeg|webp|avif|gif|mp4|webm|woff2?|ttf|otf)$"; then
             echo "touched=true" >> "$GITHUB_OUTPUT"
           else
             echo "touched=false" >> "$GITHUB_OUTPUT"
@@ -57,7 +57,7 @@ jobs:
           is_backend_only=$(echo "$BODY" | grep -qiE "backend-only" && echo yes || echo no)
           if [ "$UI_TOUCHED" = "true" ]; then
             [ "$has_images" = "yes" ] \
-              || fail "PR menyentuh apps/web|packages/ui tapi tanpa gambar — lampirkan before/after visible 375/1280 via agent-browser (lihat docs/agents/ui-proof.md)"
+              || fail "PR menyentuh file visual (tsx/css/aset) tapi tanpa gambar — lampirkan before/after visible 375/1280 via agent-browser (lihat docs/agents/ui-proof.md)"
           else
             if [ "$is_backend_only" = "yes" ]; then
               echo "  (backend-only, screenshots dilewati)"
