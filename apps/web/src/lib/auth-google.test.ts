@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatLeaderboardName, planMigration, suffixForProfileId } from "./auth-google";
+import {
+  formatLeaderboardName,
+  isNativeAuthCallback,
+  parseNativeAuthCallback,
+  planMigration,
+  suffixForProfileId,
+} from "./auth-google";
 
 describe("suffixForProfileId (#89)", () => {
   test("stabil untuk profile_id yang sama", () => {
@@ -73,5 +79,37 @@ describe("planMigration (#89: lokal tidak hilang)", () => {
   test("mastery lokal ikut dibawa", () => {
     const plan = planMigration(localProfile(), null, session);
     expect(plan.mastery).toEqual({ wre_01: "dipahami" });
+  });
+});
+
+describe("isNativeAuthCallback (#100)", () => {
+  test("true untuk scheme + path callback native", () => {
+    expect(isNativeAuthCallback("app.caksara.web://auth/callback?code=abc")).toBe(true);
+  });
+
+  test("false untuk URL web biasa dan scheme asing", () => {
+    expect(isNativeAuthCallback("https://caksara.vercel.app/auth/callback?code=abc")).toBe(false);
+    expect(isNativeAuthCallback("app.caksara.web://profil")).toBe(false);
+    expect(isNativeAuthCallback("bukan-url")).toBe(false);
+  });
+});
+
+describe("parseNativeAuthCallback (#100)", () => {
+  test("ambil code PKCE dari query", () => {
+    const parsed = parseNativeAuthCallback("app.caksara.web://auth/callback?code=pkce-1");
+    expect(parsed).toEqual({ code: "pkce-1", accessToken: null, refreshToken: null });
+  });
+
+  test("ambil token implicit dari fragment", () => {
+    const parsed = parseNativeAuthCallback(
+      "app.caksara.web://auth/callback#access_token=at-1&refresh_token=rt-1",
+    );
+    expect(parsed).toEqual({ code: null, accessToken: "at-1", refreshToken: "rt-1" });
+  });
+
+  test("null bila bukan callback native atau tanpa kredensial", () => {
+    expect(parseNativeAuthCallback("https://caksara.vercel.app/?code=abc")).toBeNull();
+    expect(parseNativeAuthCallback("app.caksara.web://auth/callback")).toBeNull();
+    expect(parseNativeAuthCallback("app.caksara.web://auth/callback?code=")).toBeNull();
   });
 });

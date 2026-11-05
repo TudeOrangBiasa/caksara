@@ -8,6 +8,11 @@ dist
 build
 *.tsbuildinfo
 
+# Capacitor native shells — dihasilkan lokal (`bunx cap add android`),
+# jangan commit (tanpa JDK/SDK di CI; keystores rahasia)
+android/
+local.properties
+
 # Generated files
 apps/web/src/routeTree.gen.ts
 local.db
