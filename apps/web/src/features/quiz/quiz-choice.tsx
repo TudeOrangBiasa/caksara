@@ -20,7 +20,7 @@ export function QuizChoice({
 }: QuizChoiceProps) {
   if (!("choices" in question)) return null;
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 lg:mt-[15px] lg:gap-3">
       {question.choices.map((choice, i) => {
         const isSelected = selectedIndex === i;
         const isCorrect = choice.isCorrect;
@@ -46,7 +46,7 @@ export function QuizChoice({
             aria-label={`Pilihan ${i + 1}: ${choice.text}`}
             aria-pressed={isSelected}
             className={cn(
-              "tile-duo flex min-h-11 w-full items-center gap-3 rounded-2xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
+              "tile-duo flex min-h-11 w-full items-center gap-3 rounded-2xl border-2 p-3.5 text-left transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] lg:h-[60px] lg:min-h-0 lg:gap-3 lg:rounded-xl lg:p-3.5",
               stateClass,
               showFeedback && "cursor-default",
               shouldShake && "animate-shake",
@@ -54,7 +54,7 @@ export function QuizChoice({
           >
             <span
               className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-bold",
+                "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-bold lg:text-sm lg:leading-5",
                 showFeedback && isSelected
                   ? isCorrect
                     ? "border-success bg-success text-primary-foreground"
@@ -66,7 +66,7 @@ export function QuizChoice({
             >
               {String.fromCodePoint(65 + i)}
             </span>
-            <span className="flex-1 text-sm">{choice.text}</span>
+            <span className="flex-1 text-sm lg:-mt-0.5 lg:text-sm lg:leading-5">{choice.text}</span>
           </button>
         );
       })}

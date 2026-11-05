@@ -12,7 +12,7 @@ export function SessionLevelBadge({ level }: { level?: number }) {
       role="status"
       aria-label={`Level ${level}`}
       className={cn(
-        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
+        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium lg:px-2 lg:py-0.5 lg:leading-[18px] lg:font-normal",
         level === 1 && "bg-primary/10 text-primary",
         level === 2 && "bg-accent/15 text-accent-foreground dark:text-accent",
         level === 3 && "bg-secondary text-secondary-foreground",

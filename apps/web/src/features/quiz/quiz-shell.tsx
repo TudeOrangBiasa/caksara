@@ -210,18 +210,18 @@ export function QuizShell({
   if (!current) return null;
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 py-5 md:max-w-xl">
-      <div className="mb-5 flex items-center gap-3">
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 py-5 md:max-w-xl lg:max-w-[576px] lg:px-0 lg:py-0 lg:pt-5">
+      <div className="mb-5 flex items-center gap-3 lg:mb-0 lg:h-8 lg:gap-3">
         <button
           type="button"
           onClick={onBack}
           aria-label="Keluar dari kuis"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:size-8"
         >
-          <ArrowLeft className="size-5" />
+          <ArrowLeft className="size-5 lg:size-4" />
         </button>
         <div
-          className="flex flex-1 gap-1"
+          className="flex flex-1 gap-1 lg:gap-2"
           role="progressbar"
           aria-valuenow={session.currentIndex + 1}
           aria-valuemin={0}
@@ -232,11 +232,11 @@ export function QuizShell({
             <span
               key={i}
               className={cn(
-                "h-2.5 flex-1 rounded-full transition-colors duration-300 ease-out",
+                "h-2.5 flex-1 rounded-full transition-colors duration-300 ease-out lg:h-4",
                 i < session.currentIndex
                   ? "bg-primary"
                   : i === session.currentIndex
-                    ? "animate-quiz-progress bg-primary/60"
+                    ? "animate-quiz-progress bg-primary"
                     : "bg-muted",
               )}
             />
@@ -247,24 +247,24 @@ export function QuizShell({
           aria-live="polite"
           aria-label={`Sisa ${hearts} Hati`}
           className={cn(
-            "flex shrink-0 items-center gap-1 rounded-full bg-card px-2.5 py-1 text-sm font-bold tabular-nums text-destructive ring-1 ring-border/60",
+            "flex shrink-0 items-center gap-1 rounded-full bg-card px-2.5 py-1 text-sm font-bold tabular-nums text-destructive ring-1 ring-border/60 lg:gap-1 lg:px-2.5 lg:py-1 lg:text-base",
             hearts <= 2 && "animate-heart-pulse",
           )}
         >
-          <Heart className="size-4 fill-current" aria-hidden />
+          <Heart className="size-4 fill-current lg:size-5" aria-hidden />
           {hearts}
         </span>
       </div>
 
       <div className="flex-1">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
+        <div className="mb-2 flex items-center justify-between gap-2 lg:mt-5 lg:mb-0 lg:h-4 lg:gap-2">
+          <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase lg:text-[13px] lg:font-extrabold lg:leading-4 lg:tracking-[0.8px]">
             Soal {session.currentIndex + 1} / {quiz.questions.length}
           </p>
           <SessionLevelBadge level={level} />
         </div>
         {current.type !== "kenali_visual" && (
-          <h2 className="mb-4 text-xl font-extrabold tracking-tight text-foreground">
+          <h2 className="mb-4 text-xl font-extrabold tracking-tight text-foreground lg:mt-0 lg:mb-0 lg:text-[22px] lg:leading-[27px] lg:tracking-normal">
             {current.prompt}
           </h2>
         )}

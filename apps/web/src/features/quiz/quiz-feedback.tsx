@@ -45,29 +45,29 @@ export function QuizFeedback({
       role="status"
       aria-live="polite"
       className={cn(
-        "sticky bottom-0 mt-4 rounded-3xl p-4 shadow-md",
+        "sticky bottom-0 mt-4 rounded-3xl border-2 border-transparent p-4 shadow-md lg:mt-6 lg:rounded-2xl lg:p-4 lg:shadow-none",
         isCorrect ? "animate-card-pop bg-success/15" : "animate-shake bg-destructive/10",
       )}
     >
-      <div className="flex items-start gap-3">
-        <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-14 shrink-0" />
+      <div className="flex items-start gap-3 lg:items-center lg:gap-3">
+        <Bedawang mood={isCorrect ? "senang" : "sedih"} className="size-14 shrink-0 lg:size-12" />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 lg:gap-2">
             <p
               className={cn(
-                "flex items-center gap-1.5 text-lg font-extrabold",
+                "flex items-center gap-1.5 text-lg font-extrabold lg:gap-2 lg:text-xl lg:font-bold",
                 isCorrect ? "text-cta" : "text-destructive",
               )}
             >
               {isCorrect ? (
-                <CheckCircle2 className="size-5 shrink-0" aria-hidden />
+                <CheckCircle2 className="size-5 shrink-0 lg:size-6" aria-hidden />
               ) : (
-                <AlertCircle className="size-5 shrink-0" aria-hidden />
+                <AlertCircle className="size-5 shrink-0 lg:size-6" aria-hidden />
               )}
               {isCorrect ? "Bener banget!" : "Belum tepat — baca dulu ya"}
             </p>
             {isCorrect && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-xs font-bold text-accent-foreground shadow-sm ring-1 ring-border/60 dark:text-accent">
+              <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-xs font-bold text-accent-foreground shadow-sm ring-1 ring-border/60 lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs lg:shadow-none dark:text-accent">
                 <Sparkles className="size-3" aria-hidden /> <XpTick from={0} to={XP_PER_CORRECT} />
               </span>
             )}
@@ -123,7 +123,7 @@ export function QuizFeedback({
                 <button
                   type="button"
                   onClick={() => onOpenKbEntry(sourceRef.split("·")[0]?.trim() ?? sourceRef)}
-                  className="ml-1 font-bold text-primary underline-offset-2 hover:underline"
+                  className="ml-1 text-[11px] font-bold text-primary underline-offset-2 hover:underline"
                 >
                   Buka di Basis Pengetahuan →
                 </button>
@@ -142,7 +142,7 @@ export function QuizFeedback({
         variant="cta"
         onClick={onNext}
         aria-label={isLast ? "Lihat hasil" : "Lanjut ke soal berikutnya"}
-        className="mt-3 h-12 w-full text-base font-bold tracking-wide"
+        className="mt-3 h-12 w-full text-base font-bold tracking-wide lg:mt-3 lg:h-[47px] lg:text-base"
       >
         {isLast ? "Lihat Hasil" : "Lanjut"}
       </Button>
