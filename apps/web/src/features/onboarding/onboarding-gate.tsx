@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 
 import { Button } from "@caksara/ui/components/button";
+import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
 import { getSupabase } from "../../lib/supabase";
 import { startGoogleLogin } from "../../lib/auth-google";
 import { loadProfile } from "../../lib/profile-store";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import { profileNameSchema } from "../../lib/zod/profile";
 import {
   GoogleSaveOffer,
@@ -23,16 +25,25 @@ const SPLASH_MS = 1500;
 const TOTAL_STEPS = 4;
 
 function Splash({ leaving }: { leaving: boolean }) {
+  const reduceMotion = usePrefersReducedMotion();
   return (
     <div
-      className={`relative flex h-full flex-col items-center justify-center overflow-hidden bg-background px-6 transition-opacity duration-300 ${leaving ? "opacity-0" : "opacity-100"}`}
+      className={cn(
+        "relative flex h-full flex-col items-center justify-center overflow-hidden bg-background px-6 transition-opacity duration-300",
+        leaving && "opacity-0",
+      )}
     >
       <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02]"></div>
       <div className="absolute -left-32 -top-32 size-72 rounded-full bg-primary/20 blur-[100px]"></div>
       <div className="absolute -bottom-32 -right-32 size-72 rounded-full bg-warning/20 blur-[100px]"></div>
 
       <div className="relative z-10 flex flex-col items-center">
-        <div className="mb-8 flex size-32 animate-[bounce_3s_infinite] items-center justify-center rounded-[3rem] bg-card shadow-2xl ring-1 ring-border/50">
+        <div
+          className={cn(
+            "mb-8 flex size-32 items-center justify-center rounded-[3rem] bg-card shadow-2xl ring-1 ring-border/50",
+            !reduceMotion && "animate-[bounce_3s_infinite]",
+          )}
+        >
           <Bedawang className="size-full rounded-[3rem]" />
         </div>
 
@@ -46,7 +57,7 @@ function Splash({ leaving }: { leaving: boolean }) {
 
         <div className="mt-12 animate-in fade-in duration-1000 delay-500 fill-mode-both">
           <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2 ring-1 ring-border">
-            <Loader2 className="size-4 animate-spin text-primary" />
+            <Loader2 className={cn("size-4 text-primary", !reduceMotion && "animate-spin")} />
             <span className="text-xs font-medium text-muted-foreground">Memuat data...</span>
           </div>
         </div>
@@ -206,8 +217,13 @@ function MultiStepOnboarding({ onComplete }: { onComplete: (name: string) => voi
         </div>
 
         {isReadyStep ? null : (
-          <footer className="pt-6">
-            <Button size="lg" className="w-full text-base font-semibold" onClick={handleNext}>
+          <footer className="w-full pt-4">
+            <Button
+              variant="cta"
+              size="lg"
+              className="h-14 w-full flex-1 text-[15px] font-extrabold tracking-[0.8px]"
+              onClick={handleNext}
+            >
               {step === TOTAL_STEPS - 1 ? "Selesai" : "Lanjut"}
             </Button>
           </footer>
