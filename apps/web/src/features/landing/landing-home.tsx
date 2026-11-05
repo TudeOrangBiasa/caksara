@@ -582,10 +582,10 @@ export function LandingHome({
       </section>
 
       {/* OVERLAPPING CTA & FOOTER */}
-      <div data-parity="cta-footer" className="relative mt-32 w-full">
+      <div data-parity="cta-footer" className="relative mt-32 w-full lg:mt-32">
         {/* CTA - Scattered Avatars Design */}
-        <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6">
-          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:rounded-[48px] lg:p-[84px_64px]">
+        <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:max-w-none lg:px-8 lg:[padding:0_32px]">
+          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:rounded-[48px] lg:p-[84px_64px] lg:mx-auto lg:w-[976px] lg:shadow-none">
             {/* Scattered Floating Avatars (Desktop only) */}
             <div className="pointer-events-none absolute inset-0 hidden md:block">
               <img
@@ -674,8 +674,8 @@ export function LandingHome({
         </div>
 
         {/* FOOTER */}
-        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:rounded-[48px] lg:px-16 lg:pb-11 lg:pt-[170px]">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr] lg:gap-12">
+        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:rounded-[48px] lg:px-16 lg:pb-11 lg:pt-[170px] lg:[padding:170px_64px_44px]">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr] lg:gap-12 lg:[column-gap:48px]">
             {/* Column 1: Brand */}
             <div className="max-w-sm">
               <p className="flex items-center gap-3 text-2xl font-bold tracking-tight">
@@ -804,8 +804,8 @@ export function LandingHome({
             </div>
           </div>
 
-          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row">
-            <p className="text-sm font-medium text-muted-foreground">
+          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row lg:mt-12 lg:gap-6 lg:pt-8">
+            <p className="text-sm font-medium text-muted-foreground lg:text-[13px] lg:leading-[18px]">
               © 2026 CAKSARA. Seluruh hak cipta dilindungi.
             </p>
             <div className="flex gap-6">
