@@ -3,14 +3,20 @@ import { Link, useNavigate } from "react-router";
 import { KeyRound, Loader2 } from "lucide-react";
 
 import { EmptyState } from "../components/empty-state";
-import { exchangeNativeAuthCallback, migrateLocalToServer } from "../lib/auth-google";
+import {
+  exchangeNativeAuthCallback,
+  migrateLocalToServer,
+  preferStashedCallbackUrl,
+} from "../lib/auth-google";
 import { notifyGoogleSynced } from "../lib/notify";
 
 /**
  * #100: jembatan callback OAuth. Deep-link `app.caksara.web://auth/callback`
- * membuka route ini lewat intent-filter; tukar `code` PKCE (atau token
- * implicit) jadi sesi, migrasikan progres lokal (#89), lalu kembali ke
- * beranda. Tanpa kredensial valid tampilkan EmptyState — bukan crash.
+ * membuka route ini lewat intent-filter (#126: URL mentah dibaca dari
+ * sessionStorage bila ada, kalau tidak pakai href WebView); tukar `code`
+ * PKCE (atau token implicit) jadi sesi, migrasikan progres lokal (#89),
+ * lalu kembali ke beranda.
+ * Tanpa kredensial valid tampilkan EmptyState, bukan crash.
  */
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -33,7 +39,7 @@ export default function AuthCallback() {
 }
 
 async function settleNativeCallback(href: string): Promise<boolean> {
-  const settled = await exchangeNativeAuthCallback(href);
+  const settled = await exchangeNativeAuthCallback(preferStashedCallbackUrl(href));
   if (!settled) return false;
   const ok = await migrateLocalToServer(settled);
   if (ok) notifyGoogleSynced();

@@ -1,10 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 
 import {
   formatLeaderboardName,
   isNativeAuthCallback,
+  NATIVE_CALLBACK_URL_KEY,
+  parseAuthCallbackParams,
   parseNativeAuthCallback,
   planMigration,
+  preferStashedCallbackUrl,
   suffixForProfileId,
 } from "./auth-google";
 
@@ -30,7 +33,7 @@ describe("suffixForProfileId (#89)", () => {
 });
 
 describe("formatLeaderboardName (#89)", () => {
-  test("`Made 421` — nama + spasi + suffix", () => {
+  test("`Made 421`: nama + spasi + suffix", () => {
     expect(formatLeaderboardName("Made", 421)).toBe("Made 421");
   });
 });
@@ -94,7 +97,49 @@ describe("isNativeAuthCallback (#100)", () => {
   });
 });
 
-describe("parseNativeAuthCallback (#100)", () => {
+describe("parseAuthCallbackParams (#126)", () => {
+  test("baca code tanpa peduli scheme atau bentuk URL", () => {
+    const expected = { code: "pkce-1", accessToken: null, refreshToken: null };
+    expect(parseAuthCallbackParams("app.caksara.web://auth/callback?code=pkce-1")).toEqual(
+      expected,
+    );
+    expect(parseAuthCallbackParams("https://localhost/auth/callback?code=pkce-1")).toEqual(
+      expected,
+    );
+    expect(parseAuthCallbackParams("/auth/callback?code=pkce-1")).toEqual(expected);
+  });
+
+  test("baca token implicit dari fragment maupun query", () => {
+    const expected = { code: null, accessToken: "at-1", refreshToken: "rt-1" };
+    expect(
+      parseAuthCallbackParams(
+        "app.caksara.web://auth/callback#access_token=at-1&refresh_token=rt-1",
+      ),
+    ).toEqual(expected);
+    expect(
+      parseAuthCallbackParams(
+        "https://localhost/auth/callback?access_token=at-1&refresh_token=rt-1",
+      ),
+    ).toEqual(expected);
+  });
+
+  test("null untuk URL tak terurai atau kredensial kosong", () => {
+    expect(parseAuthCallbackParams("bukan-url")).toBeNull();
+    expect(parseAuthCallbackParams("https://localhost/auth/callback")).toBeNull();
+    expect(parseAuthCallbackParams("/auth/callback?code=")).toBeNull();
+    expect(parseAuthCallbackParams("https://localhost/auth/callback?access_token=at-1")).toBeNull();
+  });
+
+  test("tanpa gate path: path lain tetap terbaca di level ini", () => {
+    expect(parseAuthCallbackParams("https://localhost/?code=abc")).toEqual({
+      code: "abc",
+      accessToken: null,
+      refreshToken: null,
+    });
+  });
+});
+
+describe("parseNativeAuthCallback (#126)", () => {
   test("ambil code PKCE dari query", () => {
     const parsed = parseNativeAuthCallback("app.caksara.web://auth/callback?code=pkce-1");
     expect(parsed).toEqual({ code: "pkce-1", accessToken: null, refreshToken: null });
@@ -107,9 +152,52 @@ describe("parseNativeAuthCallback (#100)", () => {
     expect(parsed).toEqual({ code: null, accessToken: "at-1", refreshToken: "rt-1" });
   });
 
-  test("null bila bukan callback native atau tanpa kredensial", () => {
+  test("settle href WebView yang dulu selalu null", () => {
+    expect(parseNativeAuthCallback("https://localhost/auth/callback?code=pkce-1")).toEqual({
+      code: "pkce-1",
+      accessToken: null,
+      refreshToken: null,
+    });
+    expect(parseNativeAuthCallback("/auth/callback?code=pkce-1")).toEqual({
+      code: "pkce-1",
+      accessToken: null,
+      refreshToken: null,
+    });
+  });
+
+  test("null bila path lain atau tanpa kredensial", () => {
     expect(parseNativeAuthCallback("https://caksara.vercel.app/?code=abc")).toBeNull();
     expect(parseNativeAuthCallback("app.caksara.web://auth/callback")).toBeNull();
     expect(parseNativeAuthCallback("app.caksara.web://auth/callback?code=")).toBeNull();
+    expect(parseNativeAuthCallback("https://localhost/profil?code=abc")).toBeNull();
+  });
+});
+
+describe("preferStashedCallbackUrl (#126)", () => {
+  const map = new Map<string, string>();
+  const fakeSession = {
+    getItem: (k: string) => (map.has(k) ? (map.get(k) as string) : null),
+    setItem: (k: string, v: string) => void map.set(k, v),
+    removeItem: (k: string) => void map.delete(k),
+  };
+
+  afterEach(() => {
+    map.clear();
+  });
+
+  test("URL mentah menang atas href WebView lalu dibersihkan", () => {
+    Object.assign(globalThis, { window: { sessionStorage: fakeSession } });
+    fakeSession.setItem(NATIVE_CALLBACK_URL_KEY, "app.caksara.web://auth/callback?code=pkce-1");
+    expect(preferStashedCallbackUrl("https://localhost/auth/callback?code=pkce-1")).toBe(
+      "app.caksara.web://auth/callback?code=pkce-1",
+    );
+    expect(fakeSession.getItem(NATIVE_CALLBACK_URL_KEY)).toBeNull();
+  });
+
+  test("tanpa simpanan pakai href apa adanya", () => {
+    Object.assign(globalThis, { window: { sessionStorage: fakeSession } });
+    expect(preferStashedCallbackUrl("https://localhost/auth/callback?code=pkce-1")).toBe(
+      "https://localhost/auth/callback?code=pkce-1",
+    );
   });
 });
