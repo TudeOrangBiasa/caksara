@@ -13,6 +13,12 @@ export const NATIVE_AUTH_SCHEME = "app.caksara.web";
 export const NATIVE_AUTH_PATH = "/auth/callback";
 export const NATIVE_AUTH_REDIRECT = `${NATIVE_AUTH_SCHEME}://${NATIVE_AUTH_PATH.slice(1)}`;
 
+/** Kunci sessionStorage untuk URL deep-link mentah (#126: navigate menghapus scheme). */
+export const NATIVE_CALLBACK_URL_KEY = "caksara.native-callback-url";
+
+/** Basis semu agar path relatif (`/auth/callback?...`) bisa diurai via `new URL`. */
+const RELATIVE_URL_BASE = "https://auth.local";
+
 /**
  * URL kembali OAuth Google. Daftarkan di Dashboard Supabase > Authentication >
  * URL Configuration > Redirect URLs:
@@ -50,7 +56,7 @@ export interface GoogleSession {
  * Mulai login Google via Supabase OAuth. Kembalikan URL tujuan bila backend
  * + provider siap; null bila tombol wajib disembunyikan (env kosong,
  * offline, provider mati, atau halaman OAuth sudah dibuka di browser
- * sistem native) — app tetap jalan sebagai tamu.
+ * sistem native), app tetap jalan sebagai tamu.
  */
 export async function startGoogleLogin(origin: string): Promise<string | null> {
   const supabase = getSupabase();
@@ -191,7 +197,7 @@ export function watchGoogleSession(onSignedIn: (session: GoogleSession) => void)
 
 /**
  * True bila URL adalah callback OAuth milik scheme native
- * (`app.caksara.web://auth/callback?...`, murni — aman diuji tanpa WebView).
+ * (`app.caksara.web://auth/callback?...`, murni, aman diuji tanpa WebView).
  */
 export function isNativeAuthCallback(rawUrl: string): boolean {
   let parsed: URL;
@@ -201,23 +207,27 @@ export function isNativeAuthCallback(rawUrl: string): boolean {
     return false;
   }
   if (parsed.protocol !== `${NATIVE_AUTH_SCHEME}:`) return false;
-  // URL non-spesial: `auth` jadi host, bukan segmen path — gabungkan kembali.
+  // URL non-spesial: `auth` jadi host, bukan segmen path (gabungkan kembali).
   return `${parsed.host}${parsed.pathname}` === NATIVE_AUTH_PATH.slice(1);
 }
 
 /**
- * Ambil potongan sesi (`code` PKCE / `access_token`+`refresh_token` implicit)
- * dari URL callback. Kembalikan null bila bukan callback native atau
- * tanpa kredensial — pemanggil menampilkan EmptyState, bukan crash.
+ * Baca param sesi tanpa peduli scheme. Dipakai untuk deep-link scheme
+ * maupun href WebView (`/auth/callback?...`), lihat #126.
  */
-export function parseNativeAuthCallback(rawUrl: string): {
+export function parseAuthCallbackParams(rawUrl: string): {
   code: string | null;
   accessToken: string | null;
   refreshToken: string | null;
 } | null {
-  if (!isNativeAuthCallback(rawUrl)) return null;
-  const query = new URL(rawUrl).searchParams;
-  const fragment = new URLSearchParams(new URL(rawUrl).hash.slice(1));
+  let parsed: URL;
+  try {
+    parsed = rawUrl.startsWith("/") ? new URL(rawUrl, RELATIVE_URL_BASE) : new URL(rawUrl);
+  } catch {
+    return null;
+  }
+  const query = parsed.searchParams;
+  const fragment = new URLSearchParams(parsed.hash.slice(1));
   const code = query.get("code");
   const accessToken = fragment.get("access_token") ?? query.get("access_token");
   const refreshToken = fragment.get("refresh_token") ?? query.get("refresh_token");
@@ -226,9 +236,56 @@ export function parseNativeAuthCallback(rawUrl: string): {
 }
 
 /**
+ * True bila URL boleh ditukar sesinya: deep-link scheme native atau
+ * path `/auth/callback` di WebView (lihat #126).
+ */
+export function isSettleableAuthCallback(rawUrl: string): boolean {
+  if (isNativeAuthCallback(rawUrl)) return true;
+  try {
+    const parsed = rawUrl.startsWith("/") ? new URL(rawUrl, RELATIVE_URL_BASE) : new URL(rawUrl);
+    return parsed.pathname === NATIVE_AUTH_PATH;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Ambil potongan sesi (`code` PKCE / `access_token`+`refresh_token` implicit)
+ * dari URL callback. Kembalikan null bila URL bukan callback yang bisa
+ * disettle atau tanpa kredensial (pemanggil menampilkan EmptyState, bukan crash).
+ */
+export function parseNativeAuthCallback(rawUrl: string): {
+  code: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+} | null {
+  if (!isSettleableAuthCallback(rawUrl)) return null;
+  return parseAuthCallbackParams(rawUrl);
+}
+
+/**
+ * URL yang ditukar sesinya: deep-link mentah dari sessionStorage menang
+ * atas href WebView (#126: navigate menghapus scheme).
+ */
+export function preferStashedCallbackUrl(href: string): string {
+  if (typeof window === "undefined") return href;
+  const store = window.sessionStorage;
+  if (!store) return href;
+  let stashed: string | null;
+  try {
+    stashed = store.getItem(NATIVE_CALLBACK_URL_KEY);
+    store.removeItem(NATIVE_CALLBACK_URL_KEY);
+  } catch {
+    return href;
+  }
+  if (stashed) return stashed;
+  return href;
+}
+
+/**
  * Tukar kredensial deep-link native jadi sesi Supabase. PKCE (`code`)
  * diutamakan; implicit (`access_token`+`refresh_token`) cadangan.
- * Null bila backend mati atau tukaran gagal — tamu tetap jalan.
+ * Null bila backend mati atau tukaran gagal (tamu tetap jalan).
  */
 export async function exchangeNativeAuthCallback(rawUrl: string): Promise<GoogleSession | null> {
   const supabase = getSupabase();

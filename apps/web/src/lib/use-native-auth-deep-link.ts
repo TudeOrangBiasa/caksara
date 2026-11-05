@@ -1,16 +1,19 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
+import { NATIVE_CALLBACK_URL_KEY } from "./auth-google";
+
 /**
  * #100: dengarkan deep-link OAuth saat app hidup di WebView Capacitor.
  * Impor dinamis menjaga bundle web murni: `@capacitor/app` hanya
  * dimuat bila `window.Capacitor` ada (shell Android). Cold-start maupun
- * warm: `appUrlOpen` membawa `app.caksara.web://auth/callback?...` —
- * teruskan ke route `/auth/callback` yang menukar sesi. No-op di web.
+ * warm: `appUrlOpen` membawa `app.caksara.web://auth/callback?...`
+ * (teruskan ke route `/auth/callback` yang menukar sesi, URL mentah
+ * disimpan agar scheme tidak hilang saat navigate, lihat #126).
+ * No-op di web.
  */
 export function useNativeAuthDeepLink(): void {
   const navigate = useNavigate();
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     // window.Capacitor disuntik shell native; tidak ada di tipe DOM lib.
@@ -27,6 +30,12 @@ export function useNativeAuthDeepLink(): void {
         App.addListener("appUrlOpen", (event) => {
           const { url } = event;
           if (!url.startsWith("app.caksara.web://auth/callback")) return;
+          try {
+            // Navigate menghapus scheme, simpan URL mentah untuk penukar sesi.
+            window.sessionStorage.setItem(NATIVE_CALLBACK_URL_KEY, url);
+          } catch {
+            // Penyimpanan penuh atau diblokir: settle pakai href WebView.
+          }
           const queryStart = url.indexOf("?");
           navigate(
             queryStart === -1 ? "/auth/callback" : `/auth/callback${url.slice(queryStart)}`,
