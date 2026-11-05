@@ -293,7 +293,7 @@ function ZigzagRow({
     <div
       ref={ref}
       className={cn(
-        "flex flex-col items-center gap-10 lg:flex-row",
+        "flex flex-col items-center gap-10 lg:flex-row lg:gap-10 lg:[column-gap:40px]",
         !reduceMotion && "transition-all duration-700 ease-out",
         !reduceMotion && !visible && "translate-y-8 opacity-0",
       )}
@@ -456,11 +456,11 @@ export function LandingHome({
       </section>
 
       {/* ZIGZAG */}
-      <section data-parity="zigzag" className="mt-12 px-2 pt-14 pb-16 lg:px-8">
-        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-cta">
+      <section data-parity="zigzag" className="mt-12 px-2 pt-14 pb-16 lg:px-8 lg:pt-24 lg:pb-16">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-cta lg:leading-[48px]">
           Kenapa Belajar di Sini?
         </h2>
-        <div className="mt-16 flex flex-col gap-16 lg:mt-24 lg:gap-32">
+        <div className="mt-16 flex flex-col gap-16 lg:mt-24 lg:gap-32 lg:[row-gap:128px]">
           <ZigzagRow
             title="Kuis Seru & Menantang"
             desc="Belajar aksara Bali jadi lebih menyenangkan! Susun kata, kumpulkan XP, dan taklukkan bentuk gantungan yang rumit. Jaga streak harianmu dan lihat progresmu setiap hari!"
