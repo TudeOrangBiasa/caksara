@@ -155,6 +155,24 @@ describe("applyOvernightReset + updateStreak (V9)", () => {
     expect(store.loadProfile()?.streak).toBe(1);
   });
 });
+describe("claimStreakBonus (#159)", () => {
+  test("streak tumbuh memberi 20 XP sekali per hari", () => {
+    const yMs = Date.now() - 24 * 3600 * 1000;
+    seed(baseProfile({ xp: 40, streak: 2, lastActiveDate: store.witaTodayStr(yMs) }));
+    expect(store.updateStreak()).toBe(true);
+    expect(store.loadProfile()?.xp).toBe(60);
+    expect(store.claimStreakBonus()).toBe(false);
+    expect(store.loadProfile()?.xp).toBe(60);
+  });
+
+  test("streak aktif hari ini tetap dapat bonus sekali", () => {
+    seed(baseProfile({ xp: 40, streak: 3, lastActiveDate: store.witaTodayStr() }));
+    expect(store.updateStreak()).toBe(false);
+    expect(store.claimStreakBonus()).toBe(true);
+    expect(store.loadProfile()?.xp).toBe(60);
+    expect(store.claimStreakBonus()).toBe(false);
+  });
+});
 
 describe("debounce tulis (V9, anti-banjir)", () => {
   test("tulis XP/Hati beruntun didebounce, flush menulis sekaligus", () => {

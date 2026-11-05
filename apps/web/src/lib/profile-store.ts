@@ -3,7 +3,8 @@ import type { ProfileAvatar, UserProfile } from "./zod/profile";
 import { ipAvatarUriForName } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
-import { MAX_HEARTS, deriveMastery } from "./game-rules";
+import { MAX_HEARTS, applyStreakBonus, deriveMastery, witaDateString } from "./game-rules";
+import { parseWitaDate } from "./zod/game-state";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const STORAGE_KEY = "caksara.profile.v1";
@@ -245,10 +246,10 @@ export function applyOvernightReset(): boolean {
  * bertambah — pemanggil (#102) membunyikan cue streak dari nilai ini,
  * bukan dari menebak tanggal.
  */
-export function updateStreak(): boolean {
+export function updateStreak(now = new Date()): boolean {
   let grew = false;
   update((profile) => {
-    const today = witaTodayStr();
+    const today = witaTodayStr(now.getTime());
     if (profile.lastActiveDate === today) return;
     if (isYesterday(profile.lastActiveDate)) {
       profile.streak += 1;
@@ -258,7 +259,39 @@ export function updateStreak(): boolean {
     profile.lastActiveDate = today;
     grew = true;
   });
+  if (grew) claimStreakBonus(now);
   return grew;
+}
+
+/**
+ * Beri bonus XP sekali per hari lewat applyStreakBonus (#155).
+ * Kembalikan true hanya bila bonus benar diberikan hari ini.
+ */
+export function claimStreakBonus(now = new Date()): boolean {
+  const today = witaDateString(now);
+  let granted = false;
+  update((profile) => {
+    const { state, granted: ok } = applyStreakBonus(
+      {
+        xp: profile.xp,
+        hearts: profile.hearts,
+        streak: profile.streak,
+        lastActiveDate: profile.lastActiveDate ? parseWitaDate(profile.lastActiveDate) : undefined,
+        heartsRefilledAt: profile.heartsRefilledAt
+          ? parseWitaDate(profile.heartsRefilledAt)
+          : undefined,
+        streakBonusClaimedAt: profile.streakBonusClaimedAt
+          ? parseWitaDate(profile.streakBonusClaimedAt)
+          : undefined,
+      },
+      today,
+    );
+    if (!ok) return;
+    profile.xp = state.xp;
+    profile.streakBonusClaimedAt = state.streakBonusClaimedAt;
+    granted = true;
+  });
+  return granted;
 }
 
 export function recordAnswerStats(

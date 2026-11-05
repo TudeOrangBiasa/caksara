@@ -1,16 +1,31 @@
-import { Trophy, Zap } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { formatLeaderboardName } from "../../lib/auth-google";
-import { LEADERBOARD_LIMIT, supabaseLeaderboardSource, topEntries } from "./leaderboard-data";
-import type { LeaderboardEntry, LeaderboardSource } from "./leaderboard-data";
+import { witaTodayStr } from "../../lib/profile-store";
+import { parseWitaDate } from "../../lib/zod/game-state";
+import {
+  LEADERBOARD_LIMIT,
+  isResetMingguIni,
+  parityLeagueSource,
+  supabaseLeaderboardSource,
+  topEntries,
+} from "./leaderboard-data";
 
-function rankStyle(rank: number): string {
-  if (rank === 1) return "bg-[#FFC800] text-[#8a6100]";
-  if (rank === 2) return "bg-muted text-muted-foreground";
-  if (rank === 3) return "bg-[#FFEED1] text-primary";
-  return "bg-transparent text-muted-foreground";
+/** Row Pencil t8BaKT: rank pill rank 1-3, lingkaran inisial, XP grouping id-ID. */
+function rowStyle(rank: number, mine: boolean): string {
+  if (mine) return "border-cta bg-[#D7FFB8]";
+  if (rank === 1) return "border-[#FFC800] bg-[#FFF3C4]";
+  if (rank === 2) return "border-[#C9CFD6] bg-[#F4F6F8]";
+  if (rank === 3) return "border-[#E8A15C] bg-[#FBEFE3]";
+  return "border-[#EDEFF3] bg-card";
 }
+
+const RANK_PILL = [
+  "bg-[#FFC800] text-white",
+  "bg-[#C9CFD6] text-white",
+  "bg-[#E8A15C] text-white",
+] as const;
 
 export function LeaderboardCard({
   source,
@@ -22,7 +37,7 @@ export function LeaderboardCard({
   const [entries, setEntries] = useState<LeaderboardEntry[] | null>(null);
 
   useEffect(() => {
-    const active = source ?? supabaseLeaderboardSource();
+    const active = source ?? parityLeagueSource() ?? supabaseLeaderboardSource();
     if (!active) {
       setEntries([]);
       return;
@@ -43,18 +58,22 @@ export function LeaderboardCard({
       aria-label="Papan peringkat"
       className="overflow-hidden rounded-[20px] border-2 border-b-[5px] border-border bg-card"
     >
-      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4 lg:gap-4 lg:px-6 lg:py-5">
+        <div className="flex items-center gap-3 lg:gap-4">
           <span className="flex size-14 items-center justify-center rounded-2xl bg-[#FFF3C4] text-[#FFC800]">
             <Trophy className="size-7" aria-hidden />
           </span>
           <div>
-            <p className="text-xl font-extrabold tracking-tight">TOP {LEADERBOARD_LIMIT}</p>
-            <p className="text-xs font-medium text-muted-foreground">Liga mingguan</p>
+            <p className="text-xl font-extrabold tracking-tight lg:leading-[24px]">
+              TOP {LEADERBOARD_LIMIT}
+            </p>
+            <p className="text-xs font-medium text-muted-foreground lg:text-[13px] lg:leading-[16px]">
+              Reset tiap Senin
+            </p>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100]">
-          {LEADERBOARD_LIMIT} teratas
+        <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100] lg:px-4 lg:py-2 lg:leading-[15px]">
+          {isResetMingguIni(parseWitaDate(witaTodayStr())) ? "Reset hari ini" : "Liga mingguan"}
         </span>
       </div>
       <div className="p-3">
@@ -65,35 +84,49 @@ export function LeaderboardCard({
             Belum ada peringkat. Masuk pakai Google biar XP-mu tercatat di sini.
           </p>
         ) : (
-          <ol className="flex flex-col gap-2">
+          <ol className="flex flex-col gap-2 lg:gap-2.5">
             {entries.map((entry, idx) => {
               const rank = idx + 1;
               const mine = entry.profile_id === currentProfileId;
+              const name = formatLeaderboardName(entry.display_name, entry.suffix);
               return (
                 <li
                   key={entry.profile_id}
                   aria-current={mine ? "true" : undefined}
-                  className={`flex items-center gap-3.5 rounded-2xl border-2 px-4 py-3 ${
-                    mine
-                      ? "border-cta bg-cta/10"
-                      : rank <= 3
-                        ? "border-border/70 bg-muted/40"
-                        : "border-border/50 bg-card"
-                  }`}
+                  className={`flex items-center gap-3.5 rounded-[14px] border-2 px-4 py-3 lg:gap-3.5 lg:px-5 lg:py-3 ${rowStyle(rank, mine)}`}
                 >
+                  {rank <= 3 ? (
+                    <span
+                      aria-hidden
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold tabular-nums ${RANK_PILL[rank - 1]}`}
+                    >
+                      {rank}
+                    </span>
+                  ) : (
+                    <span
+                      aria-hidden
+                      className={`w-2.5 shrink-0 text-center text-[15px] tabular-nums ${mine ? "text-cta" : "text-muted-foreground"}`}
+                    >
+                      {rank}
+                    </span>
+                  )}
                   <span
                     aria-hidden
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold tabular-nums ${rankStyle(rank)}`}
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold ${mine ? "bg-cta text-white" : "bg-[#EDEFF3] text-muted-foreground"}`}
                   >
-                    {rank}
+                    {name.charAt(0).toUpperCase()}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-base font-semibold">
-                    {formatLeaderboardName(entry.display_name, entry.suffix)}
-                    {mine && <span className="ml-1.5 text-cta">• Kamu</span>}
+                  <span
+                    className={`min-w-0 flex-1 truncate text-base ${mine ? "font-extrabold" : "font-semibold"}`}
+                  >
+                    {name}
+                    {mine && <span className="ml-1.5">• Kamu</span>}
                   </span>
-                  <span className="flex shrink-0 items-center gap-1 text-sm font-extrabold tabular-nums text-[#1CB0F6]">
-                    <Zap className="size-4 fill-current" aria-hidden />
-                    {entry.xp} XP
+                  <span className="flex shrink-0 items-baseline gap-1 tabular-nums">
+                    <span className={`text-base font-extrabold ${mine ? "text-cta" : ""}`}>
+                      {entry.xp.toLocaleString("id-ID")}
+                    </span>
+                    <span className="text-[11px] font-semibold text-muted-foreground">XP</span>
                   </span>
                 </li>
               );
