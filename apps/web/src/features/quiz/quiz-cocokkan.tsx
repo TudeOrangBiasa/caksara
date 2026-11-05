@@ -54,15 +54,15 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3 lg:mt-[15px] lg:gap-3">
       <p
-        className="col-span-2 text-xs font-medium text-muted-foreground"
+        className="col-span-2 text-xs font-medium text-muted-foreground lg:sr-only"
         role="status"
         aria-live="polite"
       >
         {doneCount} dari {pairs.length} pasangan cocok
       </p>
-      <div className="flex flex-col gap-2" aria-label="Kolom aksara">
+      <div className="flex flex-col gap-2 lg:gap-3" aria-label="Kolom aksara">
         {pairs.map((p) => {
           const locked = matched[p.left] !== undefined;
           return (
@@ -72,7 +72,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
               disabled={disabled || locked}
               onClick={() => setSelectedLeft(p.left)}
               className={cn(
-                "tile-duo font-balinese w-full rounded-2xl border-2 p-3 text-base font-bold transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
+                "tile-duo font-balinese w-full rounded-2xl border-2 p-3 text-base font-bold transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] lg:flex lg:h-[60px] lg:items-center lg:justify-center lg:rounded-xl lg:p-3 lg:text-base",
                 locked
                   ? "border-success/60 bg-success/10 text-success opacity-70"
                   : selectedLeft === p.left
@@ -90,7 +90,7 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
           );
         })}
       </div>
-      <div className="flex flex-col gap-2" aria-label="Kolom arti">
+      <div className="flex flex-col gap-2 lg:gap-3" aria-label="Kolom arti">
         {rightsShuffled.map((right, i) => {
           const taken = matchedRightTaken[right] === true;
           return (
@@ -100,8 +100,8 @@ export function Cocokkan({ pairs, onAnswer, disabled }: CocokkanProps) {
               disabled={disabled || selectedLeft === null || taken}
               onClick={() => handleRight(right)}
               className={cn(
-                "tile-duo w-full rounded-2xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]",
-                selectedLeft === null || taken ? "opacity-60" : "opacity-100",
+                "tile-duo w-full rounded-2xl border-2 border-border bg-card p-3 text-sm transition-all duration-150 ease-out hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] lg:flex lg:h-[60px] lg:items-center lg:justify-center lg:rounded-xl lg:p-3 lg:text-sm",
+                selectedLeft === null || taken ? "opacity-60 lg:opacity-100" : "opacity-100",
               )}
               aria-label={`Arti ${right}${taken ? " (sudah terpasang)" : ""}`}
             >

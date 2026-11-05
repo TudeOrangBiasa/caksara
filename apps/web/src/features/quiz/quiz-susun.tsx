@@ -32,7 +32,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
   // Debt: drag-and-drop sesungguhnya belum ada — tap-to-place ini jalur
   // utama (tap usable, aria jelas). Jangan implementasi drag di sini.
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:mt-4 lg:gap-4">
       <div
         className="flex min-h-24 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/40 p-3"
         role="status"
@@ -58,7 +58,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
       </div>
 
       <div
-        className="flex flex-wrap justify-center gap-2"
+        className="flex flex-wrap justify-center gap-2 lg:gap-2"
         role="group"
         aria-label="Pilihan ubin aksara"
       >
@@ -69,7 +69,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
             disabled={disabled}
             onClick={() => take(i)}
             aria-label={`Pilih ubin ${tile}`}
-            className="tile-duo font-balinese rounded-2xl border-2 border-border bg-card px-4 py-2.5 text-2xl transition-all duration-150 ease-out hover:border-cta/60 hover:bg-muted/50 focus-visible:border-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
+            className="tile-duo font-balinese rounded-2xl border-2 border-border bg-card px-4 py-2.5 text-2xl transition-all duration-150 ease-out hover:border-cta/60 hover:bg-muted/50 focus-visible:border-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] lg:rounded-xl lg:px-4 lg:py-2.5"
           >
             {tile}
           </button>
@@ -82,7 +82,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
           variant="outline"
           onClick={undo}
           disabled={disabled || draft.length === 0}
-          className="h-11 rounded-full px-5 font-bold"
+          className="h-11 rounded-full px-5 font-bold lg:h-11 lg:px-5"
         >
           <ArrowLeft className="size-4" /> Batal
         </Button>
@@ -91,7 +91,7 @@ export function SusunAksara({ tiles, onAnswer, disabled }: SusunAksaraProps) {
           variant="cta"
           onClick={() => onAnswer(draft)}
           disabled={disabled || draft.length !== tiles.length}
-          className="h-11 px-6 text-sm font-bold tracking-wide"
+          className="h-11 px-6 text-sm font-bold tracking-wide lg:h-11 lg:px-6"
         >
           <Check className="size-4" /> Cek
         </Button>

@@ -19,11 +19,11 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
       ? "Dengar, lalu pilih jawaban yang benar…"
       : question.prompt;
   return (
-    <div className="mb-4 flex gap-3">
-      <Bedawang mood="semangat" className="size-14 shrink-0" />
+    <div className="mb-4 flex gap-3 lg:mt-4 lg:mb-0 lg:items-center lg:gap-4">
+      <Bedawang mood="semangat" className="size-14 shrink-0 lg:size-32" />
       <div
         className={cn(
-          "relative min-w-0 flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3 shadow-sm",
+          "relative min-w-0 flex-1 rounded-2xl border-2 border-border bg-card px-4 py-3 shadow-sm lg:rounded-2xl lg:px-4 lg:py-3 lg:shadow-none",
           "animate-bubble-in",
           showFeedback && isCorrect && "border-success/50 bg-success/15",
           showFeedback && !isCorrect && "border-destructive/50 bg-destructive/10",
@@ -38,7 +38,7 @@ export function KenaliVisualPrompt({ question, showFeedback, isCorrect }: Kenali
           )}
         />
         {isAudio ? (
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-3 lg:gap-2">
             <p className="text-center text-sm font-semibold text-card-foreground">{safePrompt}</p>
             <QuizAudio
               audioUrl={question.audioUrl}
