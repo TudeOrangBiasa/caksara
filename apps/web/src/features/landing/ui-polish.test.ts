@@ -17,10 +17,9 @@ describe("UI — halaman memalukan dihapus (#88)", () => {
     }
   });
   test("testimoni + kontak data-driven, bukan hardcode klaim (#160)", () => {
-    // Pengecualian #160 (keputusan Main): testimoni + kontak footer
-    // tampil apa adanya dari Pencil T4HbK karena datanya bukan data asli:
-    // data asli. Guard: nama/kontak hidup di landing-data.ts, komponen hanya
-    // render via LANDING_TESTIMONIES/LANDING_CONTACTS.
+    // Pengecualian #160: testimoni + kontak footer tampil apa adanya dari
+    // Pencil T4HbK, bukan data asli. Guard: nama/kontak hidup di
+    // landing-data.ts, komponen hanya render via LANDING_TESTIMONIES/LANDING_CONTACTS.
     expect(landing.includes("LANDING_TESTIMONIES")).toBe(true);
     expect(landing.includes("LANDING_CONTACTS")).toBe(true);
     const dataDriven = [

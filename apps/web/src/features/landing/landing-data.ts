@@ -8,8 +8,7 @@ export interface LandingTestimony {
 
 /**
  * Testimoni dan kontak tampil apa adanya dari desain (data-driven, bukan hardcode klaim).
- * Nama dan kutipan tampil apa adanya dari Pencil T4HbK (
- * bukan data asli). Avatar: aset Userpics lokal.
+ * Nama dan kutipan dari Pencil T4HbK, bukan data asli. Avatar: aset Userpics lokal.
  */
 export const LANDING_TESTIMONIES: LandingTestimony[] = [
   {
