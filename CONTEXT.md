@@ -72,3 +72,64 @@ _Avoid_: guest, user tanpa login
 
 **Typography**: `--font-sans: Inter Variable`, `--font-balinese: Noto Sans Balinese` (self-host woff2, `font-display: swap`, `unicode-range: U+1B00-1B7F`, `[lang="ban"]` + `.font-balinese`). Dark mode primary lightened untuk kontras ≥4.5:1.
 _Avoid_: cold gray shadcn default, hex hardcode, TTS baca aksara (ADR 0005 fallback Latin only)
+
+## Layar (Pencil → Web, ADR 0016)
+
+Web = SPA satu route `/`: navigasi via tab (7 tab = header Pencil) + view overlay; pengecualian `/kb/:id`, `/auth/callback`.
+
+| Pencil (id + nama)                                  | Web (tab/view → komponen)             | Status |
+| --------------------------------------------------- | ------------------------------------- | ------ |
+| T4HbK Beranda — CAKSARA 2                           | tab beranda → LandingHome / Dashboard | sudah  |
+| Ky2up Belajar — CAKSARA                             | tab belajar → ModuleTree              | sudah  |
+| Gd8Af Modul Detail — CAKSARA                        | view detail → ModuleDetail            | sudah  |
+| pAPnC KB — CAKSARA                                  | tab kb → KbList / KbDetail            | sudah  |
+| tXwUy Profil — CAKSARA                              | tab profil → ProfilPage               | sudah  |
+| u78JLW Kuis (dengar)                                | view quiz → QuizShell                 | sudah  |
+| RJBIf Kuis Soal 2                                   | view quiz → QuizShell                 | sudah  |
+| g6deu Kuis Pasangan                                 | view quiz → quiz-cocokkan             | sudah  |
+| OfPb9 Kuis Susun                                    | view quiz → quiz-susun                | sudah  |
+| A8B2n Lanjut Kuis                                   | ResumeDialog                          | sudah  |
+| Z8nXI Hasil Kuis                                    | view result → QuizResult lulus        | sudah  |
+| HK0rs Hasil Gagal                                   | view result → QuizResult gagal        | sudah  |
+| t8BaKT Leaderboard Desktop                          | tab peringkat → LeaderboardCard       | sudah  |
+| IpWol Unduh — CAKSARA                               | tab unduh → UnduhPage                 | sudah  |
+| FyN8o/jU8co/vjnVJ/VyFA4/lGwoj Kanvas 01 (5 langkah) | OnboardingGate (5 step)               | sudah* |
+| — (tanpa frame Pencil)                              | tab guru → TeacherChat                | sudah  |
+
+*drift 2 string onboarding (Level, Komitmen) → ADR 0016 keputusan 4.
+
+**Beranda**:
+Layar awal (landing desktop + dasbor mobile) berisi hero, pendekatan, kuis/guru/kamus unggulan, testimoni, FAQ, CTA.
+_Avoid_: home generik, landing tanpa konteks CAKSARA
+
+**Hasil Kuis**:
+Layar akhir sesi lulus (≥70%) berisi skor, XP, pill level, fakta budaya + CTA ulangi/kembali.
+_Avoid_: result generik, skor tanpa konteks modul
+
+**Hasil Gagal**:
+Layar akhir sesi belum lulus berisi skor, pesan semangat, topik salah + CTA kembali/coba lagi.
+_Avoid_: fail generik
+
+**Lanjut Kuis**:
+Dialog penawaran melanjutkan sesi dari soal tersimpan atau mulai ulang.
+_Avoid_: resume generik
+
+**Kuis Pasangan**:
+Tipe soal mencocokkan sapaan dengan artinya.
+_Avoid_: matching generik
+
+**Kuis Susun**:
+Tipe soal menyusun suku kata/chip menjadi kata benar.
+_Avoid_: susun generik
+
+**Papan Peringkat**:
+Halaman penuh liga mingguan (H2 + League Card + List R1–R8) dengan reset Senin.
+_Avoid_: leaderboard generik tanpa liga mingguan
+
+**Unduh**:
+Layar pilihan installer per platform + banner sinkron progres.
+_Avoid_: download generik
+
+**Onboarding**:
+Alur 5 langkah (Alasan, Level, Komitmen, Nama, Sukses) berisi preferensi awal + maskot Bedawang Nala.
+_Avoid_: tutorial generik, walkthrough
