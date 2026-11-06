@@ -2,13 +2,13 @@ import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const statusBox = {
   belum: "border-border/60 bg-card text-muted-foreground",
-  dipahami: "border-[#FFC800] bg-[#FFF3C4] shadow-[0_2px_0_0_#FFC800]",
+  dipahami: "border-accent bg-accent/15 shadow-[0_2px_0_0_var(--color-accent)]",
   ahli: "border-cta bg-cta/10 shadow-[0_2px_0_0_var(--color-cta-edge)]",
 } as const;
 
 const statusTag = {
   belum: "bg-muted/60 text-muted-foreground",
-  dipahami: "bg-[#FFC800]/25 text-[#8a6100]",
+  dipahami: "bg-accent/25 text-accent-foreground",
   ahli: "bg-cta/15 text-cta",
 } as const;
 
@@ -28,7 +28,7 @@ export function MasteryGrid({
     <div>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-extrabold tracking-tight">Mastery 18 Wresastra</h3>
-        <span className="rounded-full bg-[#DDF4FF] px-2.5 py-1 text-[10px] font-bold text-[#1CB0F6]">
+        <span className="rounded-full bg-duo-blue/15 px-2.5 py-1 text-[10px] font-bold text-duo-blue">
           {unlocked} / {WRESASTRA_AKSARA.length}
         </span>
       </div>

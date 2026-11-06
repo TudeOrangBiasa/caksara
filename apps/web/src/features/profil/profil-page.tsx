@@ -134,7 +134,7 @@ export function ProfilPage({
           <SideAction
             onClick={onOpenShare}
             icon={<Share2 className="size-6 text-white" />}
-            iconBg="bg-[#1CB0F6]"
+            iconBg="bg-duo-blue"
             title="Bagikan Capaian"
             desc="Pamerkan kartu prestasimu"
           />
@@ -156,7 +156,7 @@ export function ProfilPage({
           className="rounded-[20px] border-2 border-b-[5px] border-border bg-card p-5 lg:gap-3 lg:p-[22px] lg:border lg:border-b-2 lg:shadow-[0_2px_0_0_var(--border)] lg:flex lg:flex-col"
         >
           <div className="mb-3 flex items-center gap-3 lg:mb-0 lg:gap-3">
-            <span className="flex size-[52px] items-center justify-center rounded-full bg-[#FFF3C4] text-[#FFC800]">
+            <span className="flex size-[52px] items-center justify-center rounded-full bg-accent/15 text-accent">
               <Trophy className="size-6" aria-hidden />
             </span>
             <div>
@@ -183,7 +183,7 @@ export function ProfilPage({
             aria-label={`Progres level ${level}`}
           >
             <div
-              className="h-full rounded-full bg-[#FFC800] transition-all duration-1000 ease-out"
+              className="h-full rounded-full bg-accent transition-all duration-1000 ease-out"
               style={{ width: `${(intoLevel / 50) * 100}%` }}
             />
           </div>
@@ -218,7 +218,7 @@ export function ProfilPage({
                 Koleksi Lencana
               </h2>
             </div>
-            <span className="rounded-full bg-[#DDF4FF] px-3 py-1.5 text-xs font-bold text-[#1CB0F6] lg:leading-[15px]">
+            <span className="rounded-full bg-duo-blue/15 px-3 py-1.5 text-xs font-bold text-duo-blue lg:leading-[15px]">
               {unlockedCount} / {badges.length}
             </span>
           </div>
@@ -262,7 +262,7 @@ export function ProfilPage({
           <SideAction
             onClick={onOpenShare}
             icon={<Share2 className="size-6 text-white" />}
-            iconBg="bg-[#1CB0F6]"
+            iconBg="bg-duo-blue"
             title="Bagikan Capaian"
             desc="Buat kartu prestasi"
           />
@@ -348,11 +348,11 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
   return (
     <section
       aria-label="Streak harian"
-      className="overflow-hidden rounded-[20px] bg-gradient-to-br from-[#FFA726] to-[#FF7A00] p-5 text-white shadow-[0_4px_0_0_#E87500] lg:rounded-3xl lg:p-[22px] lg:shadow-none"
+      className="overflow-hidden rounded-[20px] bg-gradient-to-br from-streak-from to-streak-to p-5 text-white shadow-[0_4px_0_0_var(--color-streak-edge)] lg:rounded-3xl lg:p-[22px] lg:shadow-none"
     >
       <div className="mb-3 flex items-center gap-3 lg:mb-0">
         <span className="flex size-[60px] items-center justify-center rounded-full bg-white">
-          <Flame className="size-7 fill-[#FF7A00] text-[#FF7A00]" aria-hidden />
+          <Flame className="size-7 fill-streak-to text-streak-to" aria-hidden />
         </span>
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-widest text-white/85 lg:text-white lg:leading-[12px]">
@@ -379,7 +379,7 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
               title={day}
               className={`flex flex-col items-center gap-0.5 rounded-full border-2 px-1 py-1.5 ${
                 lit
-                  ? "border-[#E87500] bg-white text-[#B4622D]"
+                  ? "border-streak-edge bg-streak-lit text-white"
                   : "border-white/30 bg-white/25 text-white"
               }`}
             >
@@ -399,7 +399,7 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
           : "Selesaikan 1 kuis untuk menyalakan streak hari ini."}
       </p>
       {streak > 0 && litCount < 7 && (
-        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-extrabold text-[#B4622D] lg:mt-0 lg:px-4 lg:py-2">
+        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-extrabold text-primary lg:mt-0 lg:px-4 lg:py-2">
           <Flame className="size-3.5 fill-current" aria-hidden />
           {lastActive === today
             ? `+${XP_STREAK_BONUS} XP bonus streak diklaim`
