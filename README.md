@@ -1,7 +1,5 @@
 # Caksara, web edukasi interaktif aksara Bali
 
-INVENTION 2026, kategori Web Design. Tema tahun ini "Building Smarter Communities Through Digital Learning".
-
 Caksara itu edutainment buat aksara Bali. Empat modul berurutan, Sapaan dan Adat, lalu Wresastra, lalu Andap dan Alus, lalu Tradisi. Tiap modul ditutup Sesi Kuis berisi 3 soal yang digenerate Gemini Flash dari Knowledge Base terpercaya, jadi isinya ngutip sumber, bukan ngarang. Progres dicatat per Profil Anon, lengkap dengan XP, Hati, Streak, dan Mastery. Kamu masuk, pilih nama panggilan dulu, langsung main. Google itu opsional, dan yang mau adu rajin bisa lihat papan peringkat top 20 XP.
 
 ## Stack
@@ -12,7 +10,7 @@ React, Vite, dan TypeScript di depan. Tailwind plus Material 3 buat tampilan, ox
 
 Sesi Kuis digenerate Edge Function `supabase/functions/generate-quiz/index.ts`. Modelnya `gemini-3.1-flash-lite`, temp 0.3, `responseSchema` JSON plus Zod `quizSchema`. Aturannya simpel dan saya suka bagian ini. Setiap soal Gemini wajib mengutip KB Entry yang di-inject, formatnya `sourceRef` berisi "KB#id · Basis Pengetahuan". Kalau soal datang tanpa kutipan valid, server menolaknya dan jatuh ke bank fallback. Header `x-quiz-source` bilang jujur isinya `gemini` atau `fallback`.
 
-Guru Virtual itu Gemini RAG Digifest, lihat #94 dan #95. Edge Function `supabase/functions/guru-rag/index.ts` memakai model `gemini-3.1-flash-lite`, temp 0.3, `responseSchema` berisi `{ answer, entryIds, outside }` plus Zod `ragResponseSchema`. Seluruh 27 entri KB, id plus judul plus isi ringkas, di-inject sebagai konteks terikat. Kalau model mengarang `entryIds` asing, server membuangnya. Kalau `outside:true`, FE merender kalimat tolak exact sesuai #90. Kalau gagal atau tanpa key, responsnya 503 plus fallback lokal, `getTeacherReply` atau explanation statis, jadi layar tidak pernah blank. Mode `explain` melayani tombol "Kenapa?" pada jawaban kuis yang salah, jawabannya 2 sampai 3 kalimat plus chip sumber. Secrets seperti `GEMINI_API_KEY` hanya hidup di Supabase Edge dashboard. Jangan pernah commit.
+Guru Virtual itu Gemini RAG, lihat #94 dan #95. Edge Function `supabase/functions/guru-rag/index.ts` memakai model `gemini-3.1-flash-lite`, temp 0.3, `responseSchema` berisi `{ answer, entryIds, outside }` plus Zod `ragResponseSchema`. Seluruh 27 entri KB, id plus judul plus isi ringkas, di-inject sebagai konteks terikat. Kalau model mengarang `entryIds` asing, server membuangnya. Kalau `outside:true`, FE merender kalimat tolak exact sesuai #90. Kalau gagal atau tanpa key, responsnya 503 plus fallback lokal, `getTeacherReply` atau explanation statis, jadi layar tidak pernah blank. Mode `explain` melayani tombol "Kenapa?" pada jawaban kuis yang salah, jawabannya 2 sampai 3 kalimat plus chip sumber. Secrets seperti `GEMINI_API_KEY` hanya hidup di Supabase Edge dashboard. Jangan pernah commit.
 
 ## Struktur
 
@@ -67,9 +65,9 @@ bunx vercel env add VITE_SUPABASE_PUBLISHABLE_KEY preview production
 bunx vercel env ls            # verifikasi; redeploy agar env berlaku
 ```
 
-Checklist E2E buat juri, manual, maksimal 15 menit. Onboarding, lalu Sesi Kuis yang ada badge Latin `dengar_pilih` plus atribusi, lalu Profil. 18 Wresastra tanpa tofu di 390 dan 1280 plus zoom 200%. `bun run check:secrets` hijau, artinya tidak ada GEMINI di bundle. RLS A tidak sama dengan B via `supabase/rls/0001_rls.sql`. Edge 429 sebelum Gemini, lihat `x-quiz-source`. Terakhir `bun run build` plus Vercel preview hijau.
+Checklist E2E manual, maksimal 15 menit. Onboarding, lalu Sesi Kuis yang ada badge Latin `dengar_pilih` plus atribusi, lalu Profil. 18 Wresastra tanpa tofu di 390 dan 1280 plus zoom 200%. `bun run check:secrets` hijau, artinya tidak ada GEMINI di bundle. RLS A tidak sama dengan B via `supabase/rls/0001_rls.sql`. Edge 429 sebelum Gemini, lihat `x-quiz-source`. Terakhir `bun run build` plus Vercel preview hijau.
 
-<!-- BEGIN digifest-authdocs (#89 #91), jangan gabung dengan seksi AI OwnerI -->
+<!-- BEGIN authdocs (#89 #91), jangan gabung dengan seksi AI -->
 
 ## Auth Google dan papan peringkat (#89)
 
@@ -83,7 +81,7 @@ Redirect URL yang wajib didaftarkan ada di Dashboard Supabase, menu Authenticati
 1. `https://<proyek>.vercel.app/` buat preview plus production.
 1. `app.caksara.web://auth/callback` buat shell Android #100, custom scheme dengan allowlist manual.
 
-Akun demo Google buat juri dibagikan via kanal panitia, bukan repo.
+Akun demo Google dibagikan via kanal internal, bukan repo.
 
 ## Batasan yang diketahui (#91)
 
@@ -101,5 +99,5 @@ Akun demo Google buat juri dibagikan via kanal panitia, bukan repo.
 
 ## Tag rilis (#91)
 
-Demo Digifest, tag annotated `v1.0-submission` di commit `88518df91c772d938af85f7c233f71d549447d1f`, objek tag `cc5fd164c27113c6e90196c1b3137625e6831173`, lihat #91.
-<!-- END digifest-authdocs -->
+Rilis `v1.0` di commit `88518df91c772d938af85f7c233f71d549447d1f`, objek tag `cc5fd164c27113c6e90196c1b3137625e6831173`, lihat #91.
+<!-- END authdocs -->

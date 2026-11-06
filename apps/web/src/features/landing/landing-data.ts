@@ -7,9 +7,8 @@ export interface LandingTestimony {
 }
 
 /**
- * Testimoni pitching lomba INVENTION 2026 (data-driven, bukan hardcode klaim).
- * Nama dan kutipan tampil apa adanya dari Pencil T4HbK (keputusan Main:
- * guidebook lomba melarang data asli). Avatar: aset Userpics lokal.
+ * Testimoni dan kontak tampil apa adanya dari desain (data-driven, bukan hardcode klaim).
+ * Nama dan kutipan dari Pencil T4HbK, bukan data asli. Avatar: aset Userpics lokal.
  */
 export const LANDING_TESTIMONIES: LandingTestimony[] = [
   {
@@ -44,7 +43,7 @@ export interface LandingContact {
   href: string;
 }
 
-/** Kontak footer lomba (Pencil T4HbK apa adanya, keputusan Main). */
+/** Kontak footer (Pencil T4HbK apa adanya). */
 export const LANDING_CONTACTS: LandingContact[] = [
   { id: "telp", label: "(0361) 123 456", href: "tel:+62361123456" },
   { id: "email", label: "halo@caksara.id", href: "mailto:halo@caksara.id" },

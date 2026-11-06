@@ -456,7 +456,7 @@ const TYPE_ORDER: Question["type"][] = [
  * Pilih soal sesi: selalu sertakan dengar_pilih bila bank punya, jaga
  * 2+ tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
  * agar pengulangan tidak monoton. Deterministik — aman untuk resume.
- * Sesi Digifest selalu 3 soal (#85); bank kelebihan tetap di source, tak dipilih.
+ * Sesi selalu 3 soal (#85); bank kelebihan tetap di source, tak dipilih.
  */
 export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptions): Question[] {
   const level = Math.min(3, Math.max(1, Math.round(opts?.level ?? 1)));

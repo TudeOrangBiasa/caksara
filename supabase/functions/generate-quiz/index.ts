@@ -1,7 +1,7 @@
 /// <reference lib="deno.ns" />
 // Edge Function: generate-quiz (#23 V4).
 // Kontrak: terima { moduleId, level, count, wrongTopics }, kembalikan
-// { moduleId, questions[tepat 3, Digifest #85], cached } dengan 2+ tipe soal
+// { moduleId, questions[tepat 3, #85], cached } dengan 2+ tipe soal
 // termasuk dengar_pilih (audio asli bila ada, badge Latin bila belum terkurasi).
 // Ketahanan: rate-limit 429 sebelum panggil Gemini, retry 2x lalu fallback
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
@@ -670,7 +670,7 @@ export async function handler(req: Request): Promise<Response> {
   const moduleId = typeof body.moduleId === "string" ? body.moduleId.trim() : "";
   if (!moduleId) return json(400, { error: "moduleId wajib" });
   const level = clampLevel(body.level);
-  const count = 3; // Digifest #85: sesi selalu tepat 3 soal, abaikan count klien.
+  const count = 3; // #85: sesi selalu tepat 3 soal, abaikan count klien.
   const wrongTopics = Array.isArray(body.wrongTopics)
     ? body.wrongTopics.filter((t): t is string => typeof t === "string").slice(0, 8)
     : [];
