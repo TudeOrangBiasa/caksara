@@ -6,11 +6,11 @@ via `execute` visitor teks + `Get depth≤1` per page id (bukan screenshot).
 Fakta file aktual `/home/todayz/Downloads/Caksara/Caksara.pen` (diukur
 2026-11-06): hanya **19 frame** top-level — T4HbK, Ky2up, pAPnC, tXwUy,
 Gd8Af, u78JLW, RJBIf, A8B2n, g6deu, Z8nXI, OfPb9, HK0rs, t8BaKT, IpWol,
-FyN8o, jU8co, vjnVJ, VyFA4, lGwoj. Klaim 28 id varian (oUw3N, Touj1,
-s6fBnf, By3so, F9JfH, tYWO2, zcYGq, rC4hQ, z5kXC, lLjRA, NGB8o, GqKlb,
-ise0X, D8Mhs, Q49tlr, TnrZR, chIYf, r740fO, dP2jw, z0OhL, XXIlm, gQI9t,
-XGzWh, r8LGWn) **0/28 tidak ada** di file; tidak ada tema Lontar/Banjar/
-Kelir, tidak ada Guru/Mobile/Soal terpisah. Lebar ukur: root 1440,
+FyN8o, jU8co, vjnVJ, VyFA4, lGwoj. Dikecualikan (tidak ada di file,
+hasil scan 0/28): oUw3N, Touj1, s6fBnf, By3so, F9JfH, tYWO2, zcYGq,
+rC4hQ, z5kXC, lLjRA, NGB8o, GqKlb, ise0X, D8Mhs, Q49tlr, TnrZR, chIYf,
+r740fO, dP2jw, z0OhL, XXIlm, gQI9t, XGzWh, r8LGWn; tidak ada tema
+Lontar/Banjar/Kelir, tidak ada Guru/Mobile/Soal terpisah. Lebar ukur:
 Column/Result Col kuis-hasil **576px**, League Card + List peringkat
 **800px**. Web adalah SPA satu route `/` (tab + view overlay); semua 19
 frame sudah punya padanan komponen.
