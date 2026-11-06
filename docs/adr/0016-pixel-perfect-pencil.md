@@ -47,15 +47,13 @@ kunci 576 kuis/hasil, 800 peringkat; (d) copy Indonesia eksak dari
 Pencil, jangan parafrase; (e) ikon lucide saja, tanpa emoji visual.
 
 **5. Token streak dari grounding Pencil.** Node `nItHP Streak Card`
-(tXwUy) = gradien linear 135° `#FFA726`→`#FF7A00`; token ilustrasi
-`--streak-from/--streak-to/--streak-edge (#E87500)` HEX tetap light/dark
-(pola ADR-0011), mirror `--color-streak-*`, konsumsi
-`from-streak-from/to-streak-to/shadow-[...--color-streak-edge]`.
+(tXwUy) = gradien linear 135° `#FFA726`→`#FF7A00`; `--streak-edge`
+(`#E87500`); hari lit fill `#FF9600` (`--streak-lit`), hari mati
+`#FFFFFF44` + stroke `#E5E5E5` (tetap alpha/white existing). Token
+ilustrasi HEX tetap light/dark (pola ADR-0011), mirror `--color-streak-*`.
 
-**Utang tercatat (ticket terpisah, bukan ticket docs ini):** drift
-onboarding 2 string (keputusan 4, sudah fix #172); hex literal di
-`leaderboard.tsx` (rank), `profil-page.tsx`, `mastery-grid.tsx`, shadow
-`landing-home.tsx` (melanggar ADR 0010/0015).
+**Utang lunas (PR #173):** hex rank/badge/shadow → token accent,
+duo-blue, success, muted, secondary, border.
 
 Konsekuensi: `CONTEXT.md ## Layar` + ADR ini = acuan tunggal cakupan
 pixel-perfect (19 frame, bukan varian phantom). Tanpa edit kode; `bun

@@ -379,7 +379,7 @@ function StreakCard({ streak, lastActive }: { streak: number; lastActive?: strin
               title={day}
               className={`flex flex-col items-center gap-0.5 rounded-full border-2 px-1 py-1.5 ${
                 lit
-                  ? "border-streak-edge bg-white text-primary"
+                  ? "border-streak-edge bg-streak-lit text-white"
                   : "border-white/30 bg-white/25 text-white"
               }`}
             >
