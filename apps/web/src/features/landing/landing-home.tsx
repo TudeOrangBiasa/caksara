@@ -116,7 +116,7 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
             TEBAK AKSARA
           </p>
           <p className="text-center text-[19px] font-extrabold text-foreground">Aksara apa ini?</p>
-          <div className="w-full rounded-2xl border-[2.5px] border-border bg-card px-[18px] py-4 text-center shadow-[0_12px_28px_#8A6D3B38]">
+          <div className="w-full rounded-2xl border-[2.5px] border-border bg-card px-[18px] py-4 text-center shadow-[0_12px_28px_var(--color-border)]">
             <span
               lang="ban"
               className="font-balinese text-[38px] font-bold leading-none text-foreground"
@@ -125,11 +125,11 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
             </span>
           </div>
           <div className="flex w-full flex-col gap-2.5">
-            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-cta bg-cta/10 px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-cta bg-cta/10 px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_var(--color-border)]">
               <span className="font-bold text-cta">A</span>
               <span className="font-semibold text-foreground">Ba</span>
             </span>
-            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-border bg-card px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-border bg-card px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_var(--color-border)]">
               <span className="font-semibold text-muted-foreground">B</span>
               <span className="font-normal text-foreground">Da</span>
             </span>
