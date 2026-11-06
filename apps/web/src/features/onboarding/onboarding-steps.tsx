@@ -220,7 +220,7 @@ export function StepGoal({ goal, onSelect }: { goal: string; onSelect: (v: strin
 export function StepLevel({ level, onSelect }: { level: string; onSelect: (v: string) => void }) {
   return (
     <div>
-      <StepMeta label="PILIH SATU LEVEL" question="Sudah sejauh mana kamu kenal?" />
+      <StepMeta label="PILIH SATU LEVEL" question="Seberapa jauh kamu sudah kenal?" />
       <MascotBubble
         mood="senang"
         title="Bagus sekali! Seberapa jauh kamu sudah kenal?"
@@ -240,7 +240,7 @@ export function StepCommitment({
 }) {
   return (
     <div>
-      <StepMeta label="PILIH KOMITMEN HARIANMU" question="Berapa lama tiap hari?" />
+      <StepMeta label="PILIH KOMITMEN HARIANMU" question="Berapa lama waktumu tiap hari?" />
       <MascotBubble
         mood="semangat"
         title="Konsistensi adalah kunci belajar aksara!"
