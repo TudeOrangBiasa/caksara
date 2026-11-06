@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Feather,
   Gamepad2,
-  Heart,
   Layers,
   LibraryBig,
   Mail,
@@ -16,9 +15,7 @@ import {
   Mic,
   Phone,
   Search,
-  Sparkles,
   Star,
-  X,
 } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
@@ -104,39 +101,39 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
         aria-hidden
         className="absolute left-1/2 top-1/2 size-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full ring-8 ring-primary/15 lg:size-[420px]"
       />
-      <div className="absolute left-1/2 top-1/2 w-[46%] max-w-60 -translate-x-1/2 -translate-y-1/2 rotate-6 rounded-[36px] bg-foreground p-3 shadow-lg lg:w-[240px] lg:max-w-none lg:rotate-0 lg:rounded-[32px]">
+      <div className="absolute left-1/2 top-1/2 w-[46%] max-w-60 -translate-x-1/2 -translate-y-1/2 rotate-6 rounded-[36px] bg-foreground p-3 shadow-lg lg:w-[240px] lg:max-w-none lg:rotate-6 lg:rounded-[36px]">
         <div className="flex flex-col items-center gap-3 rounded-[26px] bg-card p-4 lg:gap-3 lg:p-4">
-          <div className="flex w-full items-center gap-2">
-            <X className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="flex w-full items-center gap-1.5">
+            <span className="text-xs text-muted-foreground" aria-hidden>
+              ✕
+            </span>
             <div className="h-2 flex-1 rounded-full bg-muted" aria-hidden />
-            <Heart className="size-3.5 shrink-0 fill-destructive text-destructive" aria-hidden />
+            <span className="text-xs text-destructive" aria-hidden>
+              ♥
+            </span>
           </div>
-          <p className="text-[11px] font-extrabold tracking-[1px] text-muted-foreground">
+          <p className="text-[11px] font-extrabold tracking-[0.6px] text-muted-foreground">
             TEBAK AKSARA
           </p>
-          <p className="text-center text-[15px] font-extrabold text-foreground">Aksara apa ini?</p>
-          <div className="w-full rounded-2xl border-2 border-border bg-card p-3 text-center shadow-md">
+          <p className="text-center text-[19px] font-extrabold text-foreground">Aksara apa ini?</p>
+          <div className="w-full rounded-2xl border-[2.5px] border-border bg-card px-[18px] py-4 text-center shadow-[0_12px_28px_#8A6D3B38]">
             <span
               lang="ban"
-              className="font-balinese text-[38px] font-bold leading-none text-primary"
+              className="font-balinese text-[38px] font-bold leading-none text-foreground"
             >
               ᬩ
             </span>
           </div>
-          <div className="flex w-full flex-col gap-1.5">
-            <span className="flex items-center gap-2 rounded-2xl border-2 border-cta bg-cta/10 px-3 py-1.5 text-xs font-bold text-foreground">
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-cta text-[11px] font-bold text-primary-foreground">
-                A
-              </span>
-              Ba
+          <div className="flex w-full flex-col gap-2.5">
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-cta bg-cta/10 px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+              <span className="font-bold text-cta">A</span>
+              <span className="font-semibold text-foreground">Ba</span>
             </span>
-            <span className="flex items-center gap-2 rounded-2xl border-2 border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-bold text-muted-foreground">
-                B
-              </span>
-              Da
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-border bg-card px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+              <span className="font-semibold text-muted-foreground">B</span>
+              <span className="font-normal text-foreground">Da</span>
             </span>
-            <span className="w-full rounded-full bg-cta px-3 py-2 text-center text-xs font-bold text-primary-foreground">
+            <span className="w-full rounded-full bg-cta px-3 py-[14px] text-center text-sm font-bold text-primary-foreground">
               PERIKSA
             </span>
           </div>
@@ -152,17 +149,23 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
           key={i}
           aria-hidden
           className={cn(
-            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-border bg-card shadow-sm",
+            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-b-[5px] border-duo-blue/30 bg-card shadow-sm",
             cls,
             floatCls(i % 2 ? "5s" : "6s"),
           )}
         >
-          <Icon className="size-6 text-primary" />
+          <Icon className="size-6 text-duo-blue" />
         </span>
       ))}
-      <Sparkles aria-hidden className="absolute left-[36%] top-[10%] size-6 text-accent" />
-      <Sparkles aria-hidden className="absolute right-[26%] top-[52%] size-8 text-accent" />
-      <Sparkles aria-hidden className="absolute left-[40%] top-[54%] size-4 text-accent" />
+      <span aria-hidden className="absolute left-[36%] top-[10%] text-[28px] text-accent">
+        ✦
+      </span>
+      <span aria-hidden className="absolute right-[26%] top-[52%] text-[36px] text-accent">
+        ✦
+      </span>
+      <span aria-hidden className="absolute left-[40%] top-[54%] text-base text-accent">
+        ✦
+      </span>
       <Bedawang
         mood="semangat"
         className={cn(
@@ -378,20 +381,20 @@ export function LandingHome({
             Pelajaran singkat yang seru, dapat poin dan naik level sambil belajar komunikasi nyata
             sehari-hari.
           </p>
-          <div className="flex justify-center lg:justify-start lg:gap-3">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start lg:gap-7">
             <button
               type="button"
               onClick={onStart}
-              className="inline-flex items-center justify-center rounded-full bg-cta px-16 py-4 text-[15px] font-bold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none lg:px-11 lg:py-3.5 lg:text-sm lg:uppercase"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-cta px-16 py-4 text-[15px] font-bold text-white shadow-[0_10px_20px_0_var(--color-cta-edge)] transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none lg:px-16 lg:py-4 lg:text-[15px]"
             >
-              Mulai Belajar
+              MULAI BELAJAR
             </button>
             <button
               type="button"
               onClick={onOpenKb}
-              className="hidden items-center justify-center rounded-full border-2 border-cta/40 px-11 py-3.5 text-sm font-bold uppercase text-cta transition-all hover:bg-cta/10 lg:inline-flex"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-full border-2 border-cta/40 bg-card px-[54px] py-[14px] text-[13px] font-bold text-cta transition-all hover:bg-cta/10"
             >
-              Saya Sudah Punya Akun
+              SAYA SUDAH PUNYA AKUN
             </button>
           </div>
         </div>

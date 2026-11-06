@@ -20,6 +20,8 @@ import { ModuleTree } from "../features/module/module-tree";
 import { hasSelesai, markSelesai } from "../features/module/module-store";
 import { TeacherChat } from "../features/teacher/teacher";
 import { ProfilPage } from "../features/profil/profil-page";
+import { LeaderboardCard } from "../features/leaderboard/leaderboard";
+import { UnduhPage } from "../features/unduh/unduh-page";
 import { SettingsPage } from "../features/settings/settings";
 import { ShareSheet } from "../features/share/share-sheet";
 import type { CourseModule } from "../features/module/module-data";
@@ -389,6 +391,7 @@ export default function Home() {
         selesai={selesai}
         onStart={() => setNavTab("belajar")}
         onOpenGuru={() => setNavTab("guru")}
+        onOpenPeringkat={() => setNavTab("peringkat")}
         onOpenKb={(q) => {
           setKbQuery(q);
           setNavTab("kb");
@@ -430,6 +433,20 @@ export default function Home() {
         }}
       />
     );
+  } else if (navTab === "peringkat") {
+    content = (
+      <div className="mx-auto w-full max-w-lg px-4 pb-12 pt-6 md:max-w-2xl lg:max-w-[800px] lg:pt-10">
+        <h1 className="text-[40px] font-extrabold tracking-tight">Papan Peringkat</h1>
+        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+          Adu XP mingguan dengan pelajar lain. Reset tiap Senin.
+        </p>
+        <div className="mt-6">
+          <LeaderboardCard currentProfileId={loadProfile()?.id} />
+        </div>
+      </div>
+    );
+  } else if (navTab === "unduh") {
+    content = <UnduhPage />;
   } else {
     content = (
       <ProfilPage
