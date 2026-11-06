@@ -126,7 +126,7 @@ async function passKb(ctx: DriveCtx): Promise<void> {
   await page.getByRole("button", { name: "Keluar dari kuis" }).click();
   await page.getByRole("button", { name: "Kembali" }).first().click();
   await page.waitForSelector("text=Daftar modul");
-  await page.getByRole("button", { name: "KB", exact: true }).click();
+  await page.getByRole("button", { name: "Kamus", exact: true }).click();
   await page.waitForTimeout(1500);
   ctx.samples.push(await sampleOverflow(page, "kb"));
   await page.locator("section button").first().click();
