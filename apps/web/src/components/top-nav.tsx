@@ -53,7 +53,7 @@ export function TopNav({ active, onSelect }: { active: NavTab; onSelect: (t: Nav
         {/* Nav tabs — centered */}
         <nav
           aria-label="Navigasi utama"
-          className="flex flex-1 items-center justify-center gap-0.5"
+          className="flex min-w-0 flex-1 items-center justify-center gap-1.5"
         >
           {tabs.map((tab) => {
             const isActive = tab.id === active;
@@ -64,16 +64,13 @@ export function TopNav({ active, onSelect }: { active: NavTab; onSelect: (t: Nav
                 onClick={() => onSelect(tab.id)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200",
+                  "whitespace-nowrap rounded-full px-[18px] py-[9px] text-sm transition-all duration-200",
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                    ? "bg-primary/10 font-bold text-primary"
+                    : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 {tab.label}
-                {isActive && (
-                  <span className="absolute bottom-0.5 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-primary" />
-                )}
               </button>
             );
           })}

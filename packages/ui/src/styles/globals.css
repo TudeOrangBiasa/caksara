@@ -24,6 +24,7 @@
   --destructive: oklch(0.58 0.22 27);
   --success: oklch(0.62 0.15 145);
   --warning: oklch(0.75 0.14 65);
+  --duo-blue: #1cb0f6;
   --mastery-belum: oklch(0.97 0.01 85);
   --mastery-dipahami: oklch(0.72 0.14 75);
   --mastery-ahli: oklch(0.55 0.13 38);
@@ -146,6 +147,7 @@
   --font-balinese: "Noto Sans Balinese", sans-serif;
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-duo-blue: var(--duo-blue);
   --color-cta: var(--cta);
   --color-cta-edge: var(--cta-edge);
   --color-mastery-belum: var(--mastery-belum);

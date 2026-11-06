@@ -40,10 +40,10 @@ describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
       expect(data.includes(needle)).toBe(true);
     }
   });
-  test("hero satu CTA primary", () => {
+  test("hero dua CTA ala Pencil T4HbK (primer + sekunder)", () => {
     const hero = landing.slice(landing.indexOf("{/* HERO */}"), landing.indexOf("{/* WHY US */}"));
-    const matches = hero.match(/Mulai Belajar/g) ?? [];
-    expect(matches.length).toBe(1);
+    expect(hero.includes("MULAI BELAJAR")).toBe(true);
+    expect(hero.includes("SAYA SUDAH PUNYA AKUN")).toBe(true);
   });
 });
 

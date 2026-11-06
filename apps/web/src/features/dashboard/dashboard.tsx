@@ -39,10 +39,12 @@ function TargetHarian({ profile }: { profile: UserProfile | null }) {
 function LatihanCepat({
   onOpenKb,
   onOpenGuru,
+  onOpenPeringkat,
   onStart,
 }: {
   onOpenKb: () => void;
   onOpenGuru: () => void;
+  onOpenPeringkat: () => void;
   onStart: () => void;
 }) {
   return (
@@ -65,7 +67,7 @@ function LatihanCepat({
         </div>
         <span className="text-[11px] font-bold text-muted-foreground">Guru AI</span>
       </button>
-      <button className="group flex flex-col items-center gap-2">
+      <button onClick={onOpenPeringkat} className="group flex flex-col items-center gap-2">
         <div className="flex size-[4.25rem] items-center justify-center rounded-3xl bg-amber-500/15 text-amber-600 shadow-sm transition-transform active:scale-95 group-hover:-translate-y-1 dark:bg-amber-500/20 dark:text-amber-400">
           <Trophy className="size-6" strokeWidth={2.5} />
         </div>
@@ -81,6 +83,7 @@ export function Dashboard({
   onStart,
   onOpenGuru,
   onOpenKb,
+  onOpenPeringkat,
   onOpenDetail,
 }: {
   profile: UserProfile | null;
@@ -88,6 +91,7 @@ export function Dashboard({
   onStart: () => void;
   onOpenGuru: () => void;
   onOpenKb: (query: string) => void;
+  onOpenPeringkat: () => void;
   onOpenDetail: (mod: CourseModule) => void;
 }) {
   const statuses = deriveStatus(selesai);
@@ -173,7 +177,12 @@ export function Dashboard({
             Asah kemampuanmu kapan saja
           </p>
         </div>
-        <LatihanCepat onOpenKb={() => onOpenKb("")} onOpenGuru={onOpenGuru} onStart={onStart} />
+        <LatihanCepat
+          onOpenKb={() => onOpenKb("")}
+          onOpenGuru={onOpenGuru}
+          onOpenPeringkat={onOpenPeringkat}
+          onStart={onStart}
+        />
       </section>
 
       {/* Mastery 18 Wresastra */}
