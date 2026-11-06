@@ -782,7 +782,7 @@ export function LandingHome({
               </ul>
             </div>
 
-            {/* Column 4: Kontak Kami (data lomba, Pencil T4HbK) */}
+            {/* Column 4: Kontak Kami */}
             <div className="flex flex-col gap-4">
               <h3 className="font-bold text-foreground">Kontak Kami</h3>
               <ul className="flex flex-col gap-3">

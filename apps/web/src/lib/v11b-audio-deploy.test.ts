@@ -59,7 +59,7 @@ describe("v11b edge: 429 sebelum Gemini, tepat 3 soal Zod, kunci server-only", (
     assert.ok(edge.includes("429"));
   });
 
-  test("sesi Digifest tepat 3 soal (FE + Edge + Zod selaras #85)", () => {
+  test("sesi tepat 3 soal (FE + Edge + Zod selaras #85)", () => {
     assert.ok(edge.includes("const count = 3;"));
     assert.ok(edge.includes("minItems: 3"));
     assert.ok(edge.includes("maxItems: 3"));

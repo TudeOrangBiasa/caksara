@@ -5,7 +5,7 @@ import { join } from "node:path";
 const webRoot = join(import.meta.dir, "..", "..", "..");
 const src = (p: string) => readFileSync(join(webRoot, "src", p), "utf8");
 
-describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
+describe("UI — halaman memalukan dihapus (#88)", () => {
   const landing = src("features/landing/landing-home.tsx");
 
   test("tanpa href mati", () => {
@@ -16,9 +16,9 @@ describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
       expect(landing.includes(needle)).toBe(false);
     }
   });
-  test("testimoni + kontak lomba data-driven, bukan hardcode klaim (#160)", () => {
-    // Pengecualian #160 (keputusan Main): testimoni pitching + kontak footer
-    // tampil apa adanya dari Pencil T4HbK karena guidebook lomba melarang
+  test("testimoni + kontak data-driven, bukan hardcode klaim (#160)", () => {
+    // Pengecualian #160 (keputusan Main): testimoni + kontak footer
+    // tampil apa adanya dari Pencil T4HbK karena datanya bukan data asli:
     // data asli. Guard: nama/kontak hidup di landing-data.ts, komponen hanya
     // render via LANDING_TESTIMONIES/LANDING_CONTACTS.
     expect(landing.includes("LANDING_TESTIMONIES")).toBe(true);
@@ -47,7 +47,7 @@ describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
   });
 });
 
-describe("UI Digifest — ikon lucide-react saja (#103)", () => {
+describe("UI — ikon lucide-react saja (#103)", () => {
   test("tanpa pustaka ikon selain lucide", () => {
     const libs = ["pho" + "sphor", "react" + "-icons", "font" + "awesome"];
     for (const f of [
@@ -78,7 +78,7 @@ describe("UI Digifest — ikon lucide-react saja (#103)", () => {
   });
 });
 
-describe("UI Digifest — brand Bedawang konsisten (#98)", () => {
+describe("UI — brand Bedawang konsisten (#98)", () => {
   test("header + top-nav + splash memakai komponen Bedawang", () => {
     expect(src("components/header.tsx").includes("<Bedawang")).toBe(true);
     expect(src("components/top-nav.tsx").includes("<Bedawang")).toBe(true);
