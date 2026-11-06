@@ -23,6 +23,8 @@ const questionBase = z.object({
   prompt: z.string().min(1),
   audioUrl: z.string().optional(),
   audioType: z.enum(["original", "latin"]).optional(),
+  // Teks Latin yang dibaca saat audio asli belum terkurasi (ADR-0005: bukan TTS aksara).
+  latinText: z.string().min(1).optional(),
   explanation: z.string().optional(),
   sourceRef: z.string().optional(),
   aksaraId: z.string().optional(),

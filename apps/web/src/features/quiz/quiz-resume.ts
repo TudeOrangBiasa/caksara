@@ -3,7 +3,7 @@ import { z } from "zod";
 const storedAnswerSchema = z.object({
   selectedIndex: z.number().int().optional(),
   ordered: z.array(z.string()).optional(),
-  match: z.object({ left: z.string(), right: z.string() }).optional(),
+  matches: z.record(z.string(), z.string()).optional(),
 });
 
 const resumeSchema = z.object({
@@ -64,4 +64,13 @@ export function clearResume(moduleId: string): void {
   if (!(moduleId in all)) return;
   delete all[moduleId];
   writeAll(all);
+}
+/** Hapus seluruh tawaran lanjut kuis (dipakai reset progres total #27). */
+export function clearAllQuizResumes(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(KEY);
+  } catch {
+    // Storage diblokir: tidak ada yang perlu dihapus.
+  }
 }

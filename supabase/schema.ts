@@ -7,6 +7,7 @@ import {
   boolean,
   timestamp,
   jsonb,
+  index,
 } from "drizzle-orm/pg-core";
 
 // profiles — id = auth.uid() anon atau asli
@@ -77,7 +78,24 @@ export const userAksaraProgress = pgTable(
   }),
 );
 
-export const quizCalls = pgTable("quiz_calls", {
-  profileId: text("profile_id").notNull(),
-  calledAt: timestamp("called_at").defaultNow(),
+export const quizCalls = pgTable(
+  "quiz_calls",
+  {
+    profileId: text("profile_id").notNull(),
+    calledAt: timestamp("called_at").defaultNow(),
+    // #60: bucket jam UTC untuk counter 50/jam via index — nullable agar
+    // baris pra-migrasi (null) tetap valid.
+    windowHour: timestamp("window_hour"),
+  },
+  (t) => [index("quiz_calls_profile_window_idx").on(t.profileId, t.windowHour)],
+);
+
+// leaderboard_entries — peringkat XP publik (#89). Satu baris per profile_id
+// (= auth.uid() saat login Google); anon murni tanpa sesi tidak menulis.
+export const leaderboardEntries = pgTable("leaderboard_entries", {
+  profileId: text("profile_id").primaryKey(),
+  displayName: text("display_name").notNull(),
+  suffix: integer("suffix").notNull(),
+  xp: integer("xp").default(0).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });

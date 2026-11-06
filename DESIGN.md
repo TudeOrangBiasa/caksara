@@ -101,6 +101,32 @@ Palette is burnt-orange + neutral + gold. Single accent lock.
 
 Tokens are normative (`packages/ui/src/lib/tokens.ts` mirrors `globals.css` 36/36); prose describes use. No hex hardcode in components — use `bg-primary` etc.
 
+## Pencil Mapping (T1 #140, ADR 0015)
+
+Kanvas `Caksara.pen` (25 variabel, light-only) ter-grounding PENUH ke token existing, tanpa token baru:
+
+| Pencil                         | HEX       | Existing                                                                         |
+| ------------------------------ | --------- | -------------------------------------------------------------------------------- |
+| `$primary`                     | `#B4622D` | `--primary`                                                                      |
+| `$cta`                         | `#1D8A3C` | `--cta` (existing 4.95:1, Pencil 4.42:1 FAIL; nilai existing menang)             |
+| `$cta-dark`                    | `#156B2E` | `--cta-edge` (Pencil hanya swatch tak terpakai)                                  |
+| `$card`                        | `#FFFFFF` | `--card` (identik)                                                               |
+| `$ink`                         | `#242424` | `--foreground`                                                                   |
+| `$muted`                       | `#877D70` | `--muted-foreground`                                                             |
+| `$border`                      | `#ECE7DB` | `--border` (Δ tak kasatmata)                                                     |
+| `$primary-soft`                | `#FBE9DC` | `bg-primary/10` + `text-primary`                                                 |
+| `$amber`                       | `#C99B33` | `--accent` (ikon/level/XP) + `--warning` (streak); teks amber Pencil 2.27:1 FAIL |
+| `$red`                         | `#C13B1B` | `--destructive` + ikon non-warna                                                 |
+| `$cream-card`                  | `#F3EBDA` | `--secondary`/`--muted` (alias DITOLAK: satu warna satu nama)                    |
+| `$bg`                          | `#FFFCF6` | `--background`                                                                   |
+| `$footer-bg`                   | `#FAF7F0` | `bg-secondary/30` (alias DITOLAK)                                                |
+| `$green (+soft)`               | `#3E7C4F` | `--success`                                                                      |
+| `$red-soft`/`$amber-soft`      | n/a       | pola `/10`–`/20` + foreground kontras (ADR 0013 amend)                           |
+| `$muted-bg`                    | `#F6F1E8` | `--muted`                                                                        |
+| `$cream`/`$pink-card`/`$duo-*` | n/a       | tidak diadopsi (swatch/varian usang/tak terpakai)                                |
+
+Alasan: tiap peran sudah terisi token yang lolos kontras tercatat, punya varian dark (Pencil light-only), dan dipakai belasan file. Detail: `docs/adr/0015-audit-token-pencil.md`. Aset: `apps/web/public/NOTICE-IP-PENCIL.md`.
+
 ## Typography
 
 - **Display/Heading:** Inter Variable 600, tight tracking, for Modul titles.

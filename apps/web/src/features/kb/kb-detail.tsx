@@ -2,8 +2,10 @@ import { ArrowLeft, BookMarked, ShieldCheck } from "lucide-react";
 
 import { Button } from "@caksara/ui/components/button";
 
+import { KbAudio } from "./kb-audio";
 import { LevelBadge } from "./kb-list";
 import { KB_CATEGORY_META } from "./kb-data";
+import { TransliterateStrip } from "./transliterate-strip";
 import type { KbEntry } from "./kb-data";
 
 interface KbDetailProps {
@@ -12,6 +14,7 @@ interface KbDetailProps {
 }
 
 export function KbDetail({ entry, onBack }: KbDetailProps) {
+  const latin = entry.latin;
   return (
     <div className="mx-auto flex h-full w-full max-w-lg flex-col px-4 md:max-w-2xl lg:max-w-5xl py-5">
       <div className="mb-4 flex items-center gap-3">
@@ -19,11 +22,11 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
           type="button"
           onClick={onBack}
           aria-label="Kembali ke daftar KB"
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card ring-1 ring-border transition-colors hover:bg-muted"
         >
           <ArrowLeft className="size-4" />
         </button>
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <p className="text-[10px] font-extrabold uppercase tracking-[1.2px] text-muted-foreground">
           {KB_CATEGORY_META[entry.category].label}
         </p>
         <span className="ml-auto">
@@ -31,33 +34,50 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
         </span>
       </div>
 
-      <div className="hero-texture surface-raised rounded-3xl bg-primary px-5 py-8 text-center text-primary-foreground">
+      <div className="hero-texture surface-raised rounded-3xl border-2 border-primary bg-primary px-5 py-8 text-center text-primary-foreground">
         {entry.glyph ? (
-          <p className="font-balinese text-6xl leading-none">{entry.glyph}</p>
+          <p lang="ban" className="font-balinese wresastra-flow leading-none">
+            {entry.glyph}
+          </p>
         ) : (
           <p className="text-5xl font-bold leading-none">{entry.title.slice(0, 1)}</p>
         )}
         <h1 className="mt-4 text-[28px] font-extrabold tracking-tight md:text-[32px]">
           {entry.title}
         </h1>
-        {entry.latin && <p className="mt-1 text-sm text-white/80">{entry.latin}</p>}
+        {latin && (
+          <div className="mt-1 flex items-center justify-center gap-2 text-sm text-white/80">
+            <span>{latin}</span>
+            <KbAudio audioUrl={entry.audioUrl} latin={latin} />
+          </div>
+        )}
+        {entry.audioUrl && (
+          <p className="mt-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white">
+              Suara asli Bali · CC BY 4.0
+            </span>
+          </p>
+        )}
+        <p className="mt-2 text-[11px] font-medium text-white/70">ID {entry.id}</p>
       </div>
 
       <div className="space-y-6 lg:max-w-3xl">
-        <div className="mt-4 rounded-3xl bg-card p-5 shadow-sm">
+        <div className="mt-4 rounded-2xl border-2 border-border bg-card p-5 shadow-sm">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             Isi entri
           </p>
           <p className="mt-2 text-sm leading-relaxed">{entry.body}</p>
         </div>
+        <TransliterateStrip />
 
-        <div className="mt-4 space-y-6 rounded-3xl bg-card p-5 shadow-sm border-t border-border/60">
+        <div className="mt-4 rounded-2xl border-2 border-border bg-card p-5 shadow-sm">
           <p className="flex items-center gap-2 text-sm font-semibold">
             <BookMarked className="size-4 text-primary" />
             Sumber rujukan
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Isi ini dipakai sebagai dasar soal kuis dan jawaban Guru Virtual, jadi bisa ditelusuri.
+            Entri {entry.id} · dipakai sebagai dasar soal kuis dan jawaban Guru Virtual, jadi bisa
+            ditelusuri balik dari Sesi & Guru ke entri ini.
           </p>
           <ul className="mt-3 space-y-2">
             {entry.sources.map((s, i) => (
@@ -75,9 +95,23 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
               </li>
             ))}
           </ul>
+          <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+            Audio pelafalan: subset terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
+            (Mendeley Data, CC BY 4.0) —{" "}
+            <a
+              href="https://data.mendeley.com/datasets/6syjwz24v5/2"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2"
+            >
+              data.mendeley.com/datasets/6syjwz24v5/2
+            </a>{" "}
+            · teks Latin sementara bila audio belum terkurasi (bukan TTS aksara; audio Bali asli di
+            luar scope MVP).
+          </p>
         </div>
 
-        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-success/10 px-3 py-2.5 text-xs leading-relaxed text-success">
+        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-success/10 px-3 py-2.5 text-xs leading-relaxed text-cta">
           <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
           Soal tidak diracik sembarangan. Semua konten dirujuk ke sumber resmi biar akurat &amp;
           bisa dipercaya.
@@ -85,7 +119,7 @@ export function KbDetail({ entry, onBack }: KbDetailProps) {
       </div>
 
       <div className="mt-auto pt-4 lg:max-w-3xl">
-        <Button className="h-12 w-full rounded-full text-base font-semibold" onClick={onBack}>
+        <Button variant="cta" size="lg" className="h-12 w-full text-base" onClick={onBack}>
           Kembali ke Daftar KB
         </Button>
       </div>

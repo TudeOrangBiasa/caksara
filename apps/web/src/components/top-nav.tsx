@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { loadProfile, subscribeProfile } from "@/lib/profile-store";
+import { Bedawang } from "./bedawang";
 import { ProfileAvatar } from "./profile-avatar";
 import { useTheme } from "./theme-provider";
 import { tabs } from "./nav-tabs";
@@ -44,7 +45,7 @@ export function TopNav({ active, onSelect }: { active: NavTab; onSelect: (t: Nav
             aria-hidden
             className="flex size-9 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20 transition-all group-hover:bg-primary/15"
           >
-            <span className="font-balinese text-xl leading-none text-primary">ᬳ</span>
+            <Bedawang mood="semangat" className="size-7" />
           </span>
           <span className="text-[15px] font-bold tracking-tight">CAKSARA</span>
         </button>

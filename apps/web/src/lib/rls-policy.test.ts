@@ -23,7 +23,7 @@ const PRIVATE_TABLES = [
 ] as const;
 
 describe("rls 0001: RLS nyala di semua tabel", () => {
-  for (const table of [...PRIVATE_TABLES, "kb_entries", "modules"]) {
+  for (const table of [...PRIVATE_TABLES, "kb_entries", "modules", "leaderboard_entries"]) {
     test(`${table} enable row level security`, () => {
       assert.ok(sql.includes(`alter table public.${table} enable row level security;`));
     });
@@ -44,8 +44,8 @@ describe("rls 0001: isolasi pemilik (auth.uid)", () => {
 
   test("semua tabel privat memakai klausa auth.uid", () => {
     const uidUses = sql.match(/auth\.uid\(\)::text/gu) ?? [];
-    // profiles(2) + sessions(2) + answers(2) + progress(2) + calls(2) = 10
-    assert.equal(uidUses.length, 10);
+    // profiles(2) + sessions(2) + answers(2) + progress(2) + calls(2) + leaderboard(3) = 13
+    assert.equal(uidUses.length, 13);
   });
 
   test("answers dijaga lewat kepemilikan sesi induk", () => {
@@ -62,6 +62,12 @@ describe("rls 0001: tabel publik read-only", () => {
     });
   }
 
+  test("leaderboard dibaca publik (anon+auth), tulis hanya baris sendiri", () => {
+    assert.ok(sql.includes("on public.leaderboard_entries\n  for select using (true)"));
+    assert.ok(sql.includes("on public.leaderboard_entries\n  for insert with check"));
+    assert.ok(sql.includes("on public.leaderboard_entries\n  for update using"));
+    assert.ok(sql.includes("auth.uid()::text = profile_id"));
+  });
   test("tidak ada policy tulis di tabel publik", () => {
     for (const table of ["kb_entries", "modules"]) {
       const writes = sql.match(

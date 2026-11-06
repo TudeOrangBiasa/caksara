@@ -30,6 +30,10 @@
   --border: oklch(0.92 0.01 85);
   --input: oklch(0.92 0.01 85);
   --ring: oklch(0.55 0.13 38);
+  --cta: oklch(0.52 0.15 145);
+  --cta-edge: oklch(0.45 0.14 145);
+  --shadow-duo: 0 4px 0 0 var(--cta-edge);
+  --radius-pill: 999px;
   --shadow-sm: 0 1px 2px oklch(0.35 0.05 38 / 8%), 0 1px 3px oklch(0.35 0.05 38 / 6%);
   --shadow-md: 0 4px 12px oklch(0.35 0.05 38 / 12%), 0 2px 4px oklch(0.35 0.05 38 / 8%);
   --shadow-lg: 0 12px 32px oklch(0.35 0.05 38 / 18%), 0 4px 8px oklch(0.35 0.05 38 / 10%);
@@ -109,6 +113,8 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.7 0.12 38);
+  --cta: oklch(0.68 0.14 145);
+  --cta-edge: oklch(0.55 0.14 145);
   --shadow-sm: 0 1px 2px oklch(0 0 0 / 30%), 0 1px 3px oklch(0 0 0 / 24%);
   --shadow-md: 0 4px 12px oklch(0 0 0 / 40%), 0 2px 4px oklch(0 0 0 / 30%);
   --shadow-lg: 0 12px 32px oklch(0 0 0 / 55%), 0 4px 8px oklch(0 0 0 / 40%);
@@ -140,6 +146,8 @@
   --font-balinese: "Noto Sans Balinese", sans-serif;
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-cta: var(--cta);
+  --color-cta-edge: var(--cta-edge);
   --color-mastery-belum: var(--mastery-belum);
   --color-mastery-dipahami: var(--mastery-dipahami);
   --color-mastery-ahli: var(--mastery-ahli);
@@ -171,6 +179,7 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
+  --shadow-duo: var(--shadow-duo);
   --color-bedawang-shell: var(--bedawang-shell);
   --color-bedawang-shell-edge: var(--bedawang-shell-edge);
   --color-bedawang-shell-dark: var(--bedawang-shell-dark);
@@ -211,6 +220,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --radius-pill: var(--radius-pill);
 }
 
 @layer base {
@@ -228,6 +238,10 @@
 @layer components {
   .surface-raised {
     box-shadow: var(--highlight), var(--shadow-md);
+  }
+  /* Hard shadow kartun Duo (y+2, no-blur) untuk tile kuis. */
+  .tile-duo {
+    box-shadow: 0 2px 0 0 var(--border);
   }
   .hero-texture {
     position: relative;
@@ -255,6 +269,8 @@
   --animate-modal-in: modal-scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-card-pop: card-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-slide-up: slide-up 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shake: quiz-shake 300ms ease-out both;
+  --animate-quiz-progress: quiz-progress 200ms ease-out both;
 }
 
 @keyframes caksara-fade {
@@ -383,6 +399,31 @@
   }
 }
 
+@keyframes quiz-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes quiz-progress {
+  from {
+    width: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-bedawang-bob {
     animation: none;
@@ -411,6 +452,11 @@
   }
   .animate-card-pop {
     animation: none;
+  }
+  .animate-shake,
+  .animate-pulse,
+  [class*="animate-confetti"] {
+    animation: none !important;
   }
 }
 

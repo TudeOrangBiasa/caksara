@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BookX, RotateCcw } from "lucide-react";
 
 import type { Route } from "./+types/_index";
 import { BottomNav } from "../components/bottom-nav";
 import type { NavTab } from "../components/bottom-nav";
+import { EmptyState } from "../components/empty-state";
 import { OfflineBanner } from "../components/offline-banner";
 import { TopNav } from "../components/top-nav";
 import Header from "../components/header";
@@ -10,6 +12,7 @@ import { Dashboard } from "../features/dashboard/dashboard";
 import { OnboardingGate } from "../features/onboarding/onboarding-gate";
 import { KbDetail } from "../features/kb/kb-detail";
 import { KbList } from "../features/kb/kb-list";
+import { KB_ENTRIES } from "../features/kb/kb-data";
 import type { KbEntry } from "../features/kb/kb-data";
 import { ModuleDetail } from "../features/module/module-detail";
 import { ModuleMateri } from "../features/module/module-materi";
@@ -23,24 +26,52 @@ import type { CourseModule } from "../features/module/module-data";
 import { courseModules } from "../features/module/module-data";
 import { QuizShell } from "../features/quiz/quiz-shell";
 import { saveQuizSession } from "../features/quiz/quiz-sync";
+import { saveAksaraProgress } from "../features/quiz/quiz-progress";
+import { enqueuePendingSession, shouldBufferAfterFinish } from "../features/quiz/quiz-pending-sync";
 import { QuizResult } from "../features/quiz/quiz-result";
-import { buildMixedQuiz, buildQuiz } from "../features/quiz/quiz-data";
+import { pickTidbit } from "../features/share/achievement-card";
+import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
+import type { QuizNotice } from "../features/quiz/quiz-generate";
+import {
+  buildMixedQuiz,
+  buildSessionQuiz,
+  getAdaptiveLevel,
+  nextAttemptSeed,
+  recordSessionLevel,
+} from "../features/quiz/quiz-data";
+import { deriveWrongTopics } from "../lib/aksara-stats";
+import { migrateLocalToServer, readGoogleSession } from "../lib/auth-google";
+import { loadResume } from "../features/quiz/quiz-resume";
 import type { Quiz } from "../lib/zod/question";
+import { Button } from "@caksara/ui/components/button";
 import {
   applyOvernightReset,
   createAnonProfile,
   loadProfile,
+  recordAnswerStats,
   reconcileProfileId,
+  refillHearts,
+  WRESASTRA_IDS,
 } from "../lib/profile-store";
-import { notifyStreakReset } from "../lib/notify";
+import { MAX_HEARTS } from "../lib/game-rules";
+import {
+  notifyGoogleSynced,
+  notifyHeartsRefilled,
+  notifyQueuedOffline,
+  notifyQuizFallback,
+  notifyRateLimited,
+  notifyStreakReset,
+} from "../lib/notify";
 import { initSoundboard } from "../lib/sound";
 import { useIsDesktop } from "../lib/use-is-desktop";
+import { useNativeAuthDeepLink } from "../lib/use-native-auth-deep-link";
 import { LandingHome } from "../features/landing/landing-home";
 
 type View =
   | { kind: "home" }
   | { kind: "detail"; mod: CourseModule }
   | { kind: "materi"; mod: CourseModule }
+  | { kind: "launch"; mod: CourseModule; isLatihan?: boolean }
   | { kind: "quiz"; mod: CourseModule; quiz: Quiz; isLatihan?: boolean }
   | { kind: "kb-detail"; entry: KbEntry }
   | { kind: "settings" }
@@ -50,10 +81,106 @@ type View =
       mod: CourseModule;
       score: { correct: number; total: number };
       isLatihan?: boolean;
+      tidbit: string;
+      /** Level sesi yang selesai — pembanding cue levelUp (#102). */
+      prevLevel?: number;
     };
-
+/**
+ * Sesi kuis modul (#85): 3 soal bervariasi 2+ tipe + dengar_pilih dari
+ * bank lokal. Edge generate-quiz (Gemini) diambil via useQuizLaunch saat
+ * sesi dibuka; bank lokal adalah fallback yang tidak pernah macet.
+ */
 function deriveQuizForMod(mod: CourseModule): Quiz {
-  return buildQuiz(mod.id);
+  return buildSessionQuiz(mod.id, { seed: nextAttemptSeed(mod.id) });
+}
+
+function QuizLaunchView({
+  mod,
+  onReady,
+  onBack,
+}: {
+  mod: CourseModule;
+  onReady: (quiz: Quiz) => void;
+  onBack: () => void;
+}) {
+  // Kunci resume-vs-Gemini: bila ada currentIndex tersimpan, jangan fetch
+  // Gemini baru — pakai set tersimpan (cache/fallback lokal saja).
+  const hasResume = useMemo(() => loadResume(mod.id) !== null, [mod.id]);
+  const [retryKey, setRetryKey] = useState(0);
+  const noticeKey = useRef<QuizNotice | null>(null);
+  const fallback = useMemo(
+    () => ({
+      localFallback: () => deriveQuizForMod(mod),
+      deferRemote: hasResume,
+      reloadToken: retryKey,
+      wrongTopics: deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, []),
+      onNotice: (notice: QuizNotice) => {
+        if (noticeKey.current === notice) return;
+        noticeKey.current = notice;
+        if (notice === "quiz-ratelimit") notifyRateLimited(() => setRetryKey((k) => k + 1));
+        else notifyQuizFallback();
+      },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mod.id, hasResume, retryKey],
+  );
+  const launch = useQuizLaunch(mod.id, fallback);
+  useEffect(() => {
+    noticeKey.current = null;
+  }, [retryKey]);
+  useEffect(() => {
+    if (launch.status === "ready" && launch.quiz) onReady(launch.quiz);
+  }, [launch, onReady]);
+  if (launch.status === "ready" && !launch.quiz) {
+    const rateLimited = launch.failure === "rate-limited";
+    const offline = launch.failure === "offline";
+    return (
+      <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 md:max-w-xl">
+        <EmptyState
+          illustration={<BookX className="size-7" />}
+          title="Kuis belum tersedia"
+          body={
+            rateLimited
+              ? "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi."
+              : offline
+                ? "Kamu sedang offline. Sambungkan internet lalu coba lagi — bank soal lokal tetap siap."
+                : "Sambungan atau bank soal modul ini sedang bermasalah. Coba lagi ya."
+          }
+          tone={rateLimited || offline ? "danger" : "default"}
+          action={
+            <div className="flex w-full flex-col gap-2">
+              <Button
+                variant="cta"
+                className="h-12 w-full text-base font-bold tracking-wide"
+                onClick={() => setRetryKey((k) => k + 1)}
+              >
+                <RotateCcw className="size-4" aria-hidden /> Coba Lagi
+              </Button>
+              <Button variant="outline" className="h-12 w-full rounded-full" onClick={onBack}>
+                Kembali
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto flex h-full w-full max-w-lg flex-col items-center justify-center px-4 py-10 text-center md:max-w-xl">
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+        Menyiapkan Sesi Kuis · Level {getAdaptiveLevel(mod.id)}
+      </p>
+      <p className="mt-2 text-lg font-bold tracking-tight">Menyusun soal buat kamu…</p>
+      <AudioSourceNote />
+      <button
+        type="button"
+        onClick={onBack}
+        className="mt-6 rounded-full bg-card px-5 py-2.5 text-sm font-semibold"
+      >
+        Kembali
+      </button>
+    </div>
+  );
 }
 
 const MOD_LATIHAN: CourseModule = {
@@ -87,6 +214,7 @@ export default function Home() {
   const [navTab, setNavTab] = useState<NavTab>("beranda");
   const [kbQuery, setKbQuery] = useState("");
   const isDesktop = useIsDesktop();
+  useNativeAuthDeepLink();
 
   const selesai = new Set<string>(courseModules.map((m) => m.id).filter((id) => hasSelesai(id)));
 
@@ -106,11 +234,22 @@ export default function Home() {
     initSoundboard();
   }, []);
 
+  // V9: refill Hati + reset Streak harian berjalan saat profil siap
+  useEffect(() => {
+    if (!profileLoaded) return;
+    if (applyOvernightReset()) notifyStreakReset();
+    if (refillHearts()) notifyHeartsRefilled();
+    // #89: kembali dari callback OAuth → migrasi progres lokal sekali, lalu sambut.
+    void readGoogleSession().then((session) => {
+      if (!session) return;
+      void migrateLocalToServer(session).then((ok) => {
+        if (ok) notifyGoogleSynced();
+      });
+    });
+  }, [profileLoaded]);
   if (!profileLoaded) {
     return <OnboardingGate onComplete={handleComplete} />;
   }
-
-  const overlay = view.kind !== "home";
 
   let content: React.ReactNode;
   if (view.kind === "result") {
@@ -118,7 +257,10 @@ export default function Home() {
       <QuizResult
         mod={view.mod}
         score={view.score}
+        level={view.isLatihan ? undefined : getAdaptiveLevel(view.mod.id)}
+        prevLevel={view.prevLevel}
         isLatihan={view.isLatihan}
+        tidbit={view.tidbit}
         onRetry={() =>
           setView({
             kind: "quiz",
@@ -131,21 +273,67 @@ export default function Home() {
       />
     );
   } else if (view.kind === "quiz") {
+    const sessionLevel = view.isLatihan ? undefined : getAdaptiveLevel(view.mod.id);
     content = (
       <QuizShell
         quiz={view.quiz}
         moduleId={view.mod.id}
-        initialHearts={loadProfile()?.hearts ?? 5}
+        level={sessionLevel}
+        initialHearts={loadProfile()?.hearts ?? MAX_HEARTS}
         onFinish={(score, detail) => {
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
+            const wrong = deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, detail);
+            recordSessionLevel(view.mod.id, score.correct, score.total, wrong);
           }
-          void saveQuizSession(view.mod.id, detail, score);
-          setView({ kind: "result", mod: view.mod, score, isLatihan: view.isLatihan });
+          recordAnswerStats(detail);
+          // V10 offline-buffer: enqueue bila SALAH SATU gagal (sesi ATAU
+          // progres); flag menandai bagian yang sudah sukses agar flush tak
+          // kirim ulang. Coba-lagi reload keras pre-existing (di luar delta).
+          void Promise.allSettled([
+            saveQuizSession(view.mod.id, detail, score),
+            saveAksaraProgress(detail, WRESASTRA_IDS),
+          ]).then(([sessionRes, progressRes]) => {
+            const sessionOk =
+              sessionRes.status === "fulfilled" &&
+              (sessionRes.value.saved || sessionRes.value.reason === "validation");
+            const progressOk = progressRes.status === "fulfilled" && progressRes.value.saved;
+            const sessionValidationError =
+              sessionRes.status === "fulfilled" &&
+              !sessionRes.value.saved &&
+              sessionRes.value.reason === "validation";
+            // Sukses penuh = tak ada yang perlu di-buffer: jangan antre,
+            // jangan toast offline (entri yatim langsung di-drop saat flush).
+            // Skor inkonsisten = bug pemanggil, bukan offline: jangan antre.
+            if (!shouldBufferAfterFinish({ sessionOk, progressOk, sessionValidationError })) return;
+            if (
+              enqueuePendingSession({
+                moduleId: view.mod.id,
+                answers: detail,
+                score,
+                sessionSent: sessionOk,
+                progressSent: progressOk,
+              })
+            ) {
+              notifyQueuedOffline();
+            }
+          });
+          setView({
+            kind: "result",
+            mod: view.mod,
+            score,
+            isLatihan: view.isLatihan,
+            tidbit: pickTidbit(),
+            prevLevel: view.isLatihan ? undefined : sessionLevel,
+          });
         }}
         onBack={() =>
           view.isLatihan ? setView({ kind: "home" }) : setView({ kind: "detail", mod: view.mod })
         }
+        onOpenKbEntry={(entryId) => {
+          const entry = KB_ENTRIES.find((e) => e.id === entryId);
+          if (entry) setView({ kind: "kb-detail", entry });
+        }}
       />
     );
   } else if (view.kind === "kb-detail") {
@@ -173,7 +361,19 @@ export default function Home() {
       <ModuleMateri
         mod={view.mod}
         onBack={() => setView({ kind: "detail", mod: view.mod })}
-        onStart={() => setView({ kind: "quiz", mod: view.mod, quiz: deriveQuizForMod(view.mod) })}
+        onStart={() => setView({ kind: "launch", mod: view.mod })}
+      />
+    );
+  } else if (view.kind === "launch") {
+    content = (
+      <QuizLaunchView
+        mod={view.mod}
+        onReady={(quiz) =>
+          setView({ kind: "quiz", mod: view.mod, quiz, isLatihan: view.isLatihan })
+        }
+        onBack={() =>
+          view.isLatihan ? setView({ kind: "home" }) : setView({ kind: "detail", mod: view.mod })
+        }
       />
     );
   } else if (navTab === "beranda") {
@@ -222,20 +422,29 @@ export default function Home() {
       />
     );
   } else if (navTab === "guru") {
-    content = <TeacherChat />;
+    content = (
+      <TeacherChat
+        onOpenEntry={(entryId) => {
+          const entry = KB_ENTRIES.find((e) => e.id === entryId);
+          if (entry) setView({ kind: "kb-detail", entry });
+        }}
+      />
+    );
   } else {
     content = (
       <ProfilPage
         selesai={selesai}
         onOpenSettings={() => setView({ kind: "settings" })}
         onOpenShare={() => setView({ kind: "share" })}
+        onContinue={() => setNavTab("belajar")}
       />
     );
   }
 
+  const overlay = view.kind !== "home";
+
   return <HomeShell overlay={overlay} navTab={navTab} onSelect={setNavTab} content={content} />;
 }
-
 function HomeShell({
   overlay,
   navTab,
@@ -248,10 +457,7 @@ function HomeShell({
   content: React.ReactNode;
 }) {
   const isDesktop = useIsDesktop();
-
-  useEffect(() => {
-    if (applyOvernightReset()) notifyStreakReset();
-  }, []);
+  // V9 refill/reset berjalan di Home (profileLoaded), bukan di sini.
 
   return (
     <div className="flex h-full flex-col">

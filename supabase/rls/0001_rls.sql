@@ -5,6 +5,7 @@
 -- 2. Supabase Dashboard > SQL Editor > tempel file ini > Run (setelah `bun run db:push`).
 -- Prasyarat: tabel dari supabase/schema.ts sudah ada; Authentication > Anonymous = ON.
 -- File idempoten: aman dijalankan ulang (drop policy if exists + enable RLS).
+-- #89: leaderboard_entries SELECT publik top-20-by-xp (anon+auth), tulis hanya baris sendiri.
 
 -- 1. Nyalakan RLS di tabel privat.
 alter table public.profiles enable row level security;
@@ -52,10 +53,23 @@ create policy "own_calls_all" on public.quiz_calls
   for all using (auth.uid()::text = profile_id) with check (auth.uid()::text = profile_id);
 
 -- 3. Tabel publik read-only: kb_entries + modules bisa dibaca semua orang,
--- tulis hanya service_role (tanpa policy insert/update/delete = ditolak).
+-- tulis hanya via SUPABASE_SECRET_KEYS (secret key server, tanpa policy insert/update/delete = ditolak).
 alter table public.kb_entries enable row level security;
 alter table public.modules enable row level security;
 drop policy if exists "public_read_kb" on public.kb_entries;
 create policy "public_read_kb" on public.kb_entries for select using (true);
 drop policy if exists "public_read_modules" on public.modules;
 create policy "public_read_modules" on public.modules for select using (true);
+
+-- 4. Leaderboard #89: semua orang boleh baca peringkat publik (anon + auth),
+-- tiap pengguna hanya boleh tulis baris profile_id = auth.uid() miliknya.
+alter table public.leaderboard_entries enable row level security;
+drop policy if exists "leaderboard_public_read" on public.leaderboard_entries;
+create policy "leaderboard_public_read" on public.leaderboard_entries
+  for select using (true);
+drop policy if exists "own_leaderboard_write" on public.leaderboard_entries;
+create policy "own_leaderboard_write" on public.leaderboard_entries
+  for insert with check (auth.uid()::text = profile_id);
+drop policy if exists "own_leaderboard_update" on public.leaderboard_entries;
+create policy "own_leaderboard_update" on public.leaderboard_entries
+  for update using (auth.uid()::text = profile_id) with check (auth.uid()::text = profile_id);

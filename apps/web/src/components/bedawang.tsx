@@ -1,22 +1,32 @@
 import { cn } from "@caksara/ui/lib/utils";
-import type { BedawangAccessory, BedawangHead, BedawangShell } from "../lib/zod/profile";
 
-export type BedawangMood = "senang" | "semangat" | "sedih";
+import type { BedawangMood } from "../lib/zod/profile";
+
+export const BEDAWANG_MOOD_SRC: Record<BedawangMood, string> = {
+  senang: "/assets/bedawang-happy.png",
+  semangat: "/assets/bedawang-waving.png",
+  sedih: "/assets/bedawang-standing.png",
+};
+
+// Maskot memakai SATU set aset saja (bedawang-*).
 
 export interface BedawangProps {
   mood?: BedawangMood;
   className?: string;
   interactive?: boolean;
-  blink?: boolean;
   animate?: boolean;
-  shell?: BedawangShell;
-  head?: BedawangHead;
-  acc?: BedawangAccessory;
-  // allow onClick if interactive is true
   onClick?: () => void;
 }
 
-export function Bedawang({ className, animate, interactive, onClick }: BedawangProps) {
+const DEFAULT_SRC = "/assets/bedawang-standing.png";
+
+export function Bedawang({
+  mood = "senang",
+  className,
+  animate,
+  interactive,
+  onClick,
+}: BedawangProps) {
   return (
     <div
       className={cn("relative overflow-hidden rounded-full", className)}
@@ -24,8 +34,8 @@ export function Bedawang({ className, animate, interactive, onClick }: BedawangP
       style={{ cursor: interactive ? "pointer" : "default" }}
     >
       <img
-        src="/assets/new-hero-mascot.jpg"
-        alt="Maskot Caksara"
+        src={mood ? BEDAWANG_MOOD_SRC[mood] : DEFAULT_SRC}
+        alt="Maskot Bedawang Nala"
         className={cn("h-full w-full object-cover", animate && "animate-pulse")}
       />
     </div>

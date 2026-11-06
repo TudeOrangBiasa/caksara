@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   ChevronRight,
+  Info,
   Monitor,
   Moon,
   RotateCcw,
@@ -15,13 +16,14 @@ import * as React from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
-import { useTheme } from "../../components/theme-provider";
 import { Bedawang } from "../../components/bedawang";
-import { playCue } from "../../lib/sound";
-import { clearSelesai } from "../module/module-store";
-import { resetProfile } from "../../lib/profile-store";
+import { useTheme } from "../../components/theme-provider";
+import { playPreview } from "../../lib/sound";
+import { notifyProgressReset } from "../../lib/notify";
 import {
+  initSettings,
   loadSettings,
+  resetAllProgress,
   setSoundEnabled,
   setWresastraFontSize,
   subscribeSettings,
@@ -61,7 +63,7 @@ function Swing({ checked, onChecked }: { checked: boolean; onChecked: (v: boolea
   );
 }
 
-type SettingsSection = "profil" | "tampilan" | "aksara" | "suara" | "data";
+type SettingsSection = "profil" | "tampilan" | "aksara" | "suara" | "data" | "tentang";
 
 const SECTION_META: Record<SettingsSection, { title: string; desc: string; icon: typeof Sun }> = {
   profil: { title: "Profil", desc: "Foto, warna avatar, nama", icon: User },
@@ -69,9 +71,17 @@ const SECTION_META: Record<SettingsSection, { title: string; desc: string; icon:
   aksara: { title: "Ukuran Aksara", desc: "Besar huruf Wresastra", icon: Type },
   suara: { title: "Suara", desc: "Efek bunyi jawaban", icon: Volume2 },
   data: { title: "Data & Reset", desc: "Hapus progres", icon: Trash2 },
+  tentang: { title: "Tentang", desc: "Versi app, bantuan", icon: Info },
 };
 
-const SECTION_ORDER: SettingsSection[] = ["profil", "tampilan", "aksara", "suara", "data"];
+const SECTION_ORDER: SettingsSection[] = [
+  "profil",
+  "tampilan",
+  "aksara",
+  "suara",
+  "data",
+  "tentang",
+];
 
 function MenuList({
   onSelect,
@@ -117,17 +127,20 @@ function MenuList({
 }
 
 export function SettingsPage({ onBack }: { onBack: () => void }) {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, theme: themeSetting, resolvedTheme } = useTheme();
   const [settings, setSettingsState] = React.useState(loadSettings);
   const [section, setSection] = React.useState<SettingsSection | null>(null);
 
   React.useEffect(() => {
+    initSettings();
     setSettingsState(loadSettings());
     return subscribeSettings(() => setSettingsState(loadSettings()));
   }, []);
 
+  // Radio mencerminkan setting ("system" tetap "system"); preview memakai hasil resolved.
   const theme: ThemeMode =
-    resolvedTheme === "light" || resolvedTheme === "dark" ? resolvedTheme : "system";
+    themeSetting === "light" || themeSetting === "dark" ? themeSetting : "system";
+  const preview: "light" | "dark" = resolvedTheme === "dark" ? "dark" : "light";
 
   function pickTheme(next: ThemeMode) {
     if (next === "system") setTheme("system");
@@ -141,6 +154,7 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
     aksara: String(settings.wresastraFontSize),
     suara: settings.soundEnabled ? "Aktif" : "Mati",
     data: "",
+    tentang: "v0.1.0",
   };
 
   return (
@@ -162,10 +176,13 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto px-4 py-5 lg:[&>*]:mx-auto lg:[&>*]:w-full lg:[&>*]:max-w-3xl">
         {section === null && <MenuList onSelect={setSection} summary={summary} />}
         {section === "profil" && <ProfileSection />}
-        {section === "tampilan" && <ThemeSection theme={theme} pickTheme={pickTheme} />}
+        {section === "tampilan" && (
+          <ThemeSection theme={theme} preview={preview} pickTheme={pickTheme} />
+        )}
         {section === "aksara" && <AksaraSection fontSize={settings.wresastraFontSize} />}
         {section === "suara" && <SoundSection enabled={settings.soundEnabled} />}
         {section === "data" && <DataSection />}
+        {section === "tentang" && <AboutSection />}
       </div>
     </div>
   );
@@ -173,9 +190,11 @@ export function SettingsPage({ onBack }: { onBack: () => void }) {
 
 function ThemeSection({
   theme,
+  preview,
   pickTheme,
 }: {
   theme: ThemeMode;
+  preview: "light" | "dark";
   pickTheme: (next: ThemeMode) => void;
 }) {
   return (
@@ -204,7 +223,7 @@ function ThemeSection({
               aria-checked={active}
               onClick={() => pickTheme(opt.value)}
               className={cn(
-                "flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-all",
+                "flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 active
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -215,6 +234,26 @@ function ThemeSection({
             </button>
           );
         })}
+      </div>
+      <div
+        aria-label="Pratinjau tema"
+        className="overflow-hidden rounded-3xl border bg-card shadow-sm transition-colors duration-300"
+      >
+        <div className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground transition-colors duration-300">
+          <Bedawang mood="senang" className="size-10 shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold">Bedawang Nala</p>
+            <p className="text-xs opacity-80">Pratinjau langsung tema {preview}</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <span className="font-balinese text-2xl leading-none text-primary transition-colors duration-300">
+            ᬳᬦᬘᬭᬓ
+          </span>
+          <span className="rounded-full bg-success/15 px-2.5 py-1 text-xs font-semibold text-cta">
+            +10 XP
+          </span>
+        </div>
       </div>
       <p className="rounded-3xl bg-card p-4 text-xs leading-relaxed text-muted-foreground shadow-sm">
         Ikuti sistem artinya tampilan menyesuaikan pengaturan terang/gelap di perangkatmu secara
@@ -240,13 +279,18 @@ function AksaraSection({ fontSize }: { fontSize: number }) {
       </div>
 
       <div
-        className="flex items-center justify-center rounded-3xl bg-card py-6 shadow-sm"
-        style={{ fontSize }}
+        className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-3xl bg-card px-4 py-6 text-center shadow-sm"
         data-fontsize={fontSize}
       >
-        <span className="font-balinese leading-none" aria-label="Pratinjau aksara Wresastra">
+        <span
+          lang="ban"
+          className="font-balinese leading-none transition-[font-size] duration-300"
+          style={{ fontSize }}
+          aria-label="Pratinjau aksara Wresastra"
+        >
           {PREVIEW_GLYPH}
         </span>
+        <span className="text-xs text-muted-foreground">hanacaraka · {fontSize}px</span>
       </div>
 
       <div
@@ -310,7 +354,7 @@ function SoundSection({ enabled }: { enabled: boolean }) {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => playCue("success")}
+          onClick={() => playPreview("success")}
           className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground"
         >
           Coba
@@ -336,7 +380,8 @@ function DataSection() {
             Reset progres
           </h2>
           <p className="text-xs text-muted-foreground">
-            Hapus semua XP, hati, streak, dan modul yang sudah selesai.
+            Hapus XP, hati, streak, modul selesai, dan tawaran lanjut kuis. Tema, ukuran aksara, dan
+            suara tidak ikut terhapus.
           </p>
         </div>
       </div>
@@ -351,6 +396,113 @@ function DataSection() {
           </button>
         }
       />
+    </section>
+  );
+}
+function AboutSection() {
+  const [open, setOpen] = React.useState<"bantuan" | "privasi" | "ketentuan" | null>(null);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, open !== null);
+
+  const copy: Record<string, { title: string; body: string }> = {
+    bantuan: {
+      title: "Bantuan",
+      body: "Butuh bantuan? Tanya Bedawang Nala di tab Guru, atau ulangi modul dari awal lewat pohon modul. Semua progres tersimpan otomatis di perangkat ini.",
+    },
+    privasi: {
+      title: "Privasi",
+      body: "CAKSARA menyimpan profil, XP, dan progres belajar hanya di perangkatmu (local storage). Tidak ada data pribadi yang dikirim tanpa persetujuanmu.",
+    },
+    ketentuan: {
+      title: "Ketentuan",
+      body: "Konten belajar aksara Bali untuk tujuan edukasi. Audio pelafalan saat ini memakai label Latin sementara; audio Bali asli di luar scope MVP.",
+    },
+  };
+
+  return (
+    <section aria-labelledby="tentang-heading" className="space-y-3">
+      <div className="rounded-3xl bg-card p-5 shadow-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Tentang
+        </p>
+        <h2 id="tentang-heading" className="text-base font-bold tracking-tight">
+          CAKSARA · v0.1.0
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Web edukasi aksara Bali — pola Duo, rasa Caksara.
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Audio pelafalan: 10 klip terkurasi dari &ldquo;Balinese Text-to-Speech Dataset&rdquo;
+          (Mendeley Data, CC BY 4.0) —{" "}
+          <a
+            href="https://data.mendeley.com/datasets/6syjwz24v5/2"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
+            data.mendeley.com/datasets/6syjwz24v5/2
+          </a>{" "}
+          · efek suara UI Kenney (CC0). Entri tanpa audio memakai badge Audio Latin (sementara).
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Avatar IP oleh s1dashu (MIT) via ipaslogo.com —{" "}
+          <a href="/assets/ip-as-logo-LICENSE" className="underline underline-offset-2">
+            lihat lisensi
+          </a>
+          .
+        </p>
+      </div>
+      {(
+        [
+          ["bantuan", "Bantuan"],
+          ["privasi", "Privasi"],
+          ["ketentuan", "Ketentuan"],
+        ] as const
+      ).map(([id, label]) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => setOpen(id)}
+          className="flex w-full items-center gap-3 rounded-3xl bg-card px-4 py-3 text-left shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <Info className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1 text-sm font-semibold">{label}</span>
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        </button>
+      ))}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-sm"
+          onClick={() => setOpen(null)}
+        >
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tentang-dialog-title"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpen(null);
+            }}
+            className="w-full max-w-sm animate-modal-in rounded-3xl border bg-card p-5 shadow-lg"
+          >
+            <h2 id="tentang-dialog-title" className="text-lg font-semibold">
+              {copy[open].title}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{copy[open].body}</p>
+            <button
+              type="button"
+              onClick={() => setOpen(null)}
+              autoFocus
+              className="mt-5 w-full rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Mengerti
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -408,9 +560,9 @@ function ResetConfirm({ trigger }: { trigger: React.ReactNode }) {
   }, [open]);
 
   function confirm() {
-    resetProfile();
-    clearSelesai();
+    resetAllProgress();
     setOpen(false);
+    notifyProgressReset();
   }
 
   return (

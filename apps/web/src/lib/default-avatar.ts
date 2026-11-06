@@ -147,3 +147,56 @@ export function defaultAvatarUri(seed: string): string {
   cache.set(key, uri);
   return uri;
 }
+
+/**
+ * Slot ekspansi avatar IP (30 file WebP lisensi MIT s1dashu, lihat
+ * /assets/ip-as-logo-LICENSE). Dipilih via hash nama yang sama dengan
+ * default SVG (stabil, offline). SVG di atas TETAP default + fallback
+ * bila file hilang — daftar ini tidak mengubah perilaku existing.
+ */
+export const IP_AVATARS = [
+  "/assets/avatar-cassowary-2.webp",
+  "/assets/avatar-elephant-seal.webp",
+  "/assets/avatar-fennec-fox-2.webp",
+  "/assets/avatar-fox.webp",
+  "/assets/avatar-harbor-seal-2.webp",
+  "/assets/avatar-manatee-2.webp",
+  "/assets/avatar-manatee-3.webp",
+  "/assets/avatar-nautilus-2.webp",
+  "/assets/avatar-nautilus-3.webp",
+  "/assets/avatar-orca-2.webp",
+  "/assets/avatar-otter-2.webp",
+  "/assets/avatar-owl-4.webp",
+  "/assets/avatar-owl-5.webp",
+  "/assets/avatar-pangolin-3.webp",
+  "/assets/avatar-pangolin-4.webp",
+  "/assets/avatar-polar-bear.webp",
+  "/assets/avatar-quokka-2.webp",
+  "/assets/avatar-raccoon-2.webp",
+  "/assets/avatar-red-panda-2.webp",
+  "/assets/avatar-red-panda-3.webp",
+  "/assets/avatar-sea-turtle-3.webp",
+  "/assets/avatar-seal-2.webp",
+  "/assets/avatar-snail-3.webp",
+  "/assets/avatar-snail-4.webp",
+  "/assets/avatar-tapir-3.webp",
+  "/assets/avatar-tapir-4.webp",
+  "/assets/avatar-tapir-5.webp",
+  "/assets/avatar-turtle-2.webp",
+  "/assets/avatar-turtle.webp",
+  "/assets/avatar-walrus-2.webp",
+] as const;
+
+export function ipAvatarUri(index: number): string {
+  const i = ((index % IP_AVATARS.length) + IP_AVATARS.length) % IP_AVATARS.length;
+  return IP_AVATARS[i];
+}
+
+/**
+ * Avatar IP deterministik per nama (hashSeed yang sama dengan default SVG,
+ * modulo jumlah slot). Stabil, offline, tanpa jaringan.
+ */
+export function ipAvatarUriForName(seed: string): string {
+  const key = seed.trim() || "C";
+  return ipAvatarUri(hashSeed(key));
+}

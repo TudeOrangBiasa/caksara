@@ -1,132 +1,12 @@
-import { Flame, Target, ChevronRight, BookOpen, Library, Bot, Trophy } from "lucide-react";
+import { Flame, Target, BookOpen, LibraryBig, MessageCircleQuestion, Trophy } from "lucide-react";
 
-import { courseModules } from "../module/module-data";
-import type { CourseModule } from "../module/module-data";
+import { courseModules, deriveStatus } from "../module/module-data";
+import type { CourseModule, ModuleStatus } from "../module/module-data";
 import type { UserProfile } from "../../lib/zod/profile";
 
-import { notifyModuleLocked } from "../../lib/notify";
-
-type ModuleStatus = "aktif" | "selesai" | "terkunci";
-
-function deriveStatus(selesai: ReadonlySet<string>): ModuleStatus[] {
-  let foundActive = false;
-  return courseModules.map((m) => {
-    if (selesai.has(m.id)) return "selesai";
-    if (!foundActive) {
-      foundActive = true;
-      return "aktif";
-    }
-    return "terkunci";
-  });
-}
-
-function FeaturedModul({
-  mod,
-  status,
-  totalSelesai,
-  onStart,
-}: {
-  mod: CourseModule;
-  status: ModuleStatus;
-  totalSelesai: number;
-  onStart: () => void;
-}) {
-  const done = status === "selesai";
-  const progressPercent = done ? 100 : Math.round((totalSelesai / courseModules.length) * 100);
-
-  return (
-    <div className="relative overflow-hidden rounded-[1.75rem] bg-primary p-6 text-primary-foreground shadow-xl shadow-primary/20 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100 fill-mode-both">
-      {/* Decorative avatar on the right */}
-      <img
-        src="/assets/Userpics/PNG/Circle/3DDD-1.png"
-        className="absolute -bottom-2 right-0 w-[120px] drop-shadow-2xl animate-in fade-in slide-in-from-right-8 duration-700 delay-300 fill-mode-both sm:right-4 sm:w-[130px]"
-        alt=""
-      />
-      <div className="absolute right-5 bottom-[6.5rem] sm:right-6 sm:bottom-[7rem] rounded-2xl rounded-br-sm bg-primary-foreground/20 px-3 py-1.5 text-[11px] font-bold backdrop-blur-md shadow-sm animate-in zoom-in fade-in duration-500 delay-500 fill-mode-both">
-        Swastiastu!
-      </div>
-
-      {/* Content wrapper limited to left side to prevent overlap */}
-      <div className="relative z-10 w-[65%]">
-        <p className="text-[11px] font-medium text-primary-foreground/80">Lanjutkan belajarmu</p>
-        <h3 className="mt-1 text-lg font-bold leading-tight">{mod.title}</h3>
-
-        <div className="mt-5 flex items-center justify-between text-xs font-semibold">
-          <span>{progressPercent}%</span>
-        </div>
-        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-primary-foreground/20">
-          <div
-            className="h-full rounded-full bg-primary-foreground transition-all duration-1000 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-
-        <button
-          onClick={onStart}
-          className="mt-5 flex h-10 w-max items-center justify-center gap-1.5 rounded-full bg-primary-foreground px-4 text-xs font-bold text-primary shadow-sm transition-transform active:scale-95"
-        >
-          Lanjutkan Belajar <ChevronRight className="size-3.5" strokeWidth={2.5} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function ModulRow({
-  mod,
-  status,
-  onOpen,
-}: {
-  mod: CourseModule;
-  status: ModuleStatus;
-  onOpen: () => void;
-}) {
-  const locked = status === "terkunci";
-  const done = status === "selesai";
-  const progress = done ? 100 : locked ? 0 : 35; // Visual demo progress
-
-  // Choose a glyph based on module theme to act as the "flag"
-  const iconGlyph = mod.theme === "pengenalan" ? "ᬳ" : mod.theme === "pengangge" ? "ᬵ" : "ᬓ";
-
-  return (
-    <button
-      onClick={() => {
-        if (locked) {
-          notifyModuleLocked();
-          return;
-        }
-        onOpen();
-      }}
-      aria-disabled={locked}
-      className={`flex w-full items-center gap-4 rounded-3xl bg-card p-4 text-left shadow-sm border border-border/50 transition-all ${
-        locked ? "opacity-60 grayscale-[0.5]" : "active:scale-[0.98]"
-      }`}
-    >
-      <div
-        className={`flex size-14 shrink-0 items-center justify-center rounded-full text-2xl font-balinese ${
-          done
-            ? "bg-success/15 text-success"
-            : locked
-              ? "bg-muted text-muted-foreground"
-              : "bg-primary/10 text-primary"
-        }`}
-      >
-        {iconGlyph}
-      </div>
-      <div className="min-w-0 flex-1">
-        <h3 className="truncate text-[15px] font-bold text-foreground">{mod.title}</h3>
-        <p className="mt-0.5 text-xs font-medium text-muted-foreground">{progress}% Selesai</p>
-        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-          <div
-            className={`h-full rounded-full transition-all duration-1000 ${done ? "bg-success" : "bg-primary"}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-      <ChevronRight className="size-5 shrink-0 text-muted-foreground/40" />
-    </button>
-  );
-}
+import { MasteryGrid } from "../../components/mastery-grid";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
+import { ModulCard } from "../module/modul-card";
 
 function TargetHarian({ profile }: { profile: UserProfile | null }) {
   const current = Math.min(50, profile?.xp ?? 0);
@@ -169,7 +49,7 @@ function LatihanCepat({
     <div className="grid grid-cols-4 gap-3">
       <button onClick={onOpenKb} className="group flex flex-col items-center gap-2">
         <div className="flex size-[4.25rem] items-center justify-center rounded-3xl bg-blue-500/15 text-blue-600 shadow-sm transition-transform active:scale-95 group-hover:-translate-y-1 dark:bg-blue-500/20 dark:text-blue-400">
-          <Library className="size-6" strokeWidth={2.5} />
+          <LibraryBig className="size-6" strokeWidth={2.5} />
         </div>
         <span className="text-[11px] font-bold text-muted-foreground">Kamus</span>
       </button>
@@ -181,7 +61,7 @@ function LatihanCepat({
       </button>
       <button onClick={onOpenGuru} className="group flex flex-col items-center gap-2">
         <div className="flex size-[4.25rem] items-center justify-center rounded-3xl bg-emerald-500/15 text-emerald-600 shadow-sm transition-transform active:scale-95 group-hover:-translate-y-1 dark:bg-emerald-500/20 dark:text-emerald-400">
-          <Bot className="size-6" strokeWidth={2.5} />
+          <MessageCircleQuestion className="size-6" strokeWidth={2.5} />
         </div>
         <span className="text-[11px] font-bold text-muted-foreground">Guru AI</span>
       </button>
@@ -218,6 +98,8 @@ export function Dashboard({
     activeIdx >= 0 ? "aktif" : (statuses[statuses.length - 1] ?? "terkunci");
 
   const userName = profile?.name ? profile.name.split(" ")[0] : "Penjelajah";
+  const reduceMotion = usePrefersReducedMotion();
+  const streakPulse = (profile?.streak ?? 0) > 0 && !reduceMotion;
 
   return (
     <div className="mx-auto w-full max-w-md px-5 pt-6 pb-28 font-sans bg-background/50">
@@ -232,14 +114,18 @@ export function Dashboard({
           </p>
         </div>
         <div className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 shadow-sm">
-          <Flame className="size-[18px] text-warning" strokeWidth={2.5} />
+          <Flame
+            className={`size-[18px] text-warning${streakPulse ? " animate-pulse" : ""}`}
+            strokeWidth={2.5}
+          />
           <span className="text-sm font-bold text-warning">{profile?.streak ?? 0}</span>
         </div>
       </header>
 
       {/* Featured Banner */}
       {featured && (
-        <FeaturedModul
+        <ModulCard
+          variant="featured"
           mod={featured}
           status={featuredStatus}
           totalSelesai={totalSelesai}
@@ -257,8 +143,9 @@ export function Dashboard({
         </div>
         <div className="space-y-3">
           {courseModules.slice(0, 3).map((mod, i) => (
-            <ModulRow
+            <ModulCard
               key={mod.id}
+              variant="row"
               mod={mod}
               status={statuses[i] ?? "terkunci"}
               onOpen={() => onOpenDetail(mod)}
@@ -287,6 +174,11 @@ export function Dashboard({
           </p>
         </div>
         <LatihanCepat onOpenKb={() => onOpenKb("")} onOpenGuru={onOpenGuru} onStart={onStart} />
+      </section>
+
+      {/* Mastery 18 Wresastra */}
+      <section className="mt-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500 fill-mode-both rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
+        <MasteryGrid mastery={profile?.mastery} />
       </section>
     </div>
   );

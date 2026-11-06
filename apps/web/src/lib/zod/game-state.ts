@@ -20,6 +20,8 @@ export const gameStateSchema = z.object({
   streak: z.number().int().nonnegative(),
   lastActiveDate: witaDateSchema.optional(),
   heartsRefilledAt: witaDateSchema.optional(),
+  /** Hari WITA terakhir bonus streak diklaim. Mirrors heartsRefilledAt. */
+  streakBonusClaimedAt: witaDateSchema.optional(),
 });
 
 export type GameState = z.infer<typeof gameStateSchema>;

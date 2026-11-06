@@ -1,6 +1,7 @@
-import { ArrowLeft, ChevronsRight, Clock, ListChecks, Play } from "lucide-react";
+import { ArrowLeft, ListChecks, Timer } from "lucide-react";
 
 import type { CourseModule } from "./module-data";
+import { ModuleLevelBadge } from "./module-level-badge";
 
 export function ModuleDetail({
   mod,
@@ -27,67 +28,66 @@ export function ModuleDetail({
 
       {/* Left Column */}
       <div className="flex flex-col gap-6">
-        <div className="relative overflow-hidden rounded-[1.75rem] shadow-xl shadow-primary/20 min-h-[280px] flex flex-col justify-end p-6 group">
+        <div className="group relative flex min-h-[240px] flex-col justify-end overflow-hidden rounded-2xl">
           <img
-            src="/assets/study_mascot_2d_1788968332573.jpg"
+            src="/assets/hero-modul.jpg"
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
-
-          <div className="relative z-10 flex flex-col gap-3">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-white/70">
+          <div className="relative z-10 flex flex-col gap-2 bg-gradient-to-t from-primary p-6">
+            <div className="mb-1 flex items-center justify-between gap-3 lg:mb-0">
+              <p className="text-[13px] font-bold uppercase tracking-[1.2px] text-white/70 lg:leading-[16px]">
                 Modul {mod.order} · {mod.theme}
               </p>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-sm font-bold text-white shadow-inner backdrop-blur-md">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-white/20 text-sm font-bold text-white">
                 {mod.order}
               </span>
             </div>
 
-            <div>
-              <h1 className="text-[28px] font-extrabold tracking-tight leading-tight text-white md:text-[32px]">
+            <div className="lg:contents">
+              <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-white md:text-4xl lg:leading-[44px]">
                 {mod.title}
               </h1>
-              <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-white/80 max-w-[95%]">
+              <p className="mt-1.5 max-w-[95%] text-sm leading-relaxed text-white/90 lg:mt-0 lg:leading-[17px]">
                 {mod.description}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-[1.75rem] bg-card p-6 shadow-sm ring-1 ring-border/50">
-          <p className="mb-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="flex flex-col gap-5 rounded-2xl bg-card p-6 shadow-sm ring-1 ring-border lg:border lg:border-b-2 lg:border-border lg:pb-[23px] lg:shadow-[0_2px_0_0_var(--border)]">
+          <p className="text-[13px] font-extrabold uppercase tracking-[1.1px] text-muted-foreground lg:leading-[14px]">
             Yang akan kamu pelajari
           </p>
-          <div className="space-y-3">
+          <div className="space-y-5">
             {mod.poinBelajar.map((item, i) => (
               <div
                 key={item}
-                className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 ring-1 ring-primary/10 transition-colors hover:bg-primary/10"
+                className="flex items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-border lg:pb-[15px] lg:pt-[17px] lg:ring-0 lg:shadow-[inset_0_2px_0_0_var(--border),inset_0_-1px_0_0_var(--border),0_3px_0_0_var(--border),-2px_0_0_0_var(--border),2px_0_0_0_var(--border)]"
               >
-                <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                  <span className="text-[11px] font-bold">{i + 1}</span>
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                  <span className="text-[11px] font-bold lg:leading-[13px]">{i + 1}</span>
                 </div>
-                <span className="text-[13px] font-medium leading-relaxed">{item}</span>
+                <span className="text-sm font-bold leading-relaxed lg:leading-[17px]">{item}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Right Column (Sticky Sidebar on Desktop) */}
-      <div className="mt-8 lg:mt-0 lg:sticky lg:top-24 flex flex-col gap-5 bg-card lg:p-6 lg:rounded-[1.75rem] lg:shadow-sm lg:ring-1 lg:ring-border/50">
-        <div className="flex flex-col gap-3 mb-2">
-          <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+      {/* Right Column (Pencil Gd8Af: static card on desktop, no sticky) */}
+      <div className="mt-8 flex flex-col gap-5 bg-card lg:mt-0 lg:rounded-2xl lg:border lg:border-b-4 lg:border-border lg:p-6 lg:pb-[20px] lg:pt-[23px] lg:shadow-[-1px_0_0_0_var(--border),1px_0_0_0_var(--border),0_-1px_0_0_var(--border)]">
+        <ModuleLevelBadge moduleId={mod.id} />
+        <div className="mb-2 flex flex-col gap-3 lg:mb-0 lg:gap-5">
+          <span className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold lg:leading-[16px]">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
               <ListChecks className="size-4" />
             </div>
             {mod.jumlahSoal} Pertanyaan Kuis
           </span>
-          <span className="inline-flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 text-sm font-bold shadow-sm">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-primary">
-              <Clock className="size-4" />
+          <span className="inline-flex items-center gap-2.5 rounded-2xl bg-muted px-4 py-3 text-[13px] font-bold lg:leading-[16px]">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Timer className="size-4" />
             </div>
             Estimasi ±{mod.estimasiMenit} Menit
           </span>
@@ -96,21 +96,29 @@ export function ModuleDetail({
         <button
           type="button"
           onClick={onStart}
-          className="flex w-full cursor-pointer items-center gap-3 rounded-[1.75rem] bg-primary p-2 pr-5 text-left text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-[0.98] hover:bg-primary/90"
+          aria-label="Mulai belajar"
+          className="hidden w-full cursor-pointer items-center justify-center rounded-pill bg-cta p-4 text-center text-base font-bold uppercase tracking-wide text-primary-foreground shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none lg:flex lg:leading-[23px] lg:-mt-px"
         >
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-3xl bg-white/20 shadow-inner">
-            <Play className="size-6 fill-current translate-x-0.5" />
-          </span>
-          <span className="flex-1 text-center text-base font-bold">Mulai Belajar</span>
-          <ChevronsRight className="size-6 shrink-0 opacity-70" />
+          Mulai Belajar
         </button>
 
         <button
           type="button"
           onClick={onBack}
-          className="hidden lg:block mt-2 text-center text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-2 hidden text-center text-[13px] font-bold uppercase text-muted-foreground transition-colors hover:text-foreground lg:block lg:leading-[16px] lg:-mt-px"
         >
           Kembali ke Kurikulum
+        </button>
+      </div>
+      {/* Mobile sticky CTA (Duo pattern). Desktop unchanged: sidebar CTA above. */}
+      <div className="sticky bottom-0 -mx-4 mt-6 border-t border-border/60 bg-background/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+        <button
+          type="button"
+          onClick={onStart}
+          aria-label="Mulai belajar"
+          className="flex w-full cursor-pointer items-center justify-center rounded-pill bg-cta p-4 text-center text-base font-bold uppercase tracking-wide text-primary-foreground shadow-duo transition-all duration-150 ease-out hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-0.5 active:shadow-none"
+        >
+          Mulai Belajar
         </button>
       </div>
     </div>

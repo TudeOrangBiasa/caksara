@@ -46,4 +46,4 @@ for (const f of files) {
 }
 
 if (failed) process.exit(1);
-console.log(`✓ Tailwind lint: ${files.length} files checked`);
+console.log(`✓ Tailwind lint (lokal): ${files.length} files checked`);

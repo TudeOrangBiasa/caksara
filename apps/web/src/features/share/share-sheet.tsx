@@ -5,7 +5,7 @@ import { cn } from "@caksara/ui/lib/utils";
 
 import { userProfileSchema } from "../../lib/zod/profile";
 import type { UserProfile } from "../../lib/zod/profile";
-import { renderAchievementCard, pickTidbit } from "./achievement-card";
+import { exportPng, renderAchievementCardWithAvatar, pickTidbit } from "./achievement-card";
 import type { AchievementCardData } from "./achievement-card";
 import { loadProfile } from "../../lib/profile-store";
 
@@ -39,6 +39,7 @@ export function ShareSheet({ modulSelesai, modulTotal, onClose }: ShareSheetProp
         if (!canvas) return;
         const cardData: AchievementCardData = {
           name: profile.name,
+          avatar: profile.avatar,
           xp: profile.xp,
           streak: profile.streak,
           hearts: profile.hearts,
@@ -47,8 +48,9 @@ export function ShareSheet({ modulSelesai, modulTotal, onClose }: ShareSheetProp
           modulTotal,
           tidbit: pickTidbit(),
         };
-        renderAchievementCard(canvas, cardData);
-        const url = canvas.toDataURL("image/png");
+        await renderAchievementCardWithAvatar(canvas, cardData);
+        const url = exportPng(canvas);
+        if (!url) throw new Error("export png gagal");
         setImgUrl(url);
         setError(null);
       } catch {
@@ -59,31 +61,37 @@ export function ShareSheet({ modulSelesai, modulTotal, onClose }: ShareSheetProp
   }, [modulSelesai, modulTotal]);
 
   async function download() {
-    if (!imgUrl) return;
+    const canvas = canvasRef.current;
+    const url = imgUrl ?? (canvas ? exportPng(canvas) : null);
+    if (!url) return;
+    if (!imgUrl) setImgUrl(url);
     setStatus("downloading");
     const a = document.createElement("a");
-    const name = (loadProfile()?.name ?? "caksara").toLowerCase().replace(/\s+/g, "-");
-    a.href = imgUrl;
+    const name = (loadProfile()?.name ?? "caksara").toLowerCase().replaceAll(/\s+/gu, "-");
+    a.href = url;
     a.download = `caksara-${name}-prestasi.png`;
-    document.body.appendChild(a);
+    document.body.append(a);
     a.click();
     a.remove();
     setStatus("ok");
   }
 
   async function share() {
-    if (!imgUrl) return;
-    if (typeof navigator.canShare === "function") {
+    if (imgUrl && typeof navigator.canShare === "function") {
       try {
         const blob = await (await fetch(imgUrl)).blob();
         const file = new File([blob], "caksara-prestasi.png", { type: "image/png" });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: "Prestasi CAKSARA" });
+          await navigator.share({
+            files: [file],
+            title: "Prestasi CAKSARA",
+            text: "Lihat kartu prestasiku belajar Aksara Bali di CAKSARA!",
+          });
           setStatus("ok");
           return;
         }
       } catch {
-        /* fallback to download */
+        /* pengguna batal / berkas ditolak: fallback ke download */
       }
     }
     download();

@@ -1,0 +1,21 @@
+{
+  "name": "@caksara/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CAKSARA desktop shell — Electron, memuat apps/web, OAuth Google via loopback.",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check-types": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx src/main.ts",
+    "smoke": "node ../../scripts/desktop-smoke.js"
+  },
+  "devDependencies": {
+    "@caksara/config": "workspace:*",
+    "@types/node": "catalog:",
+    "electron": "^45.2.2",
+    "tsx": "^4.23.1",
+    "typescript": "catalog:"
+  }
+}

@@ -534,11 +534,7 @@ export function ArtGuru({ className }: { className?: string }) {
       <div className="absolute top-5 left-1/2 -translate-x-1/2 rounded-2xl rounded-bl-md bg-white px-3.5 py-2 text-xs font-bold whitespace-nowrap text-stone-900 shadow-sm">
         Om Swastiastu!
       </div>
-      <Bedawang
-        mood="semangat"
-        accessory="udeng"
-        className="absolute bottom-2 left-1/2 size-40 -translate-x-1/2"
-      />
+      <Bedawang mood="semangat" className="absolute bottom-2 left-1/2 size-40 -translate-x-1/2" />
     </Frame>
   );
 }

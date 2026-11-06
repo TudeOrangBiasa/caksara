@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@caksara/ui/lib/utils";
 
 import { Bedawang } from "../../components/bedawang";
+import { GEMINI_DOWN_MESSAGE } from "../../lib/notify";
+import { fetchGuruRemote } from "./guru-remote";
+import type { GuruRemoteVerdict } from "./guru-remote";
 import { getTeacherReply, QUICK_REPLIES } from "./teacher-data";
 import type { TeacherReply } from "./teacher-data";
 
@@ -15,17 +18,55 @@ interface Message {
   sources?: TeacherReply["sources"];
   title?: string;
   glyph?: string;
+  entryId?: string;
+  /** Kutipan numerik Edge (id → judul) — chip per entryIds #94. */
+  remoteCitations?: { id: string; title: string }[];
   suggestions?: string[];
   streaming?: boolean;
+  isError?: boolean;
 }
-
 let msgId = 0;
 const nextId = () => ++msgId;
 
+/** #94: Edge guru-rag dulu; gagal → fallback lokal getTeacherReply; gagal → AI-down exact. */
+async function resolveTeacherReply(trimmed: string): Promise<{
+  reply: TeacherReply;
+  remote: GuruRemoteVerdict | null;
+  isError: boolean;
+}> {
+  try {
+    const remote = await fetchGuruRemote({ mode: "ask", question: trimmed });
+    if (remote.ok && remote.verdict) {
+      const reply = toTeacherReply(remote.verdict);
+      return { reply, remote: remote.verdict, isError: false };
+    }
+  } catch {
+    // Jatuh ke lokal di bawah — Edge tak boleh memutihkan Guru.
+  }
+  try {
+    return { reply: getTeacherReply(trimmed), remote: null, isError: false };
+  } catch {
+    return {
+      reply: { answer: GEMINI_DOWN_MESSAGE, sources: [], outside: true },
+      remote: null,
+      isError: true,
+    };
+  }
+}
+
+/** Petakan verdict Edge ke bentuk Bubble; citations numerik tanpa deep-link lokal. */
+function toTeacherReply(verdict: GuruRemoteVerdict): TeacherReply {
+  return {
+    answer: verdict.answer,
+    sources: [],
+    entryIds: verdict.entryIds,
+    outside: verdict.outside,
+  };
+}
+
 const GREETING =
   "Rahajeng! Aku Bedawang Nala, guru virtual CAKSARA. Tanya apa aja seputar aksara, bahasa, atau budaya Bali, jawabanmu selalu kutunjukkan sumbernya biar tidak asal.";
-
-export function TeacherChat() {
+export function TeacherChat({ onOpenEntry }: { onOpenEntry?: (entryId: string) => void } = {}) {
   const [messages, setMessages] = useState<Message[]>([
     { id: nextId(), role: "guru", content: GREETING, full: GREETING },
   ]);
@@ -44,9 +85,12 @@ export function TeacherChat() {
     setMessages((m) => [...m, { id: nextId(), role: "user", content: trimmed, full: trimmed }]);
 
     setThinking(true);
-    window.setTimeout(() => {
+    void (async () => {
+      // Giliran event-loop agar ThinkingBubble sempat render sebelum fetch Edge.
+      const gate = new Promise((resolve) => window.setTimeout(resolve, 350));
+      await gate;
+      const { reply, remote, isError } = await resolveTeacherReply(trimmed);
       setThinking(false);
-      const reply = getTeacherReply(trimmed);
       const id = nextId();
       setMessages((m) => [
         ...m,
@@ -58,8 +102,11 @@ export function TeacherChat() {
           sources: reply.sources,
           title: reply.title,
           glyph: reply.glyph,
-          suggestions: reply.outside ? reply.suggestions : undefined,
+          entryId: reply.entryId,
+          remoteCitations: remote?.citations,
+          suggestions: reply.suggestions,
           streaming: true,
+          isError,
         },
       ]);
       const stream = setInterval(() => {
@@ -77,7 +124,7 @@ export function TeacherChat() {
         });
       }, 24);
       window.setTimeout(() => clearInterval(stream), 4000);
-    }, 700);
+    })();
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -129,8 +176,8 @@ export function TeacherChat() {
               Guru virtual
             </p>
             <p className="text-base font-bold tracking-tight">Bedawang Nala</p>
-            <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-success">
-              <span className="size-1.5 rounded-full bg-success" />
+            <p className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-semibold text-cta dark:text-success">
+              <span className="size-1.5 rounded-full bg-cta dark:bg-success" />
               Online · jawab pakai sumber
             </p>
           </div>
@@ -145,11 +192,34 @@ export function TeacherChat() {
           className="mx-auto w-full flex-1 space-y-3 overflow-y-auto px-4 py-4 lg:px-6"
         >
           {messages.map((msg, idx) => (
-            <Bubble key={msg.id} msg={msg} index={idx} onSuggest={(s) => send(s)} />
+            <Bubble
+              key={msg.id}
+              msg={msg}
+              index={idx}
+              onSuggest={(s) => send(s)}
+              onOpenEntry={onOpenEntry}
+            />
           ))}
-
           {thinking && <ThinkingBubble />}
-
+          {messages.some((m) => m.streaming) && !thinking && (
+            <div className="flex items-center gap-2 px-1" role="status" aria-live="polite">
+              <span className="flex items-center gap-1" aria-hidden>
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
+                  style={{ animationDelay: "300ms" }}
+                />
+              </span>
+              <span className="text-xs text-muted-foreground">Bedawang sedang mengetik…</span>
+            </div>
+          )}
           {/* Mobile-only welcome & quick replies */}
           {messages.length <= 1 && (
             <div className="animate-in fade-in zoom-in-95 duration-700 delay-100 flex flex-col gap-6 py-2 lg:hidden">
@@ -225,28 +295,32 @@ function Bubble({
   msg,
   index,
   onSuggest,
+  onOpenEntry,
 }: {
   msg: Message;
   index: number;
   onSuggest: (s: string) => void;
+  onOpenEntry?: (entryId: string) => void;
 }) {
   const isUser = msg.role === "user";
   const isDone = !msg.streaming;
+  const mood = msg.isError && isDone ? "sedih" : isDone ? "senang" : "semangat";
 
   return (
     <div
       className={cn("flex gap-2.5 animate-bubble-in", isUser ? "justify-end" : "justify-start")}
       style={{ animationDelay: `${Math.min(index * 30, 240)}ms` }}
     >
-      {!isUser && (
-        <Bedawang className="size-7 shrink-0 self-end" mood={isDone ? "senang" : "semangat"} />
-      )}
+      {!isUser && <Bedawang className="size-7 shrink-0 self-end" mood={mood} />}
       <div
+        role={msg.isError ? "alert" : undefined}
         className={cn(
           "max-w-[82%] px-4 py-2.5",
           isUser
             ? "rounded-3xl rounded-br-sm bg-primary text-sm text-primary-foreground"
-            : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
+            : msg.isError
+              ? "rounded-3xl rounded-bl-sm bg-destructive/10 text-sm ring-1 ring-destructive/30"
+              : "rounded-3xl rounded-bl-sm bg-card shadow-sm",
         )}
       >
         {msg.title && (
@@ -274,6 +348,28 @@ function Bubble({
                 </li>
               ))}
             </ul>
+            {msg.entryId && onOpenEntry && (
+              <button
+                type="button"
+                onClick={() => onOpenEntry(msg.entryId as string)}
+                className="mt-1.5 text-[11px] font-semibold text-primary underline-offset-2 hover:underline"
+              >
+                Buka di Basis Pengetahuan →
+              </button>
+            )}
+          </div>
+        )}
+
+        {msg.remoteCitations && msg.remoteCitations.length > 0 && isDone && (
+          <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Sumber rujukan">
+            {msg.remoteCitations.map((c) => (
+              <span
+                key={c.id}
+                className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary"
+              >
+                {c.title}
+              </span>
+            ))}
           </div>
         )}
 
@@ -298,9 +394,17 @@ function Bubble({
 
 function ThinkingBubble() {
   return (
-    <div className="flex justify-start">
+    <div
+      className="flex justify-start"
+      role="status"
+      aria-live="polite"
+      aria-label="Bedawang sedang mengetik"
+    >
       <Bedawang className="size-7 shrink-0 self-end" mood="semangat" />
-      <div className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm">
+      <div
+        className="flex items-center gap-1 rounded-3xl rounded-bl-md bg-card px-4 py-3 shadow-sm"
+        aria-hidden
+      >
         <span
           className="size-1.5 animate-shimmer rounded-full bg-muted-foreground"
           style={{ animationDelay: "0ms" }}

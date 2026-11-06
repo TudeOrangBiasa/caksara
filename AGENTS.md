@@ -16,10 +16,9 @@ React + Vite + TypeScript · Tailwind + Material 3 · oxlint + oxfmt · Zod · D
 ## Workflow
 
 1. Ambil ticket dari GitHub Issues dengan label `ready-for-agent`, kerjakan blockers-first (`#2` DB → `#3` KB → `#4` Edge → `#5` Auth/Tree → `#6` Quiz → `#7`/`#8` parallel)
-2. Tiap ticket dikerjakan di fresh context, drive `/tdd` internally, tutup dengan `/code-review` (Standards + Spec)
-3. Jangan push spec/plan sebagai file — Issues adalah tracker
-
-## Commands
+2. Tiap ticket = branch baru `feat/<nama>` (fix: `fix/<nama>`, chores: `chore/<nama>`) dari `develop` yang sync ke `origin/main`. Push langsung ke `develop`/`main` dilarang — semua via PR + review + `bun run verify` hijau (local verifier, lihat docs/agents/verifier.md) (detail: `docs/CODING_STANDARDS.md` §11)
+3. Tiap ticket dikerjakan di fresh context, drive `/tdd` internally, tutup dengan `/code-review` (Standards + Spec)
+4. Jangan push spec/plan sebagai file — Issues adalah tracker
 
 ```bash
 bun install                    # install (1283 packages)
@@ -32,8 +31,12 @@ bun run db:generate            # generate migrations
 
 ## Secrets
 
-Jangan commit `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `GEMINI_API_KEY` plaintext. API key Gemini hanya di Edge Function. Pakai `.env` lokal (gitignored) dan Vercel env.
+Jangan commit `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `GEMINI_API_KEY` plaintext. API key Gemini hanya di Edge Function. Pakai `.env` lokal (gitignored) dan Vercel env.
 
 ## Skills
 
 Live skills di `.agents/skills/` & `.claude/skills/` (gitignored cache), backup di `skills/` jika ada. `skills-lock.json` & `bts.jsonc` jangan dihapus.
+
+## Verification gate (solo, local verifier)
+
+No GitHub Actions. The gate is `bun run verify` ([docs/agents/verifier.md](docs/agents/verifier.md), mode in [docs/agents/repo-mode.md](docs/agents/repo-mode.md)). The pre-push hook runs it on every push; run it again before `gh pr create` and paste the real output in the PR body. Never `git push --no-verify`. New worktrees: `scripts/ensure-worktree-hooks --worktree <path>`. Merge once the verifier passed at the PR head; do not wait on GitHub checks. App-driving proof: `skills/verify-caksara/`.

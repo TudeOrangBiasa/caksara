@@ -2,20 +2,21 @@ import { toast } from "sonner";
 
 /**
  * Toast sistem untuk kondisi backend (429, Gemini down, kembali online).
- * Sonner bawaan: slide-in + swipe-to-dismiss. Action retry diserahkan ke pemanggil
- * karena pemicu 429/Gemini berasal dari Edge Function (#30).
+ * Sonner bawaan: slide-in + swipe-to-dismiss + fade-out via duration.
+ * Retry diserahkan ke pemanggil: pemicu 429/Gemini berasal dari Edge (#29 V8c).
  */
 export function notifyRateLimited(onRetry?: () => void) {
   toast.warning("Terlalu banyak permintaan (429)", {
     description: "Tunggu sebentar lalu coba lagi.",
     action: onRetry ? { label: "Coba lagi", onClick: onRetry } : undefined,
-    duration: 4000,
+    duration: 3000,
   });
 }
 
+export const GEMINI_DOWN_MESSAGE = "AI sedang gangguan. Materi dan kuis tetap bisa dibuka.";
+
 export function notifyGeminiDown(onRetry?: () => void) {
-  toast.error("Guru Virtual sedang gangguan", {
-    description: "Jawaban dari sumber KB tetap bisa dibaca manual.",
+  toast.error(GEMINI_DOWN_MESSAGE, {
     action: onRetry ? { label: "Coba lagi", onClick: onRetry } : undefined,
     duration: 5000,
   });
@@ -49,5 +50,43 @@ export function notifyModuleLocked() {
   toast.warning("Beresin modul sebelumnya dulu ya", {
     description: "Modul ini kebuka setelah modul sebelumnya selesai.",
     duration: 3500,
+  });
+}
+/** #27: reset progres total → konfirmasi singkat, ajak mulai lagi. */
+export function notifyProgressReset() {
+  toast.success("Progres direset", {
+    description: "Mulai lagi dari Modul 1, pelan-pelan ya.",
+    duration: 3500,
+  });
+}
+/** #23: Edge/Gemini gagal → sesi jalan dari bank statis lokal + cache. */
+export function notifyQuizFallback() {
+  toast.info("Mode offline kuis", {
+    description: "Soal dari bank lokal + cache. Coba lagi nanti untuk soal Gemini baru.",
+    duration: 4000,
+  });
+}
+
+/** V10: hasil kuis gagal terkirim → antre di perangkat, sync saat online. */
+export function notifyQueuedOffline() {
+  toast.info("Tersimpan di perangkat", {
+    description: "Hasil akan dikirim otomatis saat kembali online.",
+    duration: 4000,
+  });
+}
+
+/** V10: antrean buffer terkirim setelah koneksi pulih. */
+export function notifyPendingSynced(sent: number) {
+  toast.success("Hasil terkirim", {
+    description: sent === 1 ? "1 sesi tertunda sudah masuk." : `${sent} sesi tertunda sudah masuk.`,
+    duration: 3500,
+  });
+}
+
+/** #89: login Google sukses → progres lokal sudah digabung ke server. */
+export function notifyGoogleSynced() {
+  toast.success("Tersimpan pakai Google", {
+    description: "XP dan streak lokal sudah digabung ke akunmu.",
+    duration: 4000,
   });
 }

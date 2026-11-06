@@ -3,10 +3,11 @@ import type { Question, Quiz } from "../../lib/zod/question";
 export interface QuizAnswer {
   selectedIndex?: number;
   ordered?: string[];
-  match?: { left: string; right: string };
+  /** Pasangan cocokkan yang terpasang ({kiri: kanan}); soal selesai bila SEMUA pairs cocok. */
+  matches?: Record<string, string>;
 }
 
-export interface QuizSession {
+export interface QuizUiState {
   quiz: Quiz;
   currentIndex: number;
   answers: Map<number, QuizAnswer>;
@@ -19,7 +20,7 @@ export type QuizAction =
   | { type: "RESET" }
   | { type: "HYDRATE"; currentIndex: number; answers: [number, QuizAnswer][] };
 
-export function quizReducer(state: QuizSession, action: QuizAction): QuizSession {
+export function quizReducer(state: QuizUiState, action: QuizAction): QuizUiState {
   switch (action.type) {
     case "ANSWER": {
       const answers = new Map(state.answers);
@@ -49,7 +50,7 @@ export function quizReducer(state: QuizSession, action: QuizAction): QuizSession
   }
 }
 
-export function createSession(quiz: Quiz): QuizSession {
+export function createSession(quiz: Quiz): QuizUiState {
   return {
     quiz,
     currentIndex: 0,
@@ -71,16 +72,16 @@ export function isAnswerCorrect(question: Question, answer: QuizAnswer): boolean
       return arraysEqual(question.tiles, answer.ordered);
     }
     case "cocokkan": {
-      if (!question.pairs || !answer.match) return false;
-      const pair = question.pairs.find((p) => p.left === answer.match?.left);
-      return pair?.right === answer.match?.right;
+      if (!question.pairs || !answer.matches) return false;
+      if (Object.keys(answer.matches).length !== question.pairs.length) return false;
+      return question.pairs.every((p) => answer.matches?.[p.left] === p.right);
     }
     default:
       return false;
   }
 }
 
-export function getScore(session: QuizSession): { correct: number; total: number } {
+export function getScore(session: QuizUiState): { correct: number; total: number } {
   let correct = 0;
   const { questions } = session.quiz;
   session.answers.forEach((answer, qIdx) => {
@@ -90,7 +91,7 @@ export function getScore(session: QuizSession): { correct: number; total: number
   return { correct, total: questions.length };
 }
 
-export function isSessionComplete(session: QuizSession): boolean {
+export function isSessionComplete(session: QuizUiState): boolean {
   return session.answers.size === session.quiz.questions.length;
 }
 

@@ -1,8 +1,10 @@
-import { profileNameSchema, userProfileSchema } from "./zod/profile";
+import { DEFAULT_BEDAWANG, profileNameSchema, userProfileSchema } from "./zod/profile";
 import type { ProfileAvatar, UserProfile } from "./zod/profile";
-import { defaultAvatarUri } from "./default-avatar";
+import { ipAvatarUriForName } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
+import { MAX_HEARTS, applyStreakBonus, deriveMastery, witaDateString } from "./game-rules";
+import { parseWitaDate } from "./zod/game-state";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const STORAGE_KEY = "caksara.profile.v1";
@@ -28,11 +30,29 @@ function readStored(): UserProfile | null {
   if (!storage) return null;
   const raw = storage.getItem(STORAGE_KEY);
   if (!raw) return null;
+  let json: unknown;
   try {
-    return userProfileSchema.parse(JSON.parse(raw));
+    json = JSON.parse(raw);
   } catch {
     return null;
   }
+  const direct = userProfileSchema.safeParse(json);
+  if (direct.success) return direct.data;
+  // Avatar korup (mis. bedawang lama) tidak boleh me-null-kan seluruh profil:
+  // bila semua issue di jalur avatar, pertahankan profil dengan avatar default.
+  if (typeof json !== "object" || json === null) return null;
+  const avatarOnly =
+    direct.error.issues.length > 0 &&
+    direct.error.issues.every((issue) => issue.path[0] === "avatar");
+  if (!avatarOnly) return null;
+  const rest = { ...(json as Record<string, unknown>) };
+  delete rest.avatar;
+  const repaired = userProfileSchema.safeParse({
+    ...rest,
+    avatar: { kind: "bedawang", value: DEFAULT_BEDAWANG },
+  });
+  if (!repaired.success) return null;
+  return repaired.data;
 }
 
 const WITA_OFFSET_MS = 8 * 3600 * 1000;
@@ -148,14 +168,14 @@ export function createAnonProfile(name: string): UserProfile {
     name: clean,
     xp: 0,
     streak: 0,
-    hearts: 5,
+    hearts: MAX_HEARTS,
     lastActiveDate: today,
     heartsRefilledAt: today,
     mastery,
-    // Avatar acak dari lib (DiceBear, seed unik per profil); user bisa ganti nanti.
+    // Avatar IP stabil-unik per profil (hash nama + id acak); user bisa ganti nanti.
     avatar: {
       kind: "photo",
-      value: defaultAvatarUri(`${clean}-${crypto.randomUUID().slice(0, 8)}`),
+      value: ipAvatarUriForName(`${clean}-${crypto.randomUUID().slice(0, 8)}`),
     },
   };
   // Tulis sinkron: profil identitas tidak boleh hilang bila reload sebelum flush debounce.
@@ -179,22 +199,26 @@ export function addXp(delta: number): void {
 
 export function setHearts(hearts: number): void {
   update((profile) => {
-    profile.hearts = Math.min(5, Math.max(0, hearts));
+    profile.hearts = Math.min(MAX_HEARTS, Math.max(0, hearts));
   });
 }
 
 /**
  * Isi hati penuh 5 bila sudah lewat 00:00 WITA sejak refill terakhir.
- * Kembalikan true bila refill terjadi (pemanggil wajib toast).
+ * Cap heartsRefilledAt tiap hari WITA baru walau Hati sudah penuh
+ * (idempoten, cermin refillHeartsForNewDay di game-rules).
+ * Kembalikan true hanya bila Hati benar-benar bertambah (pemanggil wajib toast).
  */
 export function refillHearts(): boolean {
   const today = witaTodayStr();
   let didRefill = false;
   update((profile) => {
-    if (profile.hearts < 5 && (!profile.heartsRefilledAt || profile.heartsRefilledAt < today)) {
-      profile.hearts = 5;
+    if (!profile.heartsRefilledAt || profile.heartsRefilledAt < today) {
+      if (profile.hearts < MAX_HEARTS) {
+        profile.hearts = MAX_HEARTS;
+        didRefill = true;
+      }
       profile.heartsRefilledAt = today;
-      didRefill = true;
     }
   });
   return didRefill;
@@ -217,9 +241,15 @@ export function applyOvernightReset(): boolean {
   return didReset;
 }
 
-export function updateStreak(): void {
+/**
+ * Catat aktivitas hari ini (WITA). Kembalikan true hanya bila streak
+ * bertambah — pemanggil (#102) membunyikan cue streak dari nilai ini,
+ * bukan dari menebak tanggal.
+ */
+export function updateStreak(now = new Date()): boolean {
+  let grew = false;
   update((profile) => {
-    const today = witaTodayStr();
+    const today = witaTodayStr(now.getTime());
     if (profile.lastActiveDate === today) return;
     if (isYesterday(profile.lastActiveDate)) {
       profile.streak += 1;
@@ -227,25 +257,60 @@ export function updateStreak(): void {
       profile.streak = 1;
     }
     profile.lastActiveDate = today;
+    grew = true;
   });
+  if (grew) claimStreakBonus(now);
+  return grew;
 }
 
-export function markAksara(aksaraId: string, level: "belum" | "dipahami" | "ahli"): void {
+/**
+ * Beri bonus XP sekali per hari lewat applyStreakBonus (#155).
+ * Kembalikan true hanya bila bonus benar diberikan hari ini.
+ */
+export function claimStreakBonus(now = new Date()): boolean {
+  const today = witaDateString(now);
+  let granted = false;
   update((profile) => {
-    if (profile.mastery && profile.mastery[aksaraId] !== undefined) {
-      profile.mastery[aksaraId] = level;
-    }
+    const { state, granted: ok } = applyStreakBonus(
+      {
+        xp: profile.xp,
+        hearts: profile.hearts,
+        streak: profile.streak,
+        lastActiveDate: profile.lastActiveDate ? parseWitaDate(profile.lastActiveDate) : undefined,
+        heartsRefilledAt: profile.heartsRefilledAt
+          ? parseWitaDate(profile.heartsRefilledAt)
+          : undefined,
+        streakBonusClaimedAt: profile.streakBonusClaimedAt
+          ? parseWitaDate(profile.streakBonusClaimedAt)
+          : undefined,
+      },
+      today,
+    );
+    if (!ok) return;
+    profile.xp = state.xp;
+    profile.streakBonusClaimedAt = state.streakBonusClaimedAt;
+    granted = true;
   });
+  return granted;
 }
 
-export function markModuleMastered(moduleAksaraIds: string[]): void {
+export function recordAnswerStats(
+  answers: readonly { aksaraId?: string; correct: boolean }[],
+): void {
   update((profile) => {
-    if (!profile.mastery) return;
-    for (const id of moduleAksaraIds) {
-      if (profile.mastery[id] !== undefined) {
-        profile.mastery[id] = "ahli";
-      }
+    const stats = { ...profile.aksaraStats };
+    const mastery = { ...profile.mastery };
+    for (const a of answers) {
+      if (!a.aksaraId) continue;
+      if (!WRESASTRA_IDS.includes(a.aksaraId)) continue;
+      const prev = stats[a.aksaraId] ?? { correct: 0, total: 0 };
+      const total = prev.total + 1;
+      const correct = prev.correct + (a.correct ? 1 : 0);
+      stats[a.aksaraId] = { correct, total };
+      mastery[a.aksaraId] = deriveMastery({ correctCount: correct, totalCount: total });
     }
+    profile.aksaraStats = stats;
+    profile.mastery = mastery;
   });
 }
 

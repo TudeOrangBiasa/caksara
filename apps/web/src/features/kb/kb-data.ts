@@ -23,6 +23,8 @@ export const kbEntrySchema = z.object({
   body: z.string().min(1),
   level: kbLevelSchema,
   sources: z.array(kbSourceSchema).min(1),
+  // #105: rekaman native Mendeley (CC BY 4.0) di /audio/*.mp3; absen → fallback Web Speech Latin.
+  audioUrl: z.string().min(1).optional(),
 });
 export type KbEntry = z.infer<typeof kbEntrySchema>;
 
@@ -32,9 +34,21 @@ export const KB_CATEGORY_META: Record<KbCategory, { label: string; desc: string 
   budaya: { label: "Budaya", desc: "Tradisi & hari raya" },
 };
 
+// #105: kurasi Mendeley "Balinese Text-to-Speech Dataset" (CC BY 4.0) → 10 klip lokal.
+// Alfabet_* merekam abjad Latin, bukan suku kata wresastra — dipakai sebagai
+// panduan bunyi huruf awal, bukan klaim pelafalan aksara.
+const WRESASTRA_AUDIO: Record<string, string> = {
+  ka: "/audio/ka.mp3",
+  ba: "/audio/ba.mp3",
+  ca: "/audio/ca.mp3",
+  da: "/audio/da.mp3",
+  ga: "/audio/ga.mp3",
+};
+
 const kategoriWresastra: KbEntry[] = WRESASTRA_AKSARA.map((a) => {
   const index = Number(a.id.replace("wre_", ""));
   const level = kbLevelSchema.parse(index <= 5 ? "1" : index <= 12 ? "2" : "3");
+  const audioUrl = WRESASTRA_AUDIO[a.latin];
   return {
     id: `kb_wre_${a.id.replace("wre_", "")}`,
     category: "wresastra",
@@ -51,6 +65,7 @@ const kategoriWresastra: KbEntry[] = WRESASTRA_AKSARA.map((a) => {
       { nama: "Unicode Consortium", ket: `U+1B00–U+1B7F` },
       { nama: "Parasali", ket: "Padanan & pelafalan aksara Bali" },
     ],
+    ...(audioUrl ? { audioUrl } : {}),
   };
 });
 
@@ -75,6 +90,7 @@ const kosakataDanBudaya: KbEntry[] = [
     category: "kosakata",
     title: "Matur Suksma",
     latin: "Matur Suksma",
+    audioUrl: "/audio/matur-suksma.mp3",
     glyph: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬲ᭄ᬫ",
     body:
       "'Terima kasih'. Bentuk yang lebih halus (alus madia) dari 'suksma'. Dipakai saat menerima " +
@@ -90,6 +106,7 @@ const kosakataDanBudaya: KbEntry[] = [
     category: "kosakata",
     title: "Ampura",
     latin: "Ampura",
+    audioUrl: "/audio/pengampura.mp3",
     glyph: "ᬅᬫ᭄ᬧᬸᬭ",
     body:
       "'Mohon maaf'. Untuk permohonan maaf yang lebih dalam, dipakai 'nunas sinampura'. Ini bagian " +
@@ -105,6 +122,7 @@ const kosakataDanBudaya: KbEntry[] = [
     category: "kosakata",
     title: "Madaar / Ngajeng",
     latin: "Madaar · Ngajeng",
+    audioUrl: "/audio/sampun-ngajeng.mp3",
     body:
       "Kata 'makan' dalam Basa Andap (dengan teman) adalah 'madaar', sedangkan yang halus (Basa " +
       "Alus) adalah 'ngajeng'. Pakai 'ngajeng' saat berbicara dengan orang yang dihormati.",
@@ -133,6 +151,7 @@ const kosakataDanBudaya: KbEntry[] = [
     category: "kosakata",
     title: "Titiang",
     latin: "Titiang",
+    audioUrl: "/audio/wastan-titiang.mp3",
     body:
       "Kata ganti 'saya' dalam Basa Alus. 'Tiang' lebih netral (alus singgih), sedangkan 'titiang' " +
       "lebih halus lagi dan dipakai untuk menghormati lawan bicara.",
@@ -176,6 +195,7 @@ const kosakataDanBudaya: KbEntry[] = [
     category: "budaya",
     title: "Canang Sari",
     latin: "Canang Sari",
+    audioUrl: "/audio/pacanangan.mp3",
     glyph: "ᬘᬦᬗ᭄ᬲᬭᬶ",
     body:
       "Sarana sesaji harian dari daun dan bunga, lambang keseimbangan serta rasa syukur. Bentuk " +

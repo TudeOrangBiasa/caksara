@@ -8,6 +8,11 @@ dist
 build
 *.tsbuildinfo
 
+# Capacitor native shells — dihasilkan lokal (`bunx cap add android`),
+# jangan commit (tanpa JDK/SDK di CI; keystores rahasia)
+android/
+local.properties
+
 # Generated files
 apps/web/src/routeTree.gen.ts
 local.db
@@ -50,6 +55,8 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+.verify/
+.parity/current/
 
 # Misc
 *.tgz
@@ -69,3 +76,7 @@ spec.md
 
 # Secrets
 key.md
+
+# Skills cache lokal (Live skills, lihat AGENTS.md) — jangan commit
+.agents/skills/
+.claude/skills/

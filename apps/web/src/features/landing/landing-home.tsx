@@ -1,12 +1,34 @@
-import { BookOpen, Gamepad2, Library, Bot, Sparkles, ChevronDown } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Feather,
+  Gamepad2,
+  Heart,
+  Layers,
+  LibraryBig,
+  Mail,
+  MessageCircle,
+  MessageCircleQuestion,
+  Mic,
+  Phone,
+  Search,
+  Sparkles,
+  Star,
+  X,
+} from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@caksara/ui/lib/utils";
 
+import { Bedawang } from "../../components/bedawang";
+import { usePrefersReducedMotion } from "../../lib/use-prefers-reduced-motion";
 import type { NavTab } from "../../components/nav-tabs";
-
-/* Nama & kutipan di bawah ini placeholder untuk demo, ganti dengan testimoni asli. */
+import { LANDING_CONTACTS, LANDING_TESTIMONIES } from "./landing-data";
 
 const FAQS = [
   {
@@ -43,29 +65,287 @@ function FaqItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="rounded-3xl border border-border/50 bg-card shadow-sm transition-colors hover:border-primary/50">
+    <div
+      className={cn(
+        "rounded-2xl border-2 bg-card transition-colors lg:flex lg:flex-col lg:gap-3.5 lg:[row-gap:14px]",
+        open
+          ? "border-primary shadow-[0_4px_0_0_var(--primary)] lg:shadow-none"
+          : "border-border shadow-[0_4px_0_0_var(--border)] lg:shadow-none",
+      )}
+    >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:px-8 lg:py-6"
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left lg:gap-4 lg:px-[26px] lg:py-[22px] lg:[padding:22px_26px]"
       >
-        <span className="text-base font-bold text-foreground lg:text-lg">{q}</span>
-        <ChevronDown
-          className={cn(
-            "size-5 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180 text-primary",
-          )}
-        />
+        <span className="text-[15px] font-extrabold text-foreground lg:leading-[20px]">{q}</span>
+        {open ? (
+          <ChevronUp className="size-[18px] shrink-0 text-primary" />
+        ) : (
+          <ChevronDown className="size-[18px] shrink-0 text-muted-foreground" />
+        )}
       </button>
       {open && (
-        <p className="px-6 pb-6 text-base leading-relaxed text-muted-foreground lg:px-8 lg:pb-8 lg:text-lg">
+        <p className="px-6 pb-6 text-sm leading-relaxed text-foreground/75 lg:px-[26px] lg:pb-6 lg:leading-[22px] lg:[padding:0_26px_22px]">
           {a}
         </p>
       )}
     </div>
   );
 }
+
+function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
+  const floatCls = (dur: string) =>
+    reduceMotion ? undefined : `animate-[bounce_${dur}_infinite_alternate]`;
+  return (
+    <div className="relative mx-auto aspect-square w-full max-w-[520px] lg:aspect-auto lg:h-[520px] lg:max-w-[520px]">
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-1/2 size-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full ring-8 ring-primary/15 lg:size-[420px]"
+      />
+      <div className="absolute left-1/2 top-1/2 w-[46%] max-w-60 -translate-x-1/2 -translate-y-1/2 rotate-6 rounded-[36px] bg-foreground p-3 shadow-lg lg:w-[240px] lg:max-w-none lg:rotate-0 lg:rounded-[32px]">
+        <div className="flex flex-col items-center gap-3 rounded-[26px] bg-card p-4 lg:gap-3 lg:p-4">
+          <div className="flex w-full items-center gap-2">
+            <X className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+            <div className="h-2 flex-1 rounded-full bg-muted" aria-hidden />
+            <Heart className="size-3.5 shrink-0 fill-destructive text-destructive" aria-hidden />
+          </div>
+          <p className="text-[11px] font-extrabold tracking-[1px] text-muted-foreground">
+            TEBAK AKSARA
+          </p>
+          <p className="text-center text-[15px] font-extrabold text-foreground">Aksara apa ini?</p>
+          <div className="w-full rounded-2xl border-2 border-border bg-card p-3 text-center shadow-md">
+            <span
+              lang="ban"
+              className="font-balinese text-[38px] font-bold leading-none text-primary"
+            >
+              ᬩ
+            </span>
+          </div>
+          <div className="flex w-full flex-col gap-1.5">
+            <span className="flex items-center gap-2 rounded-2xl border-2 border-cta bg-cta/10 px-3 py-1.5 text-xs font-bold text-foreground">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-cta text-[11px] font-bold text-primary-foreground">
+                A
+              </span>
+              Ba
+            </span>
+            <span className="flex items-center gap-2 rounded-2xl border-2 border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-bold text-muted-foreground">
+                B
+              </span>
+              Da
+            </span>
+            <span className="w-full rounded-full bg-cta px-3 py-2 text-center text-xs font-bold text-primary-foreground">
+              PERIKSA
+            </span>
+          </div>
+        </div>
+      </div>
+      {[
+        { Icon: Mic, cls: "left-[6%] top-[12%]" },
+        { Icon: BookOpen, cls: "right-[6%] top-[8%]" },
+        { Icon: Feather, cls: "right-[8%] bottom-[10%]" },
+        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]" },
+      ].map(({ Icon, cls }, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={cn(
+            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-border bg-card shadow-sm",
+            cls,
+            floatCls(i % 2 ? "5s" : "6s"),
+          )}
+        >
+          <Icon className="size-6 text-primary" />
+        </span>
+      ))}
+      <Sparkles aria-hidden className="absolute left-[36%] top-[10%] size-6 text-accent" />
+      <Sparkles aria-hidden className="absolute right-[26%] top-[52%] size-8 text-accent" />
+      <Sparkles aria-hidden className="absolute left-[40%] top-[54%] size-4 text-accent" />
+      <Bedawang
+        mood="semangat"
+        className={cn(
+          "absolute bottom-[6%] left-[16%] size-20 lg:bottom-[10%] lg:left-[8%] lg:size-40",
+          floatCls("7s"),
+        )}
+      />
+    </div>
+  );
+}
+function DemoKuis() {
+  return (
+    <div className="flex w-full flex-col gap-3 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <p className="text-[15px] font-semibold text-foreground">Susun menjadi sapaan swastiastu</p>
+      <div className="flex min-h-12 items-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 p-2">
+        <span className="rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground">
+          swa
+        </span>
+        <span className="rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground">
+          stu
+        </span>
+      </div>
+      <div className="flex gap-2">
+        {["swa", "s", "ti"].map((t) => (
+          <span
+            key={t}
+            className="rounded-lg border-2 border-border bg-card px-3 py-1.5 text-sm font-semibold text-muted-foreground"
+          >
+            {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DemoChat() {
+  return (
+    <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <div className="flex items-center gap-2">
+        <Bedawang mood="senang" className="size-8 shrink-0" />
+        <div className="flex flex-col">
+          <p className="text-[11px] font-extrabold tracking-[0.8px] text-muted-foreground">
+            GURU VIRTUAL
+          </p>
+          <p className="text-base font-extrabold text-foreground">Bedawang Nala</p>
+        </div>
+        <span className="ml-auto rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
+          Online
+        </span>
+      </div>
+      <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm text-primary-foreground">
+        Jelaskan hari raya Nyepi
+      </p>
+      <div className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm leading-relaxed text-foreground">
+        <p className="font-bold">Nyepi</p>
+        <p className="text-muted-foreground">
+          Tahun Baru Saka. Sehari penuh hening: tidak menyalakan api, tidak bekerja, tidak
+          bepergian, dan tidak bersenang-senang.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function DemoKamus() {
+  return (
+    <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
+      <div className="flex items-center gap-2 rounded-full bg-muted px-3.5 py-2.5">
+        <Search className="size-4 shrink-0 text-muted-foreground" />
+        <p className="text-[13px] text-muted-foreground">Cari: suksma...</p>
+      </div>
+      {[
+        { g: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬱ᭄ᬫ", l: "matur suksma" },
+        { g: "ᬒᬁ ᬲ᭄ᬯᬲ᭄ᬢᬶᬬᬲ᭄ᬢᬸ", l: "om swastiastu" },
+        { g: "ᬭᬳᬚᭂᬂ", l: "rahajeng" },
+      ].map((e) => (
+        <div key={e.l} className="flex items-center gap-3 rounded-2xl bg-muted/60 px-3 py-2.5">
+          <span lang="ban" className="font-balinese text-2xl leading-none text-primary">
+            {e.g}
+          </span>
+          <span className="text-sm font-semibold text-foreground">{e.l}</span>
+        </div>
+      ))}
+      <p className="text-xs text-muted-foreground">+ 24 entri lainnya dan masih banyak lagi</p>
+    </div>
+  );
+}
+
+function ZigzagRow({
+  title,
+  desc,
+  art,
+  artFirst,
+  reduceMotion,
+  action,
+}: {
+  title: string;
+  desc: string;
+  art: React.ReactNode;
+  artFirst: boolean;
+  reduceMotion: boolean;
+  action?: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(reduceMotion);
+  useEffect(() => {
+    if (reduceMotion) {
+      setVisible(true);
+      return;
+    }
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduceMotion]);
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex flex-col items-center gap-10 lg:flex-row lg:gap-10 lg:[column-gap:40px]",
+        !reduceMotion && "transition-all duration-700 ease-out",
+        !reduceMotion && !visible && "translate-y-8 opacity-0",
+      )}
+    >
+      <div className={cn("flex flex-1 flex-col gap-3", artFirst && "lg:order-2")}>
+        <h3 className="text-4xl font-extrabold tracking-tight text-foreground lg:text-5xl">
+          {title}
+        </h3>
+        <p className="text-lg leading-relaxed text-muted-foreground lg:text-[21px] lg:leading-[34px]">
+          {desc}
+        </p>
+        {action}
+      </div>
+      <div className={cn("w-full max-w-[460px] flex-col items-center", artFirst && "lg:order-1")}>
+        {art}
+      </div>
+    </div>
+  );
+}
+
+const APPROACH = [
+  {
+    icon: Layers,
+    title: "Terstruktur",
+    desc: "Alur 4 modul dari nol sampai mahir tradisi.",
+    tilt: "lg:rotate-3",
+    dark: false,
+  },
+  {
+    icon: Gamepad2,
+    title: "Menyenangkan",
+    desc: "Kuis seru dan interaktif bikin ketagihan.",
+    tilt: "lg:-rotate-2",
+    dark: true,
+  },
+  {
+    icon: LibraryBig,
+    title: "Kamus Lengkap",
+    desc: "Lebih dari 27 entri budaya dan aksara.",
+    tilt: "lg:-rotate-2",
+    dark: false,
+  },
+  {
+    icon: MessageCircleQuestion,
+    title: "Pendamping",
+    desc: "Guru virtual siap membantumu kapan saja.",
+    tilt: "lg:rotate-2",
+    dark: true,
+  },
+];
 
 export function LandingHome({
   onStart,
@@ -77,286 +357,218 @@ export function LandingHome({
   onOpenTab: (t: NavTab) => void;
 }) {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
+  const reduceMotion = usePrefersReducedMotion();
+  const floatCls = (dur: string, reverse = false) =>
+    reduceMotion
+      ? undefined
+      : `animate-[bounce_${dur}_infinite_alternate${reverse ? "-reverse" : ""}]`;
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 pt-12 pb-16 md:max-w-2xl lg:max-w-7xl lg:px-8">
       {/* HERO */}
-      <section className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="text-center lg:text-left">
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl lg:text-[4rem] lg:leading-[1.1]">
-            Pelajari Aksara Bali, Pelan tapi Pasti.
+      <section
+        data-parity="hero"
+        className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-12"
+      >
+        <div className="flex flex-col gap-7 text-center lg:text-left">
+          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-5xl lg:leading-[53px] lg:tracking-[-1.6px]">
+            Cara paling seru belajar Aksara Bali!
           </h1>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground lg:text-lg">
-            Temukan kekayaan warisan budaya Bali melalui modul interaktif dan kuis seru. Dari sapaan
-            sehari-hari hingga wresastra yang bermakna.
+          <p className="text-base leading-relaxed text-muted-foreground lg:text-[17px] lg:leading-[28px]">
+            Pelajaran singkat yang seru, dapat poin dan naik level sambil belajar komunikasi nyata
+            sehari-hari.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="flex justify-center lg:justify-start lg:gap-3">
             <button
               type="button"
               onClick={onStart}
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl active:scale-95"
+              className="inline-flex items-center justify-center rounded-full bg-cta px-16 py-4 text-[15px] font-bold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none lg:px-11 lg:py-3.5 lg:text-sm lg:uppercase"
             >
               Mulai Belajar
             </button>
             <button
               type="button"
               onClick={onOpenKb}
-              className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-card ring-1 ring-border px-8 text-base font-bold text-foreground transition-all hover:bg-muted active:scale-95"
+              className="hidden items-center justify-center rounded-full border-2 border-cta/40 px-11 py-3.5 text-sm font-bold uppercase text-cta transition-all hover:bg-cta/10 lg:inline-flex"
             >
-              Jelajahi KB
+              Saya Sudah Punya Akun
             </button>
           </div>
         </div>
 
-        {/* Hero Interactive Hanacaraka - Clean, Consistent, No Gradients */}
-        <div className="relative hidden w-full lg:flex items-center justify-center">
-          <div className="w-full max-w-lg rounded-[2.5rem] border border-border/60 bg-secondary/30 p-6 shadow-sm">
-            <div className="grid grid-cols-6 gap-3">
-              {[
-                { bal: "ᬳ", lat: "Ha" },
-                { bal: "ᬦ", lat: "Na" },
-                { bal: "ᬘ", lat: "Ca" },
-                { bal: "ᬭ", lat: "Ra" },
-                { bal: "ᬓ", lat: "Ka" },
-                { bal: "ᬤ", lat: "Da" },
-                { bal: "ᬢ", lat: "Ta" },
-                { bal: "ᬲ", lat: "Sa" },
-                { bal: "ᬯ", lat: "Wa" },
-                { bal: "ᬮ", lat: "La" },
-                { bal: "ᬫ", lat: "Ma" },
-                { bal: "ᬕ", lat: "Ga" },
-                { bal: "ᬩ", lat: "Ba" },
-                { bal: "ᬗ", lat: "Nga" },
-                { bal: "ᬧ", lat: "Pa" },
-                { bal: "ᬚ", lat: "Ja" },
-                { bal: "ᬬ", lat: "Ya" },
-                { bal: "ᬜ", lat: "Nya" },
-              ].map((aksara, i) => (
-                <div
-                  key={i}
-                  className="group relative flex aspect-square cursor-pointer items-center justify-center rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-primary hover:shadow-md"
-                >
-                  <span className="absolute font-balinese text-3xl font-bold text-foreground transition-all duration-200 group-hover:scale-75 group-hover:opacity-0 lg:text-4xl">
-                    {aksara.bal}
-                  </span>
-                  <span className="absolute text-lg font-bold text-primary-foreground opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 lg:text-xl">
-                    {aksara.lat}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PhoneMock reduceMotion={reduceMotion} />
       </section>
 
       {/* WHY US */}
-      <section className="mt-32 border-t border-border/60 pt-20">
-        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">Pendekatan Kami</h2>
-          <button
-            onClick={onStart}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
-          >
-            Jelajahi modul
-          </button>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              icon: <BookOpen className="size-8 text-primary" />,
-              title: "Terstruktur",
-              desc: "Alur 4 modul dari nol sampai mahir tradisi.",
-            },
-            {
-              icon: <Gamepad2 className="size-8 text-warning" />,
-              title: "Menyenangkan",
-              desc: "Belajar lewat kuis seru dan interaktif.",
-            },
-            {
-              icon: <Library className="size-8 text-success" />,
-              title: "Kamus Lengkap",
-              desc: "Lebih dari 27+ entri budaya dan aksara.",
-            },
-            {
-              icon: <Bot className="size-8 text-destructive" />,
-              title: "Pendamping",
-              desc: "Guru virtual siap membantu kapan saja.",
-            },
-          ].map((w, i) => (
+      <section
+        data-parity="pendekatan"
+        className="mt-12 bg-background px-2 pt-12 pb-14 lg:px-8 lg:pt-12 lg:pb-14"
+      >
+        <h2 className="text-center text-[30px] font-extrabold text-cta lg:leading-[36px]">
+          Pendekatan Kami
+        </h2>
+        <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row md:flex-wrap lg:flex-nowrap lg:mt-8 lg:gap-6">
+          {APPROACH.map((w) => (
             <div
-              key={i}
-              className="group flex flex-col rounded-[2rem] bg-card p-8 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50 hover:-translate-y-1"
+              key={w.title}
+              className={cn(
+                "flex h-[184px] w-full max-w-57 flex-col gap-2 rounded-[20px] border-2 p-[18px] transition-transform hover:-translate-y-1 lg:h-[184px] lg:w-[228px] lg:max-w-none lg:gap-2 lg:rounded-[20px] lg:border-2 lg:p-[18px] lg:[row-gap:8px]",
+                w.tilt,
+                w.dark
+                  ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_0_0_var(--primary)] lg:shadow-none"
+                  : "border-border bg-card shadow-[0_4px_0_0_var(--border)] lg:shadow-none",
+              )}
             >
-              <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-background shadow-sm ring-1 ring-border/30">
-                {w.icon}
-              </div>
-              <h3 className="text-xl font-bold">{w.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{w.desc}</p>
+              <span
+                className={cn(
+                  "flex size-11 items-center justify-center rounded-full",
+                  w.dark ? "bg-white/20" : "bg-primary/10",
+                )}
+              >
+                <w.icon className={cn("size-5", w.dark ? "text-white" : "text-primary")} />
+              </span>
+              <h3
+                className={cn(
+                  "text-sm font-extrabold lg:text-sm lg:leading-[18px]",
+                  w.dark ? undefined : "text-foreground",
+                )}
+              >
+                {w.title}
+              </h3>
+              <p
+                className={cn(
+                  "text-xs leading-relaxed lg:leading-[18px]",
+                  w.dark ? "text-primary-foreground/80" : "text-foreground/80",
+                )}
+              >
+                {w.desc}
+              </p>
             </div>
           ))}
         </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="mt-32 border-t border-border/60 pt-20">
-        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <h2 className="text-3xl font-bold tracking-tight lg:text-[2.5rem]">
-            Kenapa Belajar di Sini?
-          </h2>
+        <div className="mt-10 flex justify-center">
           <button
-            onClick={onOpenKb}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border px-6 text-sm font-semibold transition-colors hover:bg-muted active:scale-95"
+            type="button"
+            onClick={onStart}
+            className="inline-flex items-center justify-center rounded-full bg-cta px-11 py-3.5 text-sm font-extrabold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none"
           >
-            Lihat semua fitur
+            Mulai Perjalananmu
           </button>
         </div>
+      </section>
 
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
-          <div className="group flex flex-col justify-center rounded-[2.5rem] bg-primary/5 p-10 lg:col-span-7 lg:p-14">
-            <Sparkles className="mb-6 size-10 text-primary" />
-            <h3 className="text-3xl font-extrabold tracking-tight lg:text-4xl">
-              Modul Interaktif yang Runtut
-            </h3>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Belajar tidak melompat-lompat. Mulai dari pengenalan wresastra hingga mahir, dirancang
-              khusus agar mudah dipahami oleh siapa saja, kapan saja.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-6 lg:col-span-5">
-            {[
-              {
-                icon: <Gamepad2 className="size-6 text-warning" />,
-                title: "Kuis Seru & Menantang",
-                desc: "Uji kemampuan membaca dan menyusun aksara dengan gamifikasi.",
-              },
-              {
-                icon: <Bot className="size-6 text-primary" />,
-                title: "Guru Virtual Cerdas",
-                desc: "Tanya apa saja seputar aksara dan budaya, kapan saja.",
-              },
-              {
-                icon: <Library className="size-6 text-success" />,
-                title: "Kamus Budaya",
-                desc: "Eksplorasi entri kebudayaan dan filosofi Bali terdalam.",
-              },
-            ].map((f, i) => (
-              <div
-                key={i}
-                className="group flex flex-1 items-center gap-6 rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border/50 transition-all hover:bg-muted/50"
+      {/* ZIGZAG */}
+      <section data-parity="zigzag" className="mt-12 px-2 pt-14 pb-16 lg:px-8 lg:pt-24 lg:pb-16">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-cta lg:leading-[48px]">
+          Kenapa Belajar di Sini?
+        </h2>
+        <div className="mt-16 flex flex-col gap-16 lg:mt-24 lg:gap-32 lg:[row-gap:128px]">
+          <ZigzagRow
+            title="Kuis Seru & Menantang"
+            desc="Belajar aksara Bali jadi lebih menyenangkan! Susun kata, kumpulkan XP, dan taklukkan bentuk gantungan yang rumit. Jaga streak harianmu dan lihat progresmu setiap hari!"
+            art={<DemoKuis />}
+            artFirst={false}
+            reduceMotion={reduceMotion}
+          />
+          <ZigzagRow
+            title="Guru Virtual Cerdas"
+            desc="Punya pertanyaan? Tanya kapan saja! Guru virtual siap memberikan penjelasan praktis lengkap dengan contoh penggunaan sehari-hari, aktif 24/7."
+            art={<DemoChat />}
+            artFirst
+            reduceMotion={reduceMotion}
+          />
+          <ZigzagRow
+            title="Kamus Budaya"
+            desc="Bukan sekadar kamus biasa. Pelajari konteks kata, waktu pengucapan, hingga gestur yang tepat dari penutur asli Bali agar kamu makin percaya diri."
+            art={<DemoKamus />}
+            artFirst={false}
+            reduceMotion={reduceMotion}
+            action={
+              <button
+                type="button"
+                onClick={onOpenKb}
+                className="mt-2 inline-flex w-fit items-center gap-2 text-[15px] font-bold text-primary transition-colors hover:text-cta"
               >
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-background ring-1 ring-border/30">
-                  {f.icon}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold">{f.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+                Jelajahi Kamus Budaya <ArrowRight className="size-4" />
+              </button>
+            }
+          />
         </div>
       </section>
 
-      {/* REVIEW */}
-      <section className="mt-32 border-t border-border/60 pt-24 pb-12">
-        <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-primary">Testimoni</p>
-          <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Apa Kata Mereka?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Bergabunglah dengan ratusan pelajar dan pengajar yang sudah merasakan mudahnya belajar
-            aksara Bali.
-          </p>
-        </div>
-
-        <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-16 px-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              name: "Bli Agung",
-              role: "Guru SMA",
-              text: "Akhirnya ada cara mengajar aksara yang bikin murid betah. Modulnya runtut, kuisnya bikin nagih banget buat anak-anak!",
-              img: "/assets/Userpics/PNG/Circle/3DDD-1.png",
-              color: "bg-primary/10",
-              ring: "ring-primary/20",
-              textRole: "text-primary",
-            },
-            {
-              name: "Ayu Saraswati",
-              role: "Mahasiswi",
-              text: "Awalnya mikir aksara itu susah dan kaku, tapi kuisnya bikin berasa main game. Seru banget buat isi waktu luang!",
-              img: "/assets/Userpics/PNG/Circle/Afterclap-1.png",
-              color: "bg-warning/10",
-              ring: "ring-warning/20",
-              textRole: "text-warning-foreground",
-            },
-            {
-              name: "Bapak Wayan",
-              role: "Pekerja",
-              text: "Pulang kerja sempatkan buka satu materi. Sangat membantu dan UI-nya sangat ramah mata. Luar biasa inovasinya.",
-              img: "/assets/Userpics/PNG/Circle/OSLO-1.png",
-              color: "bg-success/10",
-              ring: "ring-success/20",
-              textRole: "text-success-foreground",
-            },
-            {
-              name: "Ibu Putu",
-              role: "Guru SD",
-              text: "Anak-anak kelas 4 sekarang sangat antusias kalau jam pelajaran bahasa Bali. Fitur gamifikasinya juara!",
-              img: "/assets/Userpics/PNG/Circle/Cranks-1.png",
-              color: "bg-destructive/10",
-              ring: "ring-destructive/20",
-              textRole: "text-destructive",
-            },
-            {
-              name: "Dek Made",
-              role: "Siswa SMP",
-              text: "Suka banget sama karakter dan warnanya. Nggak bosenin sama sekali, malah pengen ngerjain modul terus.",
-              img: "/assets/Userpics/PNG/Circle/Guacamole-1.png",
-              color: "bg-accent/40",
-              ring: "ring-accent/50",
-              textRole: "text-accent-foreground",
-            },
-            {
-              name: "Gede Budi",
-              role: "Desainer Grafis",
-              text: "Kamus budayanya sangat membantu saya mencari referensi filosofi untuk karya seni. Sangat rapi dan terstruktur.",
-              img: "/assets/Userpics/PNG/Circle/3DDD-2.png",
-              color: "bg-secondary/40",
-              ring: "ring-secondary/50",
-              textRole: "text-secondary-foreground",
-            },
-          ].map((r, i) => (
-            <div
-              key={i}
-              className={`relative mt-6 flex flex-col rounded-[2.5rem] p-8 pt-12 shadow-sm ring-1 transition-transform hover:-translate-y-2 ${r.color} ${r.ring}`}
+      {/* TESTIMONI */}
+      <section data-parity="testimoni" className="mt-12 px-2 pt-14 pb-16 lg:px-8 lg:pt-32 lg:pb-16">
+        <h2 className="text-center text-[40px] font-extrabold tracking-[-1px] text-foreground lg:text-[44px] lg:leading-[52px]">
+          Dipercaya 1200+ pelajar Indonesia
+        </h2>
+        <p className="mt-3.5 text-center text-base text-muted-foreground lg:mt-3.5 lg:leading-[24px]">
+          Nilai 5.0 dari ribuan ulasan, gabung dan rasakan mudahnya belajar aksara Bali.
+        </p>
+        <div className="mt-10 grid gap-6 md:grid-cols-3 lg:mt-14 lg:gap-6 lg:[column-gap:24px]">
+          {LANDING_TESTIMONIES.map((t, i) => (
+            <figure
+              key={t.id}
+              className={
+                i === 1
+                  ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border-2 lg:bg-cta/10 lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
+                  : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
+              }
             >
               <img
-                src={r.img}
-                alt={r.name}
-                className="absolute -top-10 left-8 size-20 rounded-full border-[6px] border-background shadow-lg transition-transform hover:scale-110 hover:rotate-3"
+                src={t.avatar}
+                alt=""
+                className="absolute -top-8 left-1/2 size-16 -translate-x-1/2 rounded-full border-2 border-card shadow-md lg:size-16"
               />
-              <p className="mb-8 flex-1 text-lg font-medium leading-relaxed text-foreground/90">
-                "{r.text}"
+              <figcaption className="text-[15px] font-extrabold text-foreground lg:leading-[20px]">
+                {t.name}
+              </figcaption>
+              <p className="text-[13px] text-muted-foreground lg:leading-[18px]">{t.role}</p>
+              <p className="mt-2.5 flex items-center justify-center gap-1.5 lg:mt-2.5">
+                <span className="flex gap-0.5" aria-label="Rating 5 dari 5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="size-[15px] fill-accent text-accent" aria-hidden />
+                  ))}
+                </span>
+                <span className="text-[13px] font-bold text-foreground">5.0</span>
               </p>
-              <div>
-                <p className="font-extrabold text-foreground">{r.name}</p>
-                <p className={`text-sm font-bold ${r.textRole}`}>{r.role}</p>
-              </div>
-            </div>
+              <blockquote className="mt-2.5 text-sm leading-relaxed text-foreground/85 lg:leading-[22px]">
+                {t.quote}
+              </blockquote>
+            </figure>
           ))}
+        </div>
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="flex gap-2" aria-hidden>
+            <span className="h-2 w-6 rounded-full bg-primary" />
+            <span className="size-2 rounded-full bg-muted" />
+            <span className="size-2 rounded-full bg-muted" />
+          </div>
+          <div className="flex gap-3">
+            <span className="flex size-12 items-center justify-center rounded-full border border-border bg-card">
+              <ChevronLeft className="size-5 text-muted-foreground" />
+            </span>
+            <span className="flex size-12 items-center justify-center rounded-full bg-foreground">
+              <ChevronRight className="size-5 text-background" />
+            </span>
+          </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="mt-32 grid gap-8 border-t border-border/60 pt-16 lg:grid-cols-[350px_minmax(0,1fr)] lg:gap-16">
-        <div>
-          <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Sering Ditanyakan</h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground lg:text-lg">
+      <section
+        data-parity="faq"
+        className="mt-12 flex flex-col gap-8 bg-background px-2 pt-16 lg:flex-row lg:gap-[90px] lg:px-8"
+      >
+        <div className="flex flex-col gap-5 lg:w-[340px] lg:shrink-0">
+          <h2 className="text-[40px] leading-[46px] font-extrabold tracking-[-1px] text-cta">
+            Sering Ditanyakan
+          </h2>
+          <p className="text-[15px] leading-[25px] text-muted-foreground">
             Masih ragu? Jawaban singkat untuk hal yang paling sering ditanyakan saat memulai belajar
             bersama CAKSARA.
           </p>
         </div>
-        <div className="space-y-3">
+        <div className="flex flex-1 flex-col gap-4">
           {FAQS.map((f, i) => (
             <FaqItem
               key={f.q}
@@ -370,69 +582,90 @@ export function LandingHome({
       </section>
 
       {/* OVERLAPPING CTA & FOOTER */}
-      <div className="relative mt-32 w-full">
+      <div data-parity="cta-footer" className="relative mt-32 w-full lg:mt-32">
         {/* CTA - Scattered Avatars Design */}
-        <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6">
-          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:py-28">
+        <div className="relative z-20 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:max-w-none lg:px-8 lg:[padding:0_32px]">
+          <section className="relative overflow-hidden rounded-[3rem] bg-card border border-border/50 py-20 text-center shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:rounded-[48px] lg:p-[84px_64px] lg:mx-auto lg:w-[976px] lg:shadow-none">
             {/* Scattered Floating Avatars (Desktop only) */}
             <div className="pointer-events-none absolute inset-0 hidden md:block">
-              {/* Kiri */}
               <img
                 src="/assets/Userpics/PNG/Circle/3DDD-1.png"
                 alt=""
-                className="absolute left-[8%] top-[25%] size-20 rounded-full shadow-md transition-transform duration-700 hover:scale-110 animate-[bounce_6s_infinite_alternate]"
+                className={cn(
+                  "absolute left-[8%] top-[25%] size-20 rounded-full shadow-md transition-transform duration-700 hover:scale-110",
+                  floatCls("6s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Afterclap-1.png"
                 alt=""
-                className="absolute left-[22%] top-[55%] size-12 rounded-full shadow-sm animate-[bounce_5s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute left-[22%] top-[55%] size-12 rounded-full shadow-sm",
+                  floatCls("5s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/OSLO-1.png"
                 alt=""
-                className="absolute left-[12%] bottom-[15%] size-16 rounded-full shadow-md animate-[bounce_7s_infinite_alternate]"
+                className={cn(
+                  "absolute left-[12%] bottom-[15%] size-16 rounded-full shadow-md",
+                  floatCls("7s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Cranks-1.png"
                 alt=""
-                className="absolute left-[4%] top-[65%] size-10 rounded-full shadow-sm animate-[bounce_4s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute left-[4%] top-[65%] size-10 rounded-full shadow-sm",
+                  floatCls("4s", true),
+                )}
               />
-
-              {/* Kanan */}
               <img
                 src="/assets/Userpics/PNG/Circle/Guacamole-1.png"
                 alt=""
-                className="absolute right-[8%] top-[20%] size-16 rounded-full shadow-md animate-[bounce_6s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute right-[8%] top-[20%] size-16 rounded-full shadow-md",
+                  floatCls("6s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/3DDD-2.png"
                 alt=""
-                className="absolute right-[24%] top-[40%] size-10 rounded-full shadow-sm animate-[bounce_5s_infinite_alternate]"
+                className={cn(
+                  "absolute right-[24%] top-[40%] size-10 rounded-full shadow-sm",
+                  floatCls("5s"),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Juicy-1.png"
                 alt=""
-                className="absolute right-[14%] bottom-[18%] size-20 rounded-full shadow-md animate-[bounce_7s_infinite_alternate-reverse]"
+                className={cn(
+                  "absolute right-[14%] bottom-[18%] size-20 rounded-full shadow-md",
+                  floatCls("7s", true),
+                )}
               />
               <img
                 src="/assets/Userpics/PNG/Circle/Cranks-2.png"
                 alt=""
-                className="absolute right-[5%] bottom-[45%] size-12 rounded-full shadow-sm animate-[bounce_4s_infinite_alternate]"
+                className={cn(
+                  "absolute right-[5%] bottom-[45%] size-12 rounded-full shadow-sm",
+                  floatCls("4s"),
+                )}
               />
             </div>
 
             {/* Center Content */}
-            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center px-6">
-              <h2 className="text-4xl font-extrabold tracking-tight text-foreground lg:text-[4rem] lg:leading-tight">
+            <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center gap-[22px] px-6">
+              <h2 className="text-4xl font-extrabold tracking-tight text-foreground lg:w-[520px] lg:text-5xl lg:leading-[55px] lg:tracking-[-1.5px]">
                 Siap Untuk Mulai Belajar?
               </h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground lg:text-xl">
+              <p className="text-base leading-relaxed text-muted-foreground lg:w-[540px]">
                 Bergabung bersama pengguna lainnya dan mulai langkah pertamamu mempelajari aksara
                 Bali dengan mudah.
               </p>
               <button
                 onClick={onStart}
-                className="mt-10 inline-flex h-14 items-center justify-center rounded-full bg-primary px-10 text-lg font-bold text-primary-foreground shadow-xl transition-transform hover:-translate-y-1 hover:shadow-2xl active:scale-95 lg:h-16 lg:text-xl"
+                className="inline-flex items-center justify-center rounded-full bg-cta px-[34px] py-[17px] text-[15px] font-bold text-primary-foreground shadow-duo transition-all hover:brightness-105 active:translate-y-0.5 active:shadow-none"
               >
                 Mulai Belajar Sekarang
               </button>
@@ -441,8 +674,8 @@ export function LandingHome({
         </div>
 
         {/* FOOTER */}
-        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:px-20 lg:pt-64">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr] lg:gap-12">
+        <footer className="relative z-10 -mt-24 rounded-[3rem] bg-secondary/30 px-8 pb-12 pt-40 sm:px-12 lg:-mt-40 lg:rounded-[48px] lg:px-16 lg:pb-11 lg:pt-[170px] lg:[padding:170px_64px_44px]">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr] lg:gap-12 lg:[column-gap:48px]">
             {/* Column 1: Brand */}
             <div className="max-w-sm">
               <p className="flex items-center gap-3 text-2xl font-bold tracking-tight">
@@ -458,46 +691,6 @@ export function LandingHome({
                 Platform web edukasi interaktif untuk mempelajari aksara dan budaya kuno Bali dengan
                 metode modern, langkah demi langkah, dan gratis untuk semua kalangan.
               </p>
-              <div className="mt-8 flex gap-4">
-                {/* Facebook */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-                  </svg>
-                </a>
-                {/* X (formerly Twitter) */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.95H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </a>
-                {/* Instagram */}
-                <a
-                  href="#"
-                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition-colors hover:text-primary"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                  </svg>
-                </a>
-              </div>
             </div>
 
             {/* Column 2: Belajar */}
@@ -586,65 +779,43 @@ export function LandingHome({
               </ul>
             </div>
 
-            {/* Column 4: Kontak */}
+            {/* Column 4: Kontak Kami (data lomba, Pencil T4HbK) */}
             <div className="flex flex-col gap-4">
               <h3 className="font-bold text-foreground">Kontak Kami</h3>
-              <ul className="flex flex-col gap-4 mt-2">
-                <li className="flex items-center gap-3">
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+              <ul className="flex flex-col gap-3">
+                {LANDING_CONTACTS.map((c) => (
+                  <li key={c.id}>
+                    <a
+                      href={c.href}
+                      className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                     >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">(0361) 123 456</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect width="20" height="16" x="2" y="4" rx="2" />
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">halo@caksara.id</span>
-                </li>
+                      <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                        {c.id === "telp" ? (
+                          <Phone className="size-4 text-primary" />
+                        ) : (
+                          <Mail className="size-4 text-primary" />
+                        )}
+                      </span>
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
 
-          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row">
-            <p className="text-sm font-medium text-muted-foreground">
+          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/50 pt-8 sm:flex-row lg:mt-12 lg:gap-6 lg:pt-8">
+            <p className="text-sm font-medium text-muted-foreground lg:text-[13px] lg:leading-[18px]">
               © 2026 CAKSARA. Seluruh hak cipta dilindungi.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
+              <span className="text-[13px] font-medium text-muted-foreground">
                 Kebijakan Privasi
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
+              </span>
+              <span className="text-[13px] font-medium text-muted-foreground">
                 Syarat Penggunaan
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                Peta Situs
-              </a>
+              </span>
+              <span className="text-[13px] font-medium text-muted-foreground">Peta Situs</span>
             </div>
           </div>
         </footer>
