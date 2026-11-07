@@ -26,8 +26,9 @@ Prints `verify: all gates passed` and exits 0 when every step passes. Any red st
 9. `bun run build`
 10. `bun run verify:caksara` — Playwright guest run 3 viewport (bukti di `.verify/`, gitignored).
 
-PR body + gambar Screenshots dicek terpisah (butuh body/URL, bukan tiap push):
-`bun run lint:pr-body -- <file-body|nomor-PR>` — cerminan pr-lint.yml.
+PR body dicek via sumber tunggal `scripts/lint-pr-body.js`, dua titik panggil:
+lokal `bun run lint:pr-body -- <file-body|nomor-PR>` sebelum `gh pr create`,
+dan otomatis via workflow `pr-lint.yml` (wrapper tipis, mode `--ci`).
 Hard-fail: placeholder, section hilang, URL relatif. Unreachable hanya warn (offline-safe).
 
 ## Who runs it

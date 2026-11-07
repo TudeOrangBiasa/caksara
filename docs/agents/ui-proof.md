@@ -74,4 +74,5 @@ commit png kecil ke branch PR di `docs/proof/<nama>/`, lalu pakai URL blob:
 `https://github.com/<owner>/<repo>/blob/<branch>/docs/proof/<nama>/<file>.png?raw=true`.
 URL `raw.githubusercontent.com` 404 di repo privat; URL `blob?...?raw=true`
 render untuk member login. Jangan commit gambar besar (>1MB) hanya untuk
-screenshot; `docs/proof/` untuk bukti kecil berversi. Contoh lolos pr-lint: #186, #189.
+screenshot; `docs/proof/` untuk bukti kecil berversi. Contoh lolos: #186, #189.
+Cek lokal sebelum push body: `node scripts/lint-pr-body.js <file|nomor-PR>`.

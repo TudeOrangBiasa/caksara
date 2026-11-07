@@ -73,9 +73,11 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
   pr-screenshots langsung di body, tanpa `<details>`. Panduan lengkap:
   `docs/agents/ui-proof.md`. Install: `npm i -g agent-browser && agent-browser install`.
 - `main` protected (require 1 approving + strict status checks).
-- **Linter PR body (CI):** workflow `pr-lint` fail bila body kosong, masih berisi
-  placeholder `url-gambar-*`, tanpa perintah test (`bun|bunx|npm`), atau bagian
-  Screenshots tanpa gambar dan tanpa kata `backend-only`.
+- **Linter PR body (sumber tunggal `scripts/lint-pr-body.js`):** cek lokal
+  `node scripts/lint-pr-body.js <file|nomor-PR>` sebelum `gh pr create`;
+  workflow `pr-lint` (wrapper tipis, mode `--ci`) fail otomatis bila body kosong,
+  masih berisi placeholder `url-gambar-*`, tanpa perintah test (`bun|bunx|npm|node scripts/`),
+  atau bagian Screenshots tanpa gambar dan tanpa kata `backend-only` (PR visual wajib gambar).
 
 ## 12. Writing & TypeScript Guides
 

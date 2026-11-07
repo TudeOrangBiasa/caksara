@@ -1,4 +1,4 @@
-> Isi semua bagian. PR tanpa Test plan yang diisi = belum siap review (cek: pr-lint).
+> Isi semua bagian. Cek lokal: `node scripts/lint-pr-body.js <file-body|nomor-PR>` (PR lint 100% lokal, tanpa CI).
 
 ## What
 
