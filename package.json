@@ -52,7 +52,8 @@
     "verify": "bash scripts/verify.sh",
     "verify:caksara": "bun skills/verify-caksara/verify-caksara.ts",
     "cap:sync": "bunx cap sync",
-    "cap:android": "bunx cap open android"
+    "cap:android": "bunx cap open android",
+    "package:local": "bash scripts/package-local.sh"
   },
   "dependencies": {
     "@caksara/env": "workspace:*",
