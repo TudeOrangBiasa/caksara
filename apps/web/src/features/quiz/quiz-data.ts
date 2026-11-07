@@ -1,5 +1,6 @@
 import { questionSchema, quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
+import type { CourseModule } from "../module/module-data";
 
 export const QUIZ_BANK: Record<string, Question[]> = {
   mod_01: [
@@ -695,4 +696,32 @@ export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
     moduleId,
     questions: pickSessionQuestions(bank, { ...opts, level }),
   });
+}
+
+/** Modul sintetis Latihan Campuran (sesi lintas modul yang sudah selesai). */
+export const MOD_LATIHAN: CourseModule = {
+  id: "latihan",
+  order: 1,
+  title: "Latihan Campuran",
+  theme: "Ulas ulang semua materi yang sudah dipelajari",
+  description: "Latihan campuran dari semua modul yang sudah kamu selesaikan.",
+  poinBelajar: ["Pengulangan"],
+  jumlahSoal: 8,
+  estimasiMenit: 3,
+  materi: [
+    {
+      id: "lat_01",
+      judul: "Latihan Campuran",
+      isi: "Ulas ulang semua materi dari modul yang sudah kamu selesaikan.",
+    },
+  ],
+};
+
+/**
+ * Satu-satunya seam perakitan Sesi Kuis: modul latihan → campuran,
+ * modul biasa → sesi 8 soal. Router hanya memilih tab/view.
+ */
+export function quizForModule(mod: CourseModule, selesai: readonly string[] = []): Quiz {
+  if (mod.id === MOD_LATIHAN.id) return buildMixedQuiz([...selesai]);
+  return buildSessionQuiz(mod.id, { seed: nextAttemptSeed(mod.id) });
 }
