@@ -140,21 +140,21 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
         </div>
       </div>
       {[
-        { Icon: Mic, cls: "left-[6%] top-[12%]" },
-        { Icon: BookOpen, cls: "right-[6%] top-[8%]" },
-        { Icon: Feather, cls: "right-[8%] bottom-[10%]" },
-        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]" },
-      ].map(({ Icon, cls }, i) => (
+        { Icon: Mic, cls: "left-[6%] top-[12%]", iconCls: "text-primary" },
+        { Icon: BookOpen, cls: "right-[6%] top-[8%]", iconCls: "text-accent" },
+        { Icon: Feather, cls: "right-[8%] bottom-[10%]", iconCls: "text-success" },
+        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]", iconCls: "text-cta" },
+      ].map(({ Icon, cls, iconCls }, i) => (
         <span
           key={i}
           aria-hidden
           className={cn(
-            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-b-[5px] border-duo-blue/30 bg-card shadow-sm",
+            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-b-[5px] border-primary/20 bg-card shadow-sm",
             cls,
             floatCls(i % 2 ? "5s" : "6s"),
           )}
         >
-          <Icon className="size-6 text-duo-blue" />
+          <Icon className={cn("size-6", iconCls)} />
         </span>
       ))}
       <span aria-hidden className="absolute left-[36%] top-[10%] text-[28px] text-accent">
@@ -202,7 +202,7 @@ function DemoKuis() {
   );
 }
 
-function DemoChat() {
+function DemoChat({ onOpenKb }: { onOpenKb?: () => void }) {
   return (
     <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
       <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ function DemoChat() {
           <p className="text-base font-extrabold text-foreground">Bedawang Nala</p>
         </div>
         <span className="ml-auto rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
-          Online
+          Online · jawab pakai sumber
         </span>
       </div>
       <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm text-primary-foreground">
@@ -226,6 +226,26 @@ function DemoChat() {
           Tahun Baru Saka. Sehari penuh hening: tidak menyalakan api, tidak bekerja, tidak
           bepergian, dan tidak bersenang-senang.
         </p>
+      </div>
+      <div className="flex flex-col gap-1.5 rounded-2xl border border-border/60 bg-background px-3 py-2.5">
+        <p className="text-[11px] font-extrabold tracking-[0.8px] text-muted-foreground">
+          SUMBER RUJUKAN
+        </p>
+        <p className="text-xs font-medium text-foreground">Parasali · Tradisi dan hari raya</p>
+        <p className="text-xs font-medium text-foreground">
+          Balai Bahasa Provinsi Bali · Istilah keagamaan
+        </p>
+        {onOpenKb ? (
+          <button
+            type="button"
+            onClick={onOpenKb}
+            className="mt-1 w-fit text-xs font-bold text-primary transition-colors hover:text-cta"
+          >
+            Buka di Basis Pengetahuan →
+          </button>
+        ) : (
+          <p className="mt-1 w-fit text-xs font-bold text-primary">Buka di Basis Pengetahuan →</p>
+        )}
       </div>
     </div>
   );
@@ -392,9 +412,10 @@ export function LandingHome({
             <button
               type="button"
               onClick={onOpenKb}
+              aria-label="Jelajahi kamus budaya"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-full border-2 border-cta/40 bg-card px-[54px] py-[14px] text-[13px] font-bold text-cta transition-all hover:bg-cta/10"
             >
-              SAYA SUDAH PUNYA AKUN
+              JELAJAHI KB
             </button>
           </div>
         </div>
@@ -476,7 +497,7 @@ export function LandingHome({
           <ZigzagRow
             title="Guru Virtual Cerdas"
             desc="Punya pertanyaan? Tanya kapan saja! Guru virtual siap memberikan penjelasan praktis lengkap dengan contoh penggunaan sehari-hari, aktif 24/7."
-            art={<DemoChat />}
+            art={<DemoChat onOpenKb={onOpenKb} />}
             artFirst
             reduceMotion={reduceMotion}
           />

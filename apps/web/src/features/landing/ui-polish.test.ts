@@ -42,7 +42,9 @@ describe("UI — halaman memalukan dihapus (#88)", () => {
   test("hero dua CTA ala Pencil T4HbK (primer + sekunder)", () => {
     const hero = landing.slice(landing.indexOf("{/* HERO */}"), landing.indexOf("{/* WHY US */}"));
     expect(hero.includes("MULAI BELAJAR")).toBe(true);
-    expect(hero.includes("SAYA SUDAH PUNYA AKUN")).toBe(true);
+    // Beranda Pencil menulis SAYA SUDAH PUNYA AKUN tapi aksi website adalah buka KB,
+    // jadi label jujur adalah JELAJAHI KB (audit Beranda frame, Nov 2026).
+    expect(hero.includes("JELAJAHI KB")).toBe(true);
   });
 });
 
