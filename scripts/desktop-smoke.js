@@ -41,6 +41,13 @@ if (existsSync(desktopEntry)) {
 
 const electronConfig = join(root, "apps", "desktop", "electron-builder.json");
 check("electron-builder.json ada", existsSync(electronConfig));
+if (existsSync(electronConfig)) {
+  const cfg = JSON.parse(readFileSync(electronConfig, "utf8"));
+  const linux = cfg.linux?.target ?? [];
+  const win = cfg.win?.target ?? [];
+  check("linux target = AppImage saja", linux.length === 1 && linux[0] === "AppImage");
+  check("win target = nsis (.exe)", win.includes("nsis"));
+}
 
 const webIndex = join(root, "apps", "web", "build", "client", "index.html");
 if (existsSync(webIndex)) {
