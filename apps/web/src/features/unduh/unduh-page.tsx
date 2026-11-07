@@ -4,10 +4,9 @@ import { UNDUH_ARTIFACTS, UNDUH_RELEASES_URL } from "./unduh-data";
 
 /**
  * Halaman Unduh (nav "Unduh", Pencil IpWol).
- * Matriks SSOT di unduh-data.ts: Android .apk, Windows .exe, Linux
- * .AppImage. Tanpa kartu iPhone (iOS out of scope, ADR-0014).
- * Tiap kartu tombol Unduh ke GitHub Releases latest + nama berkas
- * jujur di bawahnya; artefak dari builder lokal (package:local).
+ * Kartu horizontal ala Pencil: ikon OS + teks + tombol Unduh.
+ * Tanpa kartu iPhone (iOS out of scope, ADR-0014).
+ * Banner sinkron progres ala Pencil (tint primary-soft).
  */
 export function UnduhPage() {
   return (
@@ -25,26 +24,29 @@ export function UnduhPage() {
           <section
             key={a.id}
             aria-label={`Unduh untuk ${a.title}`}
-            className="flex flex-col gap-3 rounded-[20px] border-2 border-border bg-card p-6"
+            className="flex flex-row items-center gap-4 rounded-[20px] border-2 border-border bg-card p-6"
           >
-            <div>
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+              <a.icon className="size-7 text-primary" aria-hidden />
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <h2 className="text-lg font-extrabold">{a.title}</h2>
               <p className="text-xs font-bold tracking-wide text-muted-foreground">{a.spec}</p>
+              <p className="text-sm text-muted-foreground">{a.desc}</p>
+              <p className="text-xs text-muted-foreground">Berkas: {a.filePattern}</p>
             </div>
-            <p className="text-sm text-muted-foreground">{a.desc}</p>
             <a
               href={UNDUH_RELEASES_URL}
-              className="inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
+              className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
             >
               <Download className="size-4" aria-hidden />
               Unduh
             </a>
-            <p className="text-xs text-muted-foreground">Berkas: {a.filePattern}</p>
           </section>
         ))}
       </div>
 
-      <p className="mt-6 rounded-[20px] border border-border/60 bg-muted/40 px-5 py-4 text-sm text-muted-foreground">
+      <p className="mt-6 rounded-2xl bg-primary/10 px-5 py-4 text-sm font-bold text-foreground">
         Progresmu ikut ke mana-mana. Masuk biar XP dan streak tersinkron di semua perangkat.
       </p>
     </div>
