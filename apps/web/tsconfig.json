@@ -1,9 +1,13 @@
 {
+  // v11b-audio-deploy.test.ts dikecualikan: interop Bun+Deno
+  // (Bun global + impor .ts lintas-batas). Diverifikasi via `bun test`
+  // file itu + `deno eval` path handler, bukan tsc.
+  "exclude": ["src/lib/v11b-audio-deploy.test.ts"],
   "include": ["**/*", "**/.server/**/*", "**/.client/**/*", ".react-router/types/**/*"],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vite/client"],
-    "target": "ES2022",
+    "target": "ES2023",
     "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",

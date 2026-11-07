@@ -262,18 +262,22 @@ export default function Home() {
         level={sessionLevel}
         initialHearts={loadProfile()?.hearts ?? MAX_HEARTS}
         onFinish={(score, detail) => {
+          const stats = loadProfile()?.aksaraStats ?? {};
+          const valid = detail.flatMap((d) =>
+            d.aksaraId ? [{ aksaraId: d.aksaraId, correct: d.correct }] : [],
+          );
           if (!view.isLatihan) {
             markSelesai(view.mod.id);
-            const wrong = deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, detail);
+            const wrong = deriveWrongTopics(stats, valid);
             recordSessionLevel(view.mod.id, score.correct, score.total, wrong);
           }
-          recordAnswerStats(detail);
+          recordAnswerStats(valid);
           // V10 offline-buffer: enqueue bila SALAH SATU gagal (sesi ATAU
           // progres); flag menandai bagian yang sudah sukses agar flush tak
           // kirim ulang. Coba-lagi reload keras pre-existing (di luar delta).
           void Promise.allSettled([
             saveQuizSession(view.mod.id, detail, score),
-            saveAksaraProgress(detail, WRESASTRA_IDS),
+            saveAksaraProgress(valid, WRESASTRA_IDS),
           ]).then(([sessionRes, progressRes]) => {
             const sessionOk =
               sessionRes.status === "fulfilled" &&
