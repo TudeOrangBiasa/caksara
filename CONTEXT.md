@@ -127,8 +127,11 @@ Halaman penuh liga mingguan (H2 + League Card + List R1–R8) dengan reset Senin
 _Avoid_: leaderboard generik tanpa liga mingguan
 
 **Unduh**:
-Layar pilihan installer per platform + banner sinkron progres.
-_Avoid_: download generik
+Layar 3 kartu installer + banner sinkron progres. Matriks artefak (ADR-0014):
+Linux AppImage saja, Windows .EXE (nsis 64-bit), Android .APK (Capacitor).
+Tanpa kartu iPhone (iOS out of scope, coming soon). Tiap kartu tombol
+Unduh ke aset GitHub Releases latest. Banner progres ikut perangkat retained.
+_Avoid_: download generik, kartu iPhone, .deb/.rpm di Linux
 
 **Onboarding**:
 Alur 5 langkah (Alasan, Level, Komitmen, Nama, Sukses) berisi preferensi awal + maskot Bedawang Nala.
