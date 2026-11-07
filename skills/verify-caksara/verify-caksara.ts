@@ -146,14 +146,17 @@ async function passQuiz(
   // Kerjakan). Masuk Detail via modul pertama → Kerjakan kedua.
   await settleToasts(page);
   await page.getByRole("button", { name: "KEMBALI" }).click();
+  console.log("    kembali ok");
   await page.waitForSelector("text=Daftar modul");
   await page.locator("ol button").first().click();
-  // Detail sesi ulang: Mulai Belajar → MATERI view lagi (bukti probe),
-  // jadi ulangi loop materi sampai Kerjakan muncul.
+  console.log("    modul ok");
   await page.getByLabel("Mulai belajar").filter({ visible: true }).first().click();
+  console.log("    mulai-belajar ok");
   await passMateriLoop(page);
+  console.log("    materi2 ok");
   await settleToasts(page);
   await page.getByRole("button", { name: /Kerjakan/u }).click();
+  console.log("    kerjakan2 ok");
   await page.waitForSelector("text=/Soal 1 \\//");
   const hasilGagal = await playFullSession(page, false);
   await page.getByRole("dialog").waitFor();
