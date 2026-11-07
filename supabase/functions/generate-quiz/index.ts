@@ -1,7 +1,7 @@
 /// <reference lib="deno.ns" />
 // Edge Function: generate-quiz (#23 V4).
 // Kontrak: terima { moduleId, level, count, wrongTopics }, kembalikan
-// { moduleId, questions[tepat 3, #85], cached } dengan 2+ tipe soal
+// { moduleId, questions[tepat 8, screen truth], cached } dengan 2+ tipe soal
 // termasuk dengar_pilih (audio asli bila ada, badge Latin bila belum terkurasi).
 // Ketahanan: rate-limit 429 sebelum panggil Gemini, retry 2x lalu fallback
 // bank statis QUIZ_BANK + header `x-quiz-source: gemini|fallback`, tidak
@@ -77,6 +77,33 @@ const FALLBACK_BANK: Record<string, Question[]> = {
         { left: "Ampura", right: "Mohon maaf" },
       ],
       explanation: "Salam sejahtera, terima kasih, dan mohon maaf adalah makna yang tepat.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Apa fungsi gestur Anjali Mudra saat menyapa?",
+      choices: [
+        { text: "Sekadar formalitas", isCorrect: false },
+        { text: "Tanda hormat dan ikhlas", isCorrect: true },
+        { text: "Tanda perpisahan", isCorrect: false },
+        { text: "Tanda meminta makan", isCorrect: false },
+      ],
+      explanation:
+        "Tangan dicakupkan di depan dada lalu sedikit menunduk: tanda hormat dan ikhlas.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Sapaan yang tepat untuk meminta maaf adalah...",
+      choices: [
+        { text: "Matur suksma", isCorrect: false },
+        { text: "Om Swastiastu", isCorrect: false },
+        { text: "Ampura", isCorrect: true },
+        { text: "Rahajeng", isCorrect: false },
+      ],
+      explanation: "'Ampura' berarti mohon maaf; yang lebih dalam 'Nunas sinampura'.",
       sourceRef: "kb_sapaan · Basis Pengetahuan",
       level: 1,
     },
@@ -172,6 +199,32 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       aksaraId: "wre_05",
       level: 1,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Aksara 'na' ditulis seperti apa?",
+      choices: [
+        { text: "ᬦ", isCorrect: true },
+        { text: "ᬳ", isCorrect: false },
+        { text: "ᬘ", isCorrect: false },
+        { text: "ᬭ", isCorrect: false },
+      ],
+      explanation: "Bentuk 'na' adalah ᬦ, aksara kedua urutan wresastra.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Bunyi dasar tiap aksara wresastra berakhiran...",
+      choices: [
+        { text: "'i'", isCorrect: false },
+        { text: "'a'", isCorrect: true },
+        { text: "'u'", isCorrect: false },
+        { text: "'o'", isCorrect: false },
+      ],
+      explanation: "Tiap aksara berbunyi dasar ber-akhiran 'a': Ha, Na, Ca, Ra, Ka.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
   ],
   mod_03: [
     {
@@ -248,6 +301,32 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       sourceRef: "kb_titiang · Basis Pengetahuan",
       level: 3,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Kata 'tidur' dalam Basa Alus adalah...",
+      choices: [
+        { text: "Madaar", isCorrect: false },
+        { text: "Pules", isCorrect: false },
+        { text: "Ngajeng", isCorrect: false },
+        { text: "Sirep", isCorrect: true },
+      ],
+      explanation: "Sirep adalah bentuk Alus dari 'tidur', sedangkan pules adalah Andap.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Salah pilih tingkat bahasa bisa terdengar...",
+      choices: [
+        { text: "Kasar", isCorrect: true },
+        { text: "Merdu", isCorrect: false },
+        { text: "Lucu", isCorrect: false },
+        { text: "Biasa saja", isCorrect: false },
+      ],
+      explanation: "Salah pilih Andap/Alus bisa terdengar kasar bagi lawan bicara.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
   ],
   mod_04: [
     {
@@ -322,6 +401,32 @@ const FALLBACK_BANK: Record<string, Question[]> = {
       ],
       explanation: "Setiap tradisi punya ciri khasnya masing-masing.",
       sourceRef: "kb_nyepi · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Canang Sari adalah...",
+      choices: [
+        { text: "Sesaji harian umat Bali", isCorrect: true },
+        { text: "Alat musik gamelan", isCorrect: false },
+        { text: "Pakaian adat", isCorrect: false },
+        { text: "Tarian sakral", isCorrect: false },
+      ],
+      explanation: "Canang Sari adalah sesaji harian sebagai tanda syukur.",
+      sourceRef: "kb_nyepi · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Penjor dipasang saat...",
+      choices: [
+        { text: "Nyepi", isCorrect: false },
+        { text: "Galungan", isCorrect: true },
+        { text: "Hari biasa", isCorrect: false },
+        { text: "Malam hari raya saja", isCorrect: false },
+      ],
+      explanation: "Penjor dipasang saat Galungan sebagai tanda syukur atas kesejahteraan.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
       level: 2,
     },
   ],
@@ -406,8 +511,8 @@ function responseSchema(): Record<string, unknown> {
       moduleId: { type: "STRING" },
       questions: {
         type: "ARRAY",
-        minItems: 3,
-        maxItems: 3,
+        minItems: 8,
+        maxItems: 8,
         items: {
           anyOf: [
             {
@@ -484,7 +589,7 @@ function buildPrompt(req: GenerateQuizRequest, context: string): string {
   return [
     "Kamu pembuat soal CAKSARA (aksara & budaya Bali).",
     `Buat ${req.count} soal untuk modul ${req.moduleId} pada level ${req.level}.`,
-    "Syarat: tepat 2-3 tipe berbeda dari [dengar_pilih, susun_aksara, kenali_visual, checkpoint_budaya, cocokkan],",
+    "Syarat: tepat 3-5 tipe berbeda dari [dengar_pilih, susun_aksara, kenali_visual, checkpoint_budaya, cocokkan],",
     "wajib ada 1 soal dengar_pilih (audioUrl boleh kosong; isi latinText bila audio belum ada — jangan pura-pura TTS aksara),",
     "setiap soal memakai tepat satu KB Entry di atas dan WAJIB cantumkan sourceRef persis 'KB#<id> · Basis Pengetahuan' dengan <id> salah satu id di atas (soal tanpa kutipan valid DITOLAK — jangan tulis id lain),",
     "cantumkan level KB tiap soal; choices tepat 4 dengan satu isCorrect true bila tipe pilihan.",
@@ -629,7 +734,7 @@ async function callGemini(
       const parsed = quizSchema.safeParse(extractJson(text));
       if (
         parsed.success &&
-        parsed.data.questions.length >= 3 &&
+        parsed.data.questions.length === 8 &&
         allQuestionsGrounded(parsed.data.questions, kbIds)
       ) {
         return { quiz: parsed.data, rateLimited: false as const };
@@ -670,7 +775,7 @@ export async function handler(req: Request): Promise<Response> {
   const moduleId = typeof body.moduleId === "string" ? body.moduleId.trim() : "";
   if (!moduleId) return json(400, { error: "moduleId wajib" });
   const level = clampLevel(body.level);
-  const count = 3; // #85: sesi selalu tepat 3 soal, abaikan count klien.
+  const count = 8; // Screen truth: sesi selalu tepat 8 soal, abaikan count klien.
   const wrongTopics = Array.isArray(body.wrongTopics)
     ? body.wrongTopics.filter((t): t is string => typeof t === "string").slice(0, 8)
     : [];
