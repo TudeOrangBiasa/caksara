@@ -239,16 +239,23 @@ function stopOwn(ownProc: ChildProcess | null): void {
   }
 }
 
-async function driveAll(browser: Browser, evidenceDir: string): Promise<ViewportReport[]> {
+async function driveAll(evidenceDir: string): Promise<ViewportReport[]> {
   const reports: ViewportReport[] = [];
   for (const vp of VIEWPORTS) {
-    const rep = await driveViewport(browser, vp, evidenceDir);
-    reports.push(rep);
-    console.log(
-      `  ${vp.name} ${vp.width}x${vp.height}: ${rep.soal} max=${rep.ariaValuemax} overflow=${rep.ok ? "ok" : "FAIL"}`,
-    );
-    for (const s of rep.overflow) {
-      if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
+    // Browser fresh per viewport: isolasi penuh antar-VP (pola 4x macet
+    // di VP kedua dengan 1 browser bersama; terisolasi hijau).
+    const browser = await chromium.launch({ timeout: 30000 });
+    try {
+      const rep = await driveViewport(browser, vp, evidenceDir);
+      reports.push(rep);
+      console.log(
+        `  ${vp.name} ${vp.width}x${vp.height}: ${rep.soal} max=${rep.ariaValuemax} overflow=${rep.ok ? "ok" : "FAIL"}`,
+      );
+      for (const s of rep.overflow) {
+        if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
+      }
+    } finally {
+      await browser.close();
     }
   }
   return reports;
@@ -259,15 +266,13 @@ async function main(): Promise<void> {
   const evidenceDir = join(process.cwd(), ".verify", "caksara", startedAt);
   mkdirSync(evidenceDir, { recursive: true });
   const ownProc = await launch();
-  const browser = await chromium.launch({ timeout: 30000 });
   let failed: string | null = null;
   let reports: ViewportReport[] = [];
   try {
-    reports = await driveAll(browser, evidenceDir);
+    reports = await driveAll(evidenceDir);
   } catch (err) {
     failed = err instanceof Error ? err.message : String(err);
   } finally {
-    await browser.close();
     stopOwn(ownProc);
   }
   const overflowJson: Record<string, string> = {};
