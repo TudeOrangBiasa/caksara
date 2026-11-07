@@ -29,6 +29,7 @@ import {
   subscribeSettings,
   WRESASTRA_FONT_SIZES,
 } from "./settings-store";
+import type { WresastraFontSize } from "./settings-store";
 import { ProfileSection } from "./profile-section";
 
 const PREVIEW_GLYPH = "ᬳᬦᬘᬭᬓ";
@@ -263,7 +264,7 @@ function ThemeSection({
   );
 }
 
-function AksaraSection({ fontSize }: { fontSize: number }) {
+function AksaraSection({ fontSize }: { fontSize: WresastraFontSize }) {
   return (
     <section aria-labelledby="font-heading" className="space-y-6">
       <div className="flex items-center justify-between">

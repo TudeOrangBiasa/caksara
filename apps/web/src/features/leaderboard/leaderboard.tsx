@@ -11,6 +11,7 @@ import {
   supabaseLeaderboardSource,
   topEntries,
 } from "./leaderboard-data";
+import type { LeaderboardEntry, LeaderboardSource } from "./leaderboard-data";
 
 /** Row Pencil t8BaKT: rank pill rank 1-3, lingkaran inisial, XP grouping id-ID. */
 function rowStyle(rank: number, mine: boolean): string {

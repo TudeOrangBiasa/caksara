@@ -258,11 +258,13 @@ export function ArtGlyphTile({ className }: { className?: string }) {
         aksara · tulisan · warisan
       </text>
       <g fontFamily="Inter, sans-serif" textAnchor="middle">
-        {[
-          ["18", "Aksara", 40],
-          ["4", "Modul", 150],
-          ["27", "Entri KB", 260],
-        ].map(([num, label, cx]) => (
+        {(
+          [
+            ["18", "Aksara", 40],
+            ["4", "Modul", 150],
+            ["27", "Entri KB", 260],
+          ] as [string, string, number][]
+        ).map(([num, label, cx]) => (
           <g key={label}>
             <rect
               x={cx - 48}

@@ -2,6 +2,7 @@ import { questionSchema, quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
 import type { CourseModule } from "../module/module-data";
 import { pickSessionQuestions } from "./quiz-pick";
+import type { PickOptions } from "./quiz-pick";
 
 export const QUIZ_BANK: Record<string, Question[]> = {
   mod_01: [

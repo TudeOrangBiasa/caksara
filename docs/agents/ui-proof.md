@@ -68,7 +68,10 @@ agent-browser skills get core --full  # referensi perintah lengkap
 
 ## Upload gambar ke PR GitHub
 
-GitHub tidak punya API publik untuk upload gambar deskripsi PR. Cara
-didukung: seret-jatuhkan file ke kolom komentar PR di web — GitHub mengembalikan
-URL yang bisa dipakai di body. Jangan commit gambar besar (>1MB) ke branch
-hanya untuk screenshot; `docs/proof/` untuk bukti kecil berversi.
+GitHub tak punya API publik untuk upload gambar deskripsi PR (skill resmi
+`pr-screenshots` juga WIP di bagian ini). Pola repo ini — terbukti di #189:
+commit png kecil ke branch PR di `docs/proof/<nama>/`, lalu pakai URL blob:
+`https://github.com/<owner>/<repo>/blob/<branch>/docs/proof/<nama>/<file>.png?raw=true`.
+URL `raw.githubusercontent.com` 404 di repo privat; URL `blob?...?raw=true`
+render untuk member login. Jangan commit gambar besar (>1MB) hanya untuk
+screenshot; `docs/proof/` untuk bukti kecil berversi. Contoh lolos pr-lint: #186, #189.
