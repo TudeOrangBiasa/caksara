@@ -179,7 +179,10 @@ export async function flushPendingSessions(opts: FlushDeps = {}): Promise<FlushR
         persistEntry(next);
       }
       if (!next.progressSent) {
-        const progressRes = await saveProgress(next.answers, knownIds);
+        const valid = next.answers.flatMap((a) =>
+          a.aksaraId ? [{ aksaraId: a.aksaraId, correct: a.correct }] : [],
+        );
+        const progressRes = await saveProgress(valid, knownIds);
         if (!progressRes.saved) continue;
         next = { ...next, progressSent: true };
         persistEntry(next);

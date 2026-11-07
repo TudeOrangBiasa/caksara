@@ -12,6 +12,7 @@ import {
   recordSessionLevel,
   validateQuizBank,
 } from "./quiz-data";
+import type { Question } from "../../lib/zod/question";
 import { courseModules } from "../module/module-data";
 
 describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
