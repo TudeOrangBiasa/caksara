@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { isAnswerCorrect } from "./quiz-store";
+import { gradeAnswer } from "./quiz-kind";
 import type { QuizAnswer } from "./quiz-store";
 import type { Question } from "../../lib/zod/question";
 
@@ -19,19 +19,16 @@ describe("cocokkan: soal selesai hanya bila SEMUA pasangan matched", () => {
     const legacySingle = {
       match: { left: "Om Swastiastu", right: "Salam sejahtera" },
     } as unknown as QuizAnswer;
-    assert.equal(isAnswerCorrect(sapaan, legacySingle), false);
+    assert.equal(gradeAnswer(sapaan, legacySingle), false);
   });
 
   test("satu dari tiga pasangan → belum selesai", () => {
-    assert.equal(
-      isAnswerCorrect(sapaan, { matches: { "Om Swastiastu": "Salam sejahtera" } }),
-      false,
-    );
+    assert.equal(gradeAnswer(sapaan, { matches: { "Om Swastiastu": "Salam sejahtera" } }), false);
   });
 
   test("semua pasangan benar → selesai", () => {
     assert.equal(
-      isAnswerCorrect(sapaan, {
+      gradeAnswer(sapaan, {
         matches: {
           "Om Swastiastu": "Salam sejahtera",
           "Rahajeng semeng": "Selamat pagi",
@@ -44,7 +41,7 @@ describe("cocokkan: soal selesai hanya bila SEMUA pasangan matched", () => {
 
   test("satu pasangan tertukar → salah", () => {
     assert.equal(
-      isAnswerCorrect(sapaan, {
+      gradeAnswer(sapaan, {
         matches: {
           "Om Swastiastu": "Salam sejahtera",
           "Rahajeng semeng": "Terima kasih",

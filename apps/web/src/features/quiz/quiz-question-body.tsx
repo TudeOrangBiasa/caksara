@@ -2,7 +2,7 @@ import { Cocokkan } from "./quiz-cocokkan";
 import { SusunAksara } from "./quiz-susun";
 import { QuizChoice } from "./quiz-choice";
 import { KenaliVisualPrompt } from "./quiz-visual";
-import { isAnswerCorrect } from "./quiz-store";
+import { gradeAnswer } from "./quiz-kind";
 import type { QuizAnswer, QuizUiState } from "./quiz-store";
 import type { Question } from "../../lib/zod/question";
 
@@ -41,7 +41,7 @@ export function QuestionBody({ question, session, setAnswer }: QuestionBodyProps
         <KenaliVisualPrompt
           question={question}
           showFeedback={session.showFeedback}
-          isCorrect={answer ? isAnswerCorrect(question, answer) : undefined}
+          isCorrect={answer ? gradeAnswer(question, answer) : undefined}
         />
         <QuizChoice
           question={question}
