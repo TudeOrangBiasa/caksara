@@ -178,14 +178,14 @@ export function QuizResult({
               onClick={onRetry}
             >
               <RotateCcw className="mr-1.5 size-4" />
-              Ulangi
+              ULANGI
             </Button>
             <Button
               variant="cta"
               className="h-12 flex-1 text-base font-bold lg:h-[51px]"
               onClick={onBack}
             >
-              Kembali
+              KEMBALI
             </Button>
           </>
         ) : (
@@ -195,7 +195,7 @@ export function QuizResult({
               className="h-12 flex-1 rounded-pill border-2 border-b-4 lg:h-[50px] lg:text-[15px] lg:font-bold lg:text-muted-foreground"
               onClick={onBack}
             >
-              Kembali
+              KEMBALI
             </Button>
             <Button
               variant="cta"
@@ -203,7 +203,7 @@ export function QuizResult({
               onClick={onRetry}
             >
               <RotateCcw className="size-4" />
-              Coba Lagi
+              COBA LAGI
             </Button>
           </>
         )}
