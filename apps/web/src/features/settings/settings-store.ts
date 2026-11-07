@@ -11,8 +11,12 @@ import { clearPendingSessions } from "../quiz/quiz-pending-sync";
 export const WRESASTRA_FONT_SIZES = [20, 24, 32] as const;
 export type WresastraFontSize = (typeof WRESASTRA_FONT_SIZES)[number];
 
+const DEFAULT_FONT_SIZE: WresastraFontSize = 24;
+
 export const appSettingsSchema = z.object({
-  wresastraFontSize: z.enum(WRESASTRA_FONT_SIZES).default(WRESASTRA_FONT_SIZES[1]),
+  wresastraFontSize: z
+    .union([z.literal(20), z.literal(24), z.literal(32)])
+    .default(DEFAULT_FONT_SIZE),
   soundEnabled: z.boolean().default(true),
 });
 export type AppSettings = z.infer<typeof appSettingsSchema>;
@@ -20,7 +24,7 @@ export type AppSettings = z.infer<typeof appSettingsSchema>;
 const STORAGE_KEY = "caksara.settings.v1";
 
 const DEFAULT_SETTINGS: AppSettings = {
-  wresastraFontSize: WRESASTRA_FONT_SIZES[1],
+  wresastraFontSize: DEFAULT_FONT_SIZE,
   soundEnabled: true,
 };
 

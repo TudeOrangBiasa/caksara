@@ -2,15 +2,16 @@ import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 
 import { kbMatchesFilter } from "./kb-filter";
+import type { KbCategoryFilter, KbFilterInput, KbLevelFilter } from "./kb-filter";
 
-const ha = {
+const ha: KbFilterInput = {
   category: "wresastra",
   title: "Aksara ha",
   latin: "ha",
   body: "aksara dasar ha",
   level: "1",
 };
-const galungan = {
+const galungan: KbFilterInput = {
   category: "budaya",
   title: "Galungan",
   latin: "Galungan",
@@ -18,7 +19,7 @@ const galungan = {
   level: "2",
 };
 
-function semua(query: string) {
+function semua(query: string): { category: KbCategoryFilter; level: KbLevelFilter; query: string } {
   return { category: "semua", level: "semua", query };
 }
 
