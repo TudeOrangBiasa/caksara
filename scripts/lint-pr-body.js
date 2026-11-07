@@ -49,7 +49,11 @@ async function main() {
   let body = "";
   let uiTouched = null; // null = tak diketahui (lint file/stdin tanpa konteks git)
 
-  if (!arg || arg === "-") {
+  if (arg === "--ci") {
+    body = process.env.PR_BODY ?? "";
+    uiTouched = process.env.UI_TOUCHED === "true";
+    console.log(`  CI mode: ui-touched=${uiTouched}`);
+  } else if (!arg || arg === "-") {
     body = readFileSync(0, "utf8");
     // Bila stdin dari pipe gh, UI-touch tak bisa disimpulkan → anggap butuh gambar
     // kecuali backend-only tertulis.
