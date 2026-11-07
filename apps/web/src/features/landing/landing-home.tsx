@@ -534,7 +534,7 @@ export function LandingHome({
             <figure
               key={t.id}
               className={
-                (i + spotlight) % LANDING_TESTIMONIES.length === 1
+                i === spotlight
                   ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border-2 lg:bg-cta/10 lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
                   : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
               }
@@ -569,11 +569,11 @@ export function LandingHome({
                 key={t.id}
                 type="button"
                 role="tab"
-                aria-selected={(i + spotlight) % LANDING_TESTIMONIES.length === 1}
+                aria-selected={i === spotlight}
                 aria-label={`Sorot testimoni ${t.name}`}
-                onClick={() => setSpotlight((1 - i + LANDING_TESTIMONIES.length * 3) % 3)}
+                onClick={() => setSpotlight(i)}
                 className={
-                  (i + spotlight) % LANDING_TESTIMONIES.length === 1
+                  i === spotlight
                     ? "h-2 w-6 rounded-full bg-primary"
                     : "size-2 rounded-full bg-muted transition-colors hover:bg-primary/50"
                 }
@@ -584,7 +584,11 @@ export function LandingHome({
             <button
               type="button"
               aria-label="Testimoni sebelumnya"
-              onClick={() => setSpotlight((s) => (s + 1) % LANDING_TESTIMONIES.length)}
+              onClick={() =>
+                setSpotlight(
+                  (s) => (s + LANDING_TESTIMONIES.length - 1) % LANDING_TESTIMONIES.length,
+                )
+              }
               className="flex size-12 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary"
             >
               <ChevronLeft className="size-5 text-muted-foreground" />
@@ -592,11 +596,7 @@ export function LandingHome({
             <button
               type="button"
               aria-label="Testimoni berikutnya"
-              onClick={() =>
-                setSpotlight(
-                  (s) => (s + LANDING_TESTIMONIES.length - 1) % LANDING_TESTIMONIES.length,
-                )
-              }
+              onClick={() => setSpotlight((s) => (s + 1) % LANDING_TESTIMONIES.length)}
               className="flex size-12 items-center justify-center rounded-full bg-foreground transition-transform active:translate-y-px"
             >
               <ChevronRight className="size-5 text-background" />
