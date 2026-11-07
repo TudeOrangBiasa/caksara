@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright-core";
 import type { Browser, Page } from "playwright-core";
+import { playFullSession, settleToasts } from "./quiz-solver";
 
 // Verifikator tamu Caksara: mainkan kuis Modul 1 di 3 viewport,
 // assert tanpa horizontal overflow, simpan screenshot sebagai bukti.
@@ -19,11 +20,17 @@ interface Viewport {
   dsf: number;
 }
 
-const VIEWPORTS: Viewport[] = [
+const ALL_VIEWPORTS: Viewport[] = [
   { name: "mobile", width: 390, height: 844, dsf: 2 },
   { name: "tablet", width: 820, height: 1180, dsf: 2 },
   { name: "desktop", width: 1440, height: 900, dsf: 1 },
 ];
+
+// Filter viewport untuk iterasi cepat: CAKSARA_VP=mobile|tablet|desktop.
+const VIEWPORTS: Viewport[] =
+  process.env.CAKSARA_VP != null
+    ? ALL_VIEWPORTS.filter((v) => v.name === process.env.CAKSARA_VP)
+    : ALL_VIEWPORTS;
 
 interface OverflowSample {
   step: string;
@@ -35,6 +42,8 @@ interface ViewportReport {
   viewport: string;
   soal: string;
   ariaValuemax: number | null;
+  hasilLulus: string;
+  hasilGagal: string;
   overflow: OverflowSample[];
   ok: boolean;
 }
@@ -93,22 +102,33 @@ async function passOnboarding(ctx: DriveCtx): Promise<void> {
   await shot(ctx, "01-home.png");
 }
 
-async function passMateri(ctx: DriveCtx): Promise<void> {
-  const { page } = ctx;
-  await page.getByRole("button", { name: "Belajar", exact: true }).click();
-  await page.waitForSelector("text=Daftar modul");
-  await page.locator("ol button").first().click();
-  await page.getByRole("button", { name: "Mulai belajar" }).first().click();
+/** Lanjut × N halaman materi sampai tombol Kerjakan muncul (dipakai sesi 1 & 2). */
+async function passMateriLoop(page: Page): Promise<void> {
   await page.waitForTimeout(1000);
   for (let i = 0; i < 8; i++) {
     if ((await page.getByRole("button", { name: /Kerjakan/u }).count()) > 0) break;
     await page.getByRole("button", { name: /Lanjut/u }).click();
     await page.waitForTimeout(500);
   }
+}
+
+async function passMateri(ctx: DriveCtx): Promise<void> {
+  const { page } = ctx;
+  await page.getByRole("button", { name: "Belajar", exact: true }).click();
+  await page.waitForSelector("text=Daftar modul");
+  await page.locator("ol button").first().click();
+  await page
+    .getByRole("button", { name: "Mulai belajar" })
+    .filter({ visible: true })
+    .first()
+    .click();
+  await passMateriLoop(page);
   ctx.samples.push(await sampleOverflow(page, "materi"));
 }
 
-async function passQuiz(ctx: DriveCtx): Promise<{ soal: string; ariaValuemax: number | null }> {
+async function passQuiz(
+  ctx: DriveCtx,
+): Promise<{ soal: string; ariaValuemax: number | null; hasilLulus: string; hasilGagal: string }> {
   const { page } = ctx;
   await page.getByRole("button", { name: /Kerjakan/u }).click();
   await page.waitForSelector("text=/Soal 1 \\//");
@@ -117,15 +137,43 @@ async function passQuiz(ctx: DriveCtx): Promise<{ soal: string; ariaValuemax: nu
   const maxRaw = await progress.first().getAttribute("aria-valuemax");
   ctx.samples.push(await sampleOverflow(page, "quiz"));
   await shot(ctx, "02-quiz.png");
-  return { soal, ariaValuemax: maxRaw ? Number(maxRaw) : null };
+  // Lintasan lulus: semua soal benar → "Mantap, modul beres!".
+  const hasilLulus = await playFullSession(page, true);
+  ctx.samples.push(await sampleOverflow(page, "hasil-lulus"));
+  await settleToasts(page);
+  await shot(ctx, "02b-hasil-lulus.png");
+  // KEMBALI dari hasil → pohon modul (bukti probe: h1 "Belajar", tanpa
+  // Kerjakan). Masuk Detail via modul pertama → Kerjakan kedua.
+  await settleToasts(page);
+  await page.getByRole("button", { name: "KEMBALI" }).click();
+  console.log("    kembali ok");
+  await page.waitForSelector("text=Daftar modul");
+  await page.locator("ol button").first().click();
+  console.log("    modul ok");
+  await page.getByLabel("Mulai belajar").filter({ visible: true }).first().click();
+  console.log("    mulai-belajar ok");
+  await passMateriLoop(page);
+  console.log("    materi2 ok");
+  await settleToasts(page);
+  await page.getByRole("button", { name: /Kerjakan/u }).click();
+  console.log("    kerjakan2 ok");
+  await page.waitForSelector("text=/Soal 1 \\//");
+  const hasilGagal = await playFullSession(page, false);
+  await page.getByRole("dialog").waitFor();
+  ctx.samples.push(await sampleOverflow(page, "gameover"));
+  await shot(ctx, "02c-gameover.png");
+  // Pulihkan sesi (RESET + hearts penuh) lalu keluar rapi: Coba Lagi →
+  // Keluar dari kuis → Kembali ke Detail Modul.
+  await settleToasts(page);
+  await page.getByRole("button", { name: "Coba Lagi" }).click();
+  return { soal, ariaValuemax: maxRaw ? Number(maxRaw) : null, hasilLulus, hasilGagal };
 }
 
 async function passKb(ctx: DriveCtx): Promise<void> {
   const { page } = ctx;
-  // Keluar kuis -> Detail Modul (overlay, tanpa nav) -> Kembali -> pohon.
+  // Dari sesi pulih → Keluar dari kuis → Detail Modul (overlay, tanpa nav) -> Kembali -> pohon.
   await page.getByRole("button", { name: "Keluar dari kuis" }).click();
   await page.getByRole("button", { name: "Kembali" }).first().click();
-  await page.waitForSelector("text=Daftar modul");
   await page.getByRole("button", { name: "Kamus", exact: true }).click();
   await page.waitForTimeout(1500);
   ctx.samples.push(await sampleOverflow(page, "kb"));
@@ -153,11 +201,11 @@ async function driveViewport(
   const ctx: DriveCtx = { page, vp, evidenceDir, samples };
   await passOnboarding(ctx);
   await passMateri(ctx);
-  const { soal, ariaValuemax } = await passQuiz(ctx);
+  const { soal, ariaValuemax, hasilLulus, hasilGagal } = await passQuiz(ctx);
   await passKb(ctx);
   await context.close();
   const ok = samples.every((s) => s.doc <= 0 && s.body <= 0);
-  return { viewport: vp.name, soal, ariaValuemax, overflow: samples, ok };
+  return { viewport: vp.name, soal, ariaValuemax, hasilLulus, hasilGagal, overflow: samples, ok };
 }
 
 /// Doctor: HTTP 200 + selector onboarding. Luncurkan dev:web sendiri bila
@@ -176,7 +224,8 @@ async function launch(): Promise<ChildProcess | null> {
   try {
     const dpage = await dctx.newPage();
     await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-    await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 20000 });
+    // Cold-start Vite: kompilasi awal lambat → 60 dtk.
+    await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 60000 });
   } finally {
     await dctx.close();
     await doctor.close();
@@ -193,16 +242,23 @@ function stopOwn(ownProc: ChildProcess | null): void {
   }
 }
 
-async function driveAll(browser: Browser, evidenceDir: string): Promise<ViewportReport[]> {
+async function driveAll(evidenceDir: string): Promise<ViewportReport[]> {
   const reports: ViewportReport[] = [];
   for (const vp of VIEWPORTS) {
-    const rep = await driveViewport(browser, vp, evidenceDir);
-    reports.push(rep);
-    console.log(
-      `  ${vp.name} ${vp.width}x${vp.height}: ${rep.soal} max=${rep.ariaValuemax} overflow=${rep.ok ? "ok" : "FAIL"}`,
-    );
-    for (const s of rep.overflow) {
-      if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
+    // Browser fresh per viewport: isolasi penuh antar-VP (pola 4x macet
+    // di VP kedua dengan 1 browser bersama; terisolasi hijau).
+    const browser = await chromium.launch({ timeout: 30000 });
+    try {
+      const rep = await driveViewport(browser, vp, evidenceDir);
+      reports.push(rep);
+      console.log(
+        `  ${vp.name} ${vp.width}x${vp.height}: ${rep.soal} max=${rep.ariaValuemax} overflow=${rep.ok ? "ok" : "FAIL"}`,
+      );
+      for (const s of rep.overflow) {
+        if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
+      }
+    } finally {
+      await browser.close();
     }
   }
   return reports;
@@ -213,15 +269,13 @@ async function main(): Promise<void> {
   const evidenceDir = join(process.cwd(), ".verify", "caksara", startedAt);
   mkdirSync(evidenceDir, { recursive: true });
   const ownProc = await launch();
-  const browser = await chromium.launch({ timeout: 30000 });
   let failed: string | null = null;
   let reports: ViewportReport[] = [];
   try {
-    reports = await driveAll(browser, evidenceDir);
+    reports = await driveAll(evidenceDir);
   } catch (err) {
     failed = err instanceof Error ? err.message : String(err);
   } finally {
-    await browser.close();
     stopOwn(ownProc);
   }
   const overflowJson: Record<string, string> = {};
