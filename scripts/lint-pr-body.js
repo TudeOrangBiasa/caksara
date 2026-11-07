@@ -16,7 +16,7 @@ import { readFileSync } from "node:fs";
 const PLACEHOLDER_RE = /url-gambar-(before|after)/i;
 const SECTION_TEST = /## Test plan/i;
 const SECTION_SHOTS = /## Screenshots/i;
-const CMD_RE = /(bun|bunx|npm)( run| test|x )/i;
+const CMD_RE = /(bun|bunx|npm|node|bash)( run| test|x | scripts\/)/i;
 const IMG_MD_RE = /!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
 const IMG_HTML_RE = /<img[^>]+src=["']([^"']+)["']/gi;
 const UI_PATH_RE =
