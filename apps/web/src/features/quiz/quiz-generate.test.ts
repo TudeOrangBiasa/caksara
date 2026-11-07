@@ -1,39 +1,11 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { fetchGeneratedQuiz, isRateLimitedError, readCachedQuiz } from "./quiz-generate";
 import type { GenerateQuizRequestBody } from "./quiz-generate";
-import { getAdaptiveLevel, recordSessionLevel } from "./quiz-data";
+import { buildSessionQuiz, getAdaptiveLevel, recordSessionLevel } from "./quiz-data";
 import type { Quiz } from "../../lib/zod/question";
 
-function quizTiga(): Quiz {
-  return {
-    moduleId: "mod_01",
-    questions: [
-      {
-        type: "kenali_visual",
-        prompt: "Apa arti 'Om Swastiastu'?",
-        choices: [
-          { text: "Salam sejahtera", isCorrect: true },
-          { text: "Selamat tinggal", isCorrect: false },
-        ],
-      },
-      {
-        type: "kenali_visual",
-        prompt: "Kata 'matur' artinya?",
-        choices: [
-          { text: "Bicara", isCorrect: true },
-          { text: "Diam", isCorrect: false },
-        ],
-      },
-      {
-        type: "kenali_visual",
-        prompt: "Galungan merayakan?",
-        choices: [
-          { text: "Dharma atas adharma", isCorrect: true },
-          { text: "Panen raya", isCorrect: false },
-        ],
-      },
-    ],
-  };
+function quizDelapan(): Quiz {
+  return buildSessionQuiz("mod_01", { seed: 0 });
 }
 
 describe("isRateLimitedError — 429 vs non-429 #29", () => {
@@ -62,7 +34,7 @@ describe("fetchGeneratedQuiz — klasifikasi failure #29", () => {
   test("invoke 429 sekali saja (tanpa retry) + failure rate-limited", async () => {
     let calls = 0;
     const out = await fetchGeneratedQuiz("mod_01", {
-      localFallback: quizTiga,
+      localFallback: quizDelapan,
       invokeRemote: () => {
         calls += 1;
         return Promise.resolve({
@@ -80,7 +52,7 @@ describe("fetchGeneratedQuiz — klasifikasi failure #29", () => {
   test("invoke 500 di-retry 1x lalu failure server-down", async () => {
     let calls = 0;
     const out = await fetchGeneratedQuiz("mod_01", {
-      localFallback: quizTiga,
+      localFallback: quizDelapan,
       invokeRemote: () => {
         calls += 1;
         return Promise.resolve({ data: null, error: { message: "gemini 500" } });
@@ -96,7 +68,7 @@ describe("fetchGeneratedQuiz — klasifikasi failure #29", () => {
     try {
       let calls = 0;
       const out = await fetchGeneratedQuiz("mod_01", {
-        localFallback: quizTiga,
+        localFallback: quizDelapan,
         invokeRemote: () => {
           calls += 1;
           return Promise.resolve({ data: null, error: null });
@@ -117,14 +89,14 @@ describe("fetchGeneratedQuiz — body adaptif #96", () => {
     recordSessionLevel(mod, 1, 5, ["wre_01", "wre_02"]);
     let seen: GenerateQuizRequestBody | null = null;
     const out = await fetchGeneratedQuiz(mod, {
-      localFallback: quizTiga,
+      localFallback: quizDelapan,
       wrongTopics: ["wre_01", "wre_02"],
       onRequestBody: (body) => {
         seen = body;
       },
       invokeRemote: () =>
         Promise.resolve({
-          data: { moduleId: mod, questions: quizTiga().questions },
+          data: { moduleId: mod, questions: quizDelapan().questions },
           error: null,
         }),
     });
@@ -168,14 +140,14 @@ describe("readCachedQuiz — kontrak cacheSchema #58", () => {
   }
 
   function validRow() {
-    return { quiz: quizTiga(), source: "gemini", at: Date.now() };
+    return { quiz: quizDelapan(), source: "gemini", at: Date.now() };
   }
 
   test("baris valid round-trip → cache hit", () => {
     seedRow("mod_01", 1, validRow());
     const hit = readCachedQuiz("mod_01", 1);
     expect(hit?.quiz?.moduleId).toBe("mod_01");
-    expect(hit?.quiz?.questions.length).toBe(3);
+    expect(hit?.quiz?.questions.length).toBe(8);
     expect(hit?.source).toBe("cache");
     expect(hit?.offline).toBe(false);
   });
@@ -201,7 +173,7 @@ describe("readCachedQuiz — kontrak cacheSchema #58", () => {
 
   test("baris kedaluwarsa TTL → null", () => {
     seedRow("mod_01", 1, {
-      quiz: quizTiga(),
+      quiz: quizDelapan(),
       source: "gemini",
       at: Date.now() - CACHE_TTL_MS - 1000,
     });

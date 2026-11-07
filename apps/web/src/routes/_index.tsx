@@ -35,10 +35,9 @@ import { pickTidbit } from "../features/share/achievement-card";
 import { AudioSourceNote, useQuizLaunch } from "../features/quiz/quiz-generate";
 import type { QuizNotice } from "../features/quiz/quiz-generate";
 import {
-  buildMixedQuiz,
-  buildSessionQuiz,
+  MOD_LATIHAN,
   getAdaptiveLevel,
-  nextAttemptSeed,
+  quizForModule,
   recordSessionLevel,
 } from "../features/quiz/quiz-data";
 import { deriveWrongTopics } from "../lib/aksara-stats";
@@ -88,13 +87,11 @@ type View =
       prevLevel?: number;
     };
 /**
- * Sesi kuis modul (#85): 3 soal bervariasi 2+ tipe + dengar_pilih dari
+ * Sesi kuis modul (screen truth): 8 soal bervariasi 3-5 tipe + dengar_pilih dari
  * bank lokal. Edge generate-quiz (Gemini) diambil via useQuizLaunch saat
  * sesi dibuka; bank lokal adalah fallback yang tidak pernah macet.
+ * Perakitan Sesi Kuis di quizForModule (quiz-data) — router hanya memilih view.
  */
-function deriveQuizForMod(mod: CourseModule): Quiz {
-  return buildSessionQuiz(mod.id, { seed: nextAttemptSeed(mod.id) });
-}
 
 function QuizLaunchView({
   mod,
@@ -112,7 +109,7 @@ function QuizLaunchView({
   const noticeKey = useRef<QuizNotice | null>(null);
   const fallback = useMemo(
     () => ({
-      localFallback: () => deriveQuizForMod(mod),
+      localFallback: () => quizForModule(mod),
       deferRemote: hasResume,
       reloadToken: retryKey,
       wrongTopics: deriveWrongTopics(loadProfile()?.aksaraStats ?? {}, []),
@@ -185,24 +182,6 @@ function QuizLaunchView({
   );
 }
 
-const MOD_LATIHAN: CourseModule = {
-  id: "latihan",
-  order: 1,
-  title: "Latihan Campuran",
-  theme: "Ulas ulang semua materi yang sudah dipelajari",
-  description: "Latihan campuran dari semua modul yang sudah kamu selesaikan.",
-  poinBelajar: ["Pengulangan"],
-  jumlahSoal: 8,
-  estimasiMenit: 3,
-  materi: [
-    {
-      id: "lat_01",
-      judul: "Latihan Campuran",
-      isi: "Ulas ulang semua materi dari modul yang sudah kamu selesaikan.",
-    },
-  ],
-};
-
 export function meta(_args: Route.MetaArgs) {
   return [
     { title: "CAKSARA | Aksara Bali" },
@@ -267,7 +246,7 @@ export default function Home() {
           setView({
             kind: "quiz",
             mod: view.mod,
-            quiz: view.isLatihan ? buildMixedQuiz([...selesai]) : deriveQuizForMod(view.mod),
+            quiz: quizForModule(view.mod, [...selesai]),
             isLatihan: view.isLatihan,
           })
         }
@@ -408,12 +387,12 @@ export default function Home() {
           setView({
             kind: "quiz",
             mod: MOD_LATIHAN,
-            quiz: buildMixedQuiz([...selesai]),
+            quiz: quizForModule(MOD_LATIHAN, [...selesai]),
             isLatihan: true,
           })
         }
         onLatihanMod={(mod) =>
-          setView({ kind: "quiz", mod, quiz: deriveQuizForMod(mod), isLatihan: true })
+          setView({ kind: "quiz", mod, quiz: quizForModule(mod, [...selesai]), isLatihan: true })
         }
       />
     );

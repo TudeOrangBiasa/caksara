@@ -1,4 +1,5 @@
-import type { Question, Quiz } from "../../lib/zod/question";
+import { gradeAnswer } from "./quiz-kind";
+import type { Quiz } from "../../lib/zod/question";
 
 export interface QuizAnswer {
   selectedIndex?: number;
@@ -59,42 +60,16 @@ export function createSession(quiz: Quiz): QuizUiState {
   };
 }
 
-export function isAnswerCorrect(question: Question, answer: QuizAnswer): boolean {
-  switch (question.type) {
-    case "kenali_visual":
-    case "dengar_pilih":
-    case "checkpoint_budaya": {
-      if (answer.selectedIndex === undefined) return false;
-      return question.choices?.[answer.selectedIndex]?.isCorrect === true;
-    }
-    case "susun_aksara": {
-      if (!question.tiles || !answer.ordered) return false;
-      return arraysEqual(question.tiles, answer.ordered);
-    }
-    case "cocokkan": {
-      if (!question.pairs || !answer.matches) return false;
-      if (Object.keys(answer.matches).length !== question.pairs.length) return false;
-      return question.pairs.every((p) => answer.matches?.[p.left] === p.right);
-    }
-    default:
-      return false;
-  }
-}
-
 export function getScore(session: QuizUiState): { correct: number; total: number } {
   let correct = 0;
   const { questions } = session.quiz;
   session.answers.forEach((answer, qIdx) => {
     const q = questions[qIdx];
-    if (q && isAnswerCorrect(q, answer)) correct++;
+    if (q && gradeAnswer(q, answer)) correct++;
   });
   return { correct, total: questions.length };
 }
 
 export function isSessionComplete(session: QuizUiState): boolean {
   return session.answers.size === session.quiz.questions.length;
-}
-
-function arraysEqual(a: string[], b: string[]): boolean {
-  return a.length === b.length && a.every((v, i) => v === b[i]);
 }

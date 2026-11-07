@@ -5,12 +5,14 @@ import {
   buildSessionQuiz,
   getAdaptiveLevel,
   hasVariety,
+  MOD_LATIHAN,
   pickSessionQuestions,
   QUIZ_BANK,
+  quizForModule,
   recordSessionLevel,
   validateQuizBank,
 } from "./quiz-data";
-import type { Question } from "../../lib/zod/question";
+import { courseModules } from "../module/module-data";
 
 describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
   test("setiap modul punya soal dengar_pilih dengan badge Latin (bukan TTS aksara)", () => {
@@ -29,10 +31,10 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     }
   });
 
-  test("sesi tepat 3 soal dengan 2+ tipe termasuk dengar_pilih", () => {
+  test("sesi tepat 8 soal dengan 2+ tipe termasuk dengar_pilih", () => {
     for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
       const quiz = buildSessionQuiz(mod, { seed: 0 });
-      assert.equal(quiz.questions.length, 3);
+      assert.equal(quiz.questions.length, 8);
       assert.ok(hasVariety(quiz.questions, 2), `${mod} kurang bervariasi`);
       assert.ok(
         quiz.questions.some((q) => q.type === "dengar_pilih"),
@@ -41,6 +43,15 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     }
   });
 
+  test("quizForModule: modul biasa → 8 soal modul itu; latihan → campuran selesai", () => {
+    const mod01 = courseModules.find((m) => m.id === "mod_01");
+    assert.ok(mod01);
+    const biasa = quizForModule(mod01);
+    assert.equal(biasa.moduleId, "mod_01");
+    assert.equal(biasa.questions.length, 8);
+    const lat = quizForModule(MOD_LATIHAN, ["mod_01"]);
+    assert.equal(lat.moduleId, "latihan");
+  });
   test("pengulangan sesi memutar urutan soal (tidak monoton)", () => {
     const first = buildSessionQuiz("mod_01", { seed: 0 }).questions.map((q) => q.prompt);
     const second = buildSessionQuiz("mod_01", { seed: 1 }).questions.map((q) => q.prompt);

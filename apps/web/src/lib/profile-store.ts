@@ -3,8 +3,17 @@ import type { ProfileAvatar, UserProfile } from "./zod/profile";
 import { ipAvatarUriForName } from "./default-avatar";
 import { ensureAnonSession } from "./supabase";
 import { scheduleProfileSync } from "./profile-sync";
-import { MAX_HEARTS, applyStreakBonus, deriveMastery, witaDateString } from "./game-rules";
+import {
+  MAX_HEARTS,
+  applyStreakBonus,
+  deriveMastery,
+  refillHeartsForNewDay,
+  resetStreakForMissedDay,
+  touchStreakOnActivity,
+  witaDateString,
+} from "./game-rules";
 import { parseWitaDate } from "./zod/game-state";
+import type { GameState } from "./zod/game-state";
 import { WRESASTRA_AKSARA } from "../features/module/aksara-data";
 
 const STORAGE_KEY = "caksara.profile.v1";
@@ -55,8 +64,6 @@ function readStored(): UserProfile | null {
   return repaired.data;
 }
 
-const WITA_OFFSET_MS = 8 * 3600 * 1000;
-const DAY_MS = 24 * 3600 * 1000;
 /** V9: tulis XP/Hati didebounce agar tidak membanjiri storage saat kuis. */
 const DISK_WRITE_DEBOUNCE_MS = 500;
 
@@ -110,18 +117,9 @@ export function flushProfileWrites(): void {
   writeDisk(cache);
 }
 
-/** Tanggal kalender WITA (UTC+8 tetap, tanpa DST) format YYYY-MM-DD. */
+/** Tanggal kalender WITA — adapter tipis ke witaDateString (game-rules SSOT). */
 export function witaTodayStr(now = Date.now()): string {
-  return new Date(now + WITA_OFFSET_MS).toISOString().slice(0, 10);
-}
-
-function witaYesterdayStr(now = Date.now()): string {
-  return new Date(now + WITA_OFFSET_MS - DAY_MS).toISOString().slice(0, 10);
-}
-
-function isYesterday(dateStr: string | undefined): boolean {
-  if (!dateStr) return false;
-  return dateStr === witaYesterdayStr();
+  return witaDateString(new Date(now));
 }
 
 export function loadProfile(): UserProfile | null {
@@ -191,6 +189,22 @@ function update(mutate: (profile: UserProfile) => void): void {
   persist(next);
 }
 
+/** Jembatan Profil Anon → GameState murni (parse tanggal WITA di batas). */
+function toGameState(profile: UserProfile): GameState {
+  return {
+    xp: profile.xp,
+    hearts: profile.hearts,
+    streak: profile.streak,
+    lastActiveDate: profile.lastActiveDate ? parseWitaDate(profile.lastActiveDate) : undefined,
+    heartsRefilledAt: profile.heartsRefilledAt
+      ? parseWitaDate(profile.heartsRefilledAt)
+      : undefined,
+    streakBonusClaimedAt: profile.streakBonusClaimedAt
+      ? parseWitaDate(profile.streakBonusClaimedAt)
+      : undefined,
+  };
+}
+
 export function addXp(delta: number): void {
   update((profile) => {
     profile.xp = Math.max(0, profile.xp + delta);
@@ -205,21 +219,17 @@ export function setHearts(hearts: number): void {
 
 /**
  * Isi hati penuh 5 bila sudah lewat 00:00 WITA sejak refill terakhir.
- * Cap heartsRefilledAt tiap hari WITA baru walau Hati sudah penuh
- * (idempoten, cermin refillHeartsForNewDay di game-rules).
+ * Delegasi ke refillHeartsForNewDay (game-rules); store hanya load/save.
  * Kembalikan true hanya bila Hati benar-benar bertambah (pemanggil wajib toast).
  */
-export function refillHearts(): boolean {
-  const today = witaTodayStr();
+export function refillHearts(now = new Date()): boolean {
   let didRefill = false;
   update((profile) => {
-    if (!profile.heartsRefilledAt || profile.heartsRefilledAt < today) {
-      if (profile.hearts < MAX_HEARTS) {
-        profile.hearts = MAX_HEARTS;
-        didRefill = true;
-      }
-      profile.heartsRefilledAt = today;
-    }
+    const before = profile.hearts;
+    const next = refillHeartsForNewDay(toGameState(profile), now);
+    profile.hearts = next.hearts;
+    profile.heartsRefilledAt = next.heartsRefilledAt;
+    didRefill = next.hearts > before;
   });
   return didRefill;
 }
@@ -229,14 +239,14 @@ export function refillHearts(): boolean {
  * (WITA), streak dinolkan. Dijalankan sekali saat aplikasi dimuat.
  * Kembalikan true bila streak direset (pemanggil wajib toast).
  */
-export function applyOvernightReset(): boolean {
-  const yesterday = witaYesterdayStr();
+export function applyOvernightReset(now = new Date()): boolean {
+  const today = witaDateString(now);
   let didReset = false;
   update((profile) => {
-    if (profile.lastActiveDate && profile.lastActiveDate < yesterday && profile.streak !== 0) {
-      profile.streak = 0;
-      didReset = true;
-    }
+    const before = profile.streak;
+    const next = resetStreakForMissedDay(toGameState(profile), today);
+    profile.streak = next.streak;
+    didReset = before !== 0 && next.streak === 0;
   });
   return didReset;
 }
@@ -247,17 +257,14 @@ export function applyOvernightReset(): boolean {
  * bukan dari menebak tanggal.
  */
 export function updateStreak(now = new Date()): boolean {
+  const today = witaDateString(now);
   let grew = false;
   update((profile) => {
-    const today = witaTodayStr(now.getTime());
-    if (profile.lastActiveDate === today) return;
-    if (isYesterday(profile.lastActiveDate)) {
-      profile.streak += 1;
-    } else {
-      profile.streak = 1;
-    }
-    profile.lastActiveDate = today;
-    grew = true;
+    const before = profile.streak;
+    const next = touchStreakOnActivity(toGameState(profile), today);
+    profile.streak = next.streak;
+    profile.lastActiveDate = next.lastActiveDate;
+    grew = next.streak !== before;
   });
   if (grew) claimStreakBonus(now);
   return grew;
@@ -271,21 +278,7 @@ export function claimStreakBonus(now = new Date()): boolean {
   const today = witaDateString(now);
   let granted = false;
   update((profile) => {
-    const { state, granted: ok } = applyStreakBonus(
-      {
-        xp: profile.xp,
-        hearts: profile.hearts,
-        streak: profile.streak,
-        lastActiveDate: profile.lastActiveDate ? parseWitaDate(profile.lastActiveDate) : undefined,
-        heartsRefilledAt: profile.heartsRefilledAt
-          ? parseWitaDate(profile.heartsRefilledAt)
-          : undefined,
-        streakBonusClaimedAt: profile.streakBonusClaimedAt
-          ? parseWitaDate(profile.streakBonusClaimedAt)
-          : undefined,
-      },
-      today,
-    );
+    const { state, granted: ok } = applyStreakBonus(toGameState(profile), today);
     if (!ok) return;
     profile.xp = state.xp;
     profile.streakBonusClaimedAt = state.streakBonusClaimedAt;

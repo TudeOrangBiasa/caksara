@@ -59,6 +59,29 @@ export function buildVendoredBlock(feSource: string): string {
   return [VENDOR_HEADER, VENDOR_WHY, renamed, ...lines.slice(1)].join("\n");
 }
 
+const FE_PICK_REL = "apps/web/src/features/quiz/quiz-pick.ts";
+const EDGE_PICK_REL = "supabase/functions/generate-quiz/pick-shared.ts";
+const PICK_HEADER = `// Vendored dari ${FE_PICK_REL} — JANGAN EDIT MANUAL, jalankan bun vendor-bank.ts`;
+const PICK_WHY =
+  "// Impor lintas batas Deno/Vite ditolak bundler Edge; sumber tunggal tetap quiz-pick.ts FE.";
+const FE_PICK_IMPORT = 'import type { Question } from "../../lib/zod/question";';
+const EDGE_PICK_IMPORT = 'import type { Question } from "./question.ts";';
+
+/** Salin modul picker FE ke Edge dengan import type di-rewrite ke question.ts lokal. */
+export function buildVendoredPicker(feSource: string): string {
+  if (!feSource.includes(FE_PICK_IMPORT)) {
+    throw new Error("[vendor-bank] picker FE: import Question tak ketemu");
+  }
+  const body = feSource.replace(FE_PICK_IMPORT, EDGE_PICK_IMPORT);
+  return [PICK_HEADER, PICK_WHY, body].join("\n");
+}
+
+export function syncPickerFile(feSource: string, edgeSource: string | null): string | null {
+  const next = buildVendoredPicker(feSource);
+  if (edgeSource === next) return null;
+  return next;
+}
+
 function main(): void {
   const fe = readFileSync(join(ROOT, FE_REL), "utf8");
   const edgePath = join(ROOT, EDGE_REL);
@@ -66,10 +89,25 @@ function main(): void {
   const next = spliceVendoredBlock(edge, buildVendoredBlock(fe));
   if (next === edge) {
     console.log(`[vendor-bank] sinkron: ${EDGE_REL} = ${FE_REL} (no-op)`);
+  } else {
+    writeFileSync(edgePath, next);
+    console.log(`[vendor-bank] tulis: ${EDGE_REL} ← ${FE_REL}`);
+  }
+  const fePick = readFileSync(join(ROOT, FE_PICK_REL), "utf8");
+  const edgePickPath = join(ROOT, EDGE_PICK_REL);
+  let edgePick: string | null = null;
+  try {
+    edgePick = readFileSync(edgePickPath, "utf8");
+  } catch {
+    edgePick = null;
+  }
+  const pickNext = syncPickerFile(fePick, edgePick);
+  if (pickNext === null) {
+    console.log(`[vendor-bank] sinkron: ${EDGE_PICK_REL} = ${FE_PICK_REL} (no-op)`);
     return;
   }
-  writeFileSync(edgePath, next);
-  console.log(`[vendor-bank] tulis: ${EDGE_REL} ← ${FE_REL}`);
+  writeFileSync(edgePickPath, pickNext);
+  console.log(`[vendor-bank] tulis: ${EDGE_PICK_REL} ← ${FE_PICK_REL}`);
 }
 
 if (import.meta.main) main();

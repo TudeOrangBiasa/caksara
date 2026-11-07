@@ -1,5 +1,7 @@
 import { questionSchema, quizSchema } from "../../lib/zod/question";
 import type { Question, Quiz } from "../../lib/zod/question";
+import type { CourseModule } from "../module/module-data";
+import { pickSessionQuestions } from "./quiz-pick";
 
 export const QUIZ_BANK: Record<string, Question[]> = {
   mod_01: [
@@ -62,6 +64,33 @@ export const QUIZ_BANK: Record<string, Question[]> = {
         { left: "Ampura", right: "Mohon maaf" },
       ],
       explanation: "Salam sejahtera, terima kasih, dan mohon maaf adalah makna yang tepat.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Apa fungsi gestur Anjali Mudra saat menyapa?",
+      choices: [
+        { text: "Sekadar formalitas", isCorrect: false },
+        { text: "Tanda hormat dan ikhlas", isCorrect: true },
+        { text: "Tanda perpisahan", isCorrect: false },
+        { text: "Tanda meminta makan", isCorrect: false },
+      ],
+      explanation:
+        "Tangan dicakupkan di depan dada lalu sedikit menunduk: tanda hormat dan ikhlas.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Sapaan yang tepat untuk meminta maaf adalah...",
+      choices: [
+        { text: "Matur suksma", isCorrect: false },
+        { text: "Om Swastiastu", isCorrect: false },
+        { text: "Ampura", isCorrect: true },
+        { text: "Rahajeng", isCorrect: false },
+      ],
+      explanation: "'Ampura' berarti mohon maaf; yang lebih dalam 'Nunas sinampura'.",
       sourceRef: "kb_sapaan · Basis Pengetahuan",
       level: 1,
     },
@@ -157,6 +186,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       aksaraId: "wre_05",
       level: 1,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Aksara 'na' ditulis seperti apa?",
+      choices: [
+        { text: "ᬦ", isCorrect: true },
+        { text: "ᬳ", isCorrect: false },
+        { text: "ᬘ", isCorrect: false },
+        { text: "ᬭ", isCorrect: false },
+      ],
+      explanation: "Bentuk 'na' adalah ᬦ, aksara kedua urutan wresastra.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Bunyi dasar tiap aksara wresastra berakhiran...",
+      choices: [
+        { text: "'i'", isCorrect: false },
+        { text: "'a'", isCorrect: true },
+        { text: "'u'", isCorrect: false },
+        { text: "'o'", isCorrect: false },
+      ],
+      explanation: "Tiap aksara berbunyi dasar ber-akhiran 'a': Ha, Na, Ca, Ra, Ka.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
   ],
   mod_03: [
     {
@@ -232,6 +287,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       explanation: "Urutan yang benar: Titiang - jagi - ngajeng.",
       sourceRef: "kb_titiang · Basis Pengetahuan",
       level: 3,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Kata 'tidur' dalam Basa Alus adalah...",
+      choices: [
+        { text: "Madaar", isCorrect: false },
+        { text: "Pules", isCorrect: false },
+        { text: "Ngajeng", isCorrect: false },
+        { text: "Sirep", isCorrect: true },
+      ],
+      explanation: "Sirep adalah bentuk Alus dari 'tidur', sedangkan pules adalah Andap.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Salah pilih tingkat bahasa bisa terdengar...",
+      choices: [
+        { text: "Kasar", isCorrect: true },
+        { text: "Merdu", isCorrect: false },
+        { text: "Lucu", isCorrect: false },
+        { text: "Biasa saja", isCorrect: false },
+      ],
+      explanation: "Salah pilih Andap/Alus bisa terdengar kasar bagi lawan bicara.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
     },
   ],
   mod_04: [
@@ -309,6 +390,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       sourceRef: "kb_nyepi · Basis Pengetahuan",
       level: 2,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Canang Sari adalah...",
+      choices: [
+        { text: "Sesaji harian umat Bali", isCorrect: true },
+        { text: "Alat musik gamelan", isCorrect: false },
+        { text: "Pakaian adat", isCorrect: false },
+        { text: "Tarian sakral", isCorrect: false },
+      ],
+      explanation: "Canang Sari adalah sesaji harian sebagai tanda syukur.",
+      sourceRef: "kb_nyepi · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Penjor dipasang saat...",
+      choices: [
+        { text: "Nyepi", isCorrect: false },
+        { text: "Galungan", isCorrect: true },
+        { text: "Hari biasa", isCorrect: false },
+        { text: "Malam hari raya saja", isCorrect: false },
+      ],
+      explanation: "Penjor dipasang saat Galungan sebagai tanda syukur atas kesejahteraan.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
   ],
 };
 
@@ -325,8 +432,8 @@ for (const [moduleId, bank] of Object.entries(QUIZ_BANK)) {
   QUIZ_BANK[moduleId] = validateQuizBank(moduleId, bank);
 }
 
-const SESSION_COUNT = 3;
-const MIN_TYPES = 2;
+export { hasVariety, MIN_TYPES, pickSessionQuestions, SESSION_COUNT } from "./quiz-pick";
+export type { PickOptions } from "./quiz-pick";
 
 const MODULE_BASE_LEVEL: Record<string, number> = {
   mod_01: 1,
@@ -432,106 +539,6 @@ export function nextAttemptSeed(moduleId: string): number {
   return prev;
 }
 
-export function hasVariety(questions: readonly Question[], minTypes = MIN_TYPES): boolean {
-  return new Set(questions.map((q) => q.type)).size >= minTypes;
-}
-
-export interface PickOptions {
-  level?: number;
-  count?: number;
-  seed?: number;
-  /** Batas tipe berbeda per sesi (default 3 dari 5 agar sesi fokus). */
-  maxTypes?: number;
-}
-
-const TYPE_ORDER: Question["type"][] = [
-  "dengar_pilih",
-  "kenali_visual",
-  "checkpoint_budaya",
-  "susun_aksara",
-  "cocokkan",
-];
-
-/**
- * Pilih soal sesi: selalu sertakan dengar_pilih bila bank punya, jaga
- * 2+ tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
- * agar pengulangan tidak monoton. Deterministik — aman untuk resume.
- * Sesi selalu 3 soal (#85); bank kelebihan tetap di source, tak dipilih.
- */
-export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptions): Question[] {
-  const level = Math.min(3, Math.max(1, Math.round(opts?.level ?? 1)));
-  const count = SESSION_COUNT;
-  const seed = Math.max(0, Math.round(opts?.seed ?? 0));
-  const maxTypes = Math.min(5, Math.max(MIN_TYPES, Math.round(opts?.maxTypes ?? 3)));
-  if (bank.length === 0) return [];
-
-  const byLevel = [...bank]
-    .map((q, i) => ({ q, i }))
-    .toSorted((a, b) => {
-      const da = Math.abs((a.q.level ?? level) - level);
-      const db = Math.abs((b.q.level ?? level) - level);
-      return da - db || a.i - b.i;
-    })
-    .map((x) => x.q);
-
-  // Pilih maxTypes dari 5 tipe via shuffle seed-tetap per level (selalu
-  // sertakan dengar_pilih bila ada). Seed sesi hanya memutar urutan, bukan
-  // mengganti himpunan soal — pengulangan tetap sehimpunan (aman resume).
-  const bankTypes = new Set(byLevel.map((q) => q.type));
-  const shuffledTypes = [...TYPE_ORDER];
-  let s = (0x9e3779b9 ^ Math.imul(level, 0x9e3779b1)) >>> 0;
-  const rand = (): number => {
-    s = (s * 1664525 + 1013904223) >>> 0;
-    return s / 2 ** 32;
-  };
-  for (let i = shuffledTypes.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    const tmp = shuffledTypes[i] as Question["type"];
-    shuffledTypes[i] = shuffledTypes[j] as Question["type"];
-    shuffledTypes[j] = tmp;
-  }
-  let allowed: Question["type"][] = shuffledTypes.slice(
-    0,
-    Math.min(maxTypes, shuffledTypes.length),
-  );
-  if (bankTypes.has("dengar_pilih") && !allowed.includes("dengar_pilih")) {
-    allowed[allowed.length - 1] = "dengar_pilih";
-  }
-  const filtered = allowed.filter((t) => bankTypes.has(t));
-  allowed = (
-    filtered.length > 0 ? filtered : [...bankTypes].slice(0, maxTypes)
-  ) as Question["type"][];
-
-  const picked: Question[] = [];
-  const used = new Set<Question>();
-  const takeOfType = (type: Question["type"]): boolean => {
-    const found = byLevel.find((q) => q.type === type && !used.has(q));
-    if (!found) return false;
-    picked.push(found);
-    used.add(found);
-    return true;
-  };
-
-  const order: Question["type"][] = [
-    ...(allowed.includes("dengar_pilih") ? (["dengar_pilih"] as const) : []),
-    ...allowed.filter((t) => t !== "dengar_pilih"),
-  ];
-  for (const t of order) {
-    if (picked.length >= count) break;
-    takeOfType(t);
-  }
-  for (const t of order) {
-    if (picked.length >= count) break;
-    while (picked.length < count && takeOfType(t)) {
-      // Lanjut sampai tipe ini habis atau kuota penuh.
-    }
-  }
-  if (picked.length === 0) return byLevel.slice(0, Math.min(count, byLevel.length));
-
-  const rot = seed % picked.length;
-  return picked.slice(rot).concat(picked.slice(0, rot));
-}
-
 /** FNV-1a 32-bit: seed default campuran modul (#43). */
 function hashModuleIds(moduleIds: readonly string[]): number {
   let h = 2166136261;
@@ -582,7 +589,7 @@ export function buildMixedQuiz(moduleIds: string[] = Object.keys(QUIZ_BANK), see
   return quizSchema.parse({ moduleId: "latihan", questions: rotated });
 }
 
-/** Sesi kuis modul: 3 soal bervariasi, tervalidasi Zod di batas. */
+/** Sesi kuis modul: 8 soal bervariasi, tervalidasi Zod di batas. */
 export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
   const bank = QUIZ_BANK[moduleId] ?? QUIZ_BANK.mod_01;
   const level = opts?.level ?? getAdaptiveLevel(moduleId);
@@ -590,4 +597,32 @@ export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
     moduleId,
     questions: pickSessionQuestions(bank, { ...opts, level }),
   });
+}
+
+/** Modul sintetis Latihan Campuran (sesi lintas modul yang sudah selesai). */
+export const MOD_LATIHAN: CourseModule = {
+  id: "latihan",
+  order: 1,
+  title: "Latihan Campuran",
+  theme: "Ulas ulang semua materi yang sudah dipelajari",
+  description: "Latihan campuran dari semua modul yang sudah kamu selesaikan.",
+  poinBelajar: ["Pengulangan"],
+  jumlahSoal: 8,
+  estimasiMenit: 3,
+  materi: [
+    {
+      id: "lat_01",
+      judul: "Latihan Campuran",
+      isi: "Ulas ulang semua materi dari modul yang sudah kamu selesaikan.",
+    },
+  ],
+};
+
+/**
+ * Satu-satunya seam perakitan Sesi Kuis: modul latihan → campuran,
+ * modul biasa → sesi 8 soal. Router hanya memilih tab/view.
+ */
+export function quizForModule(mod: CourseModule, selesai: readonly string[] = []): Quiz {
+  if (mod.id === MOD_LATIHAN.id) return buildMixedQuiz([...selesai]);
+  return buildSessionQuiz(mod.id, { seed: nextAttemptSeed(mod.id) });
 }
