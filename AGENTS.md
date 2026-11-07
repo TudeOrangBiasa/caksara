@@ -45,6 +45,8 @@ Tiap aturan punya enforcer. Aturan tanpa enforcer = repeat, naikkan levelnya di 
 | --- | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
 | 1   | CTA jujur: label tombol = aksinya (dilarang label login dengan aksi buka KB)   | `apps/web/src/features/landing/ui-polish.test.ts` hero CTA |
 | 2   | Demo + jawaban Guru Virtual wajib blok SUMBER RUJUKAN + link Basis Pengetahuan | review + `teacher/guru-remote.test.ts` fallback lokal      |
+| 3   | Screenshot PR visual wajib URL absolut (path relatif tak render di GitHub)     | `pr-lint` + review body sebelum merge manual               |
+| 4   | Ganti warna tombol cek light + dark (secondary bisa gagal di krem)             | proof-ui 390/1280 + baca kedua screenshot sebelum merge    |
 
 ## Verification gate (solo, local verifier)
 
