@@ -14,15 +14,17 @@ Home -> Belajar -> Modul 1 (node "Aktif") -> Mulai Belajar -> materi
 ## Driving it with Playwright
 
 `bun run verify:caksara` drives this as a guest at 390x844, 820x1180, and
-1440x900 (locale id-ID, fresh context = empty storage). Per viewport it
-records the `Soal 1 / N` text plus the quiz progressbar `aria-valuemax`,
-asserts no horizontal overflow at home/materi/quiz/kb/kb-detail
-(`documentElement.scrollWidth <= clientWidth` + body), and saves
-`<viewport>-02-quiz.png` to `.verify/caksara/<timestamp>/`.
+1440x900 (locale id-ID, fresh context = empty storage). Per viewport:
+lintasan lulus (8 soal benar via bank lookup → "Mantap, modul beres!"),
+lintasan gagal (5 salah → overlay "Hati kamu habis" → "Coba Lagi"),
+records `Soal 1 / N` + progressbar `aria-valuemax`, asserts no horizontal
+overflow at home/materi/quiz/hasil-lulus/gameover/kb/kb-detail, saves
+`<viewport>-02-quiz.png`, `-02b-hasil-lulus.png`, `-02c-gameover.png`.
 
 Stable selectors: `Lewati`, `Mulai Petualangan`, nav `Belajar` (exact),
-`ol button` first (Modul 1 Aktif), `Mulai belajar`, `Lanjut` / `Kerjakan`,
-`Soal 1 /` text, `progressbar` named `Soal 1`, `Keluar dari kuis`,
+`ol button` first (Modul 1 Aktif), `Mulai belajar`, `Lanjut` / `Kerjakan`
+(sesi pertama) / `Mulai Belajar` (sesi ulang via Detail), `Soal 1 /` text,
+`progressbar` named `Soal 1`, `KEMBALI`, `Coba Lagi`, `Keluar dari kuis`,
 `Kembali`, nav `KB`, `section button` first (KB card).
 
 ## Gotchas
