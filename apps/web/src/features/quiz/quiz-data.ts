@@ -66,6 +66,33 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       level: 1,
     },
     {
+      type: "checkpoint_budaya",
+      prompt: "Apa fungsi gestur Anjali Mudra saat menyapa?",
+      choices: [
+        { text: "Sekadar formalitas", isCorrect: false },
+        { text: "Tanda hormat dan ikhlas", isCorrect: true },
+        { text: "Tanda perpisahan", isCorrect: false },
+        { text: "Tanda meminta makan", isCorrect: false },
+      ],
+      explanation:
+        "Tangan dicakupkan di depan dada lalu sedikit menunduk: tanda hormat dan ikhlas.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Sapaan yang tepat untuk meminta maaf adalah...",
+      choices: [
+        { text: "Matur suksma", isCorrect: false },
+        { text: "Om Swastiastu", isCorrect: false },
+        { text: "Ampura", isCorrect: true },
+        { text: "Rahajeng", isCorrect: false },
+      ],
+      explanation: "'Ampura' berarti mohon maaf; yang lebih dalam 'Nunas sinampura'.",
+      sourceRef: "kb_sapaan · Basis Pengetahuan",
+      level: 1,
+    },
+    {
       type: "kenali_visual",
       prompt: "ᬫᬢᬸᬃᬲᬸᬓ᭄ᬲ᭄ᬫ",
       choices: [
@@ -157,6 +184,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       aksaraId: "wre_05",
       level: 1,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Aksara 'na' ditulis seperti apa?",
+      choices: [
+        { text: "ᬦ", isCorrect: true },
+        { text: "ᬳ", isCorrect: false },
+        { text: "ᬘ", isCorrect: false },
+        { text: "ᬭ", isCorrect: false },
+      ],
+      explanation: "Bentuk 'na' adalah ᬦ, aksara kedua urutan wresastra.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Bunyi dasar tiap aksara wresastra berakhiran...",
+      choices: [
+        { text: "'i'", isCorrect: false },
+        { text: "'a'", isCorrect: true },
+        { text: "'u'", isCorrect: false },
+        { text: "'o'", isCorrect: false },
+      ],
+      explanation: "Tiap aksara berbunyi dasar ber-akhiran 'a': Ha, Na, Ca, Ra, Ka.",
+      sourceRef: "kb_wre_01 · Basis Pengetahuan",
+      level: 1,
+    },
   ],
   mod_03: [
     {
@@ -232,6 +285,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       explanation: "Urutan yang benar: Titiang - jagi - ngajeng.",
       sourceRef: "kb_titiang · Basis Pengetahuan",
       level: 3,
+    },
+    {
+      type: "kenali_visual",
+      prompt: "Kata 'tidur' dalam Basa Alus adalah...",
+      choices: [
+        { text: "Madaar", isCorrect: false },
+        { text: "Pules", isCorrect: false },
+        { text: "Ngajeng", isCorrect: false },
+        { text: "Sirep", isCorrect: true },
+      ],
+      explanation: "Sirep adalah bentuk Alus dari 'tidur', sedangkan pules adalah Andap.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Salah pilih tingkat bahasa bisa terdengar...",
+      choices: [
+        { text: "Kasar", isCorrect: true },
+        { text: "Merdu", isCorrect: false },
+        { text: "Lucu", isCorrect: false },
+        { text: "Biasa saja", isCorrect: false },
+      ],
+      explanation: "Salah pilih Andap/Alus bisa terdengar kasar bagi lawan bicara.",
+      sourceRef: "kb_madaar_ngajeng · Basis Pengetahuan",
+      level: 2,
     },
   ],
   mod_04: [
@@ -309,6 +388,32 @@ export const QUIZ_BANK: Record<string, Question[]> = {
       sourceRef: "kb_nyepi · Basis Pengetahuan",
       level: 2,
     },
+    {
+      type: "kenali_visual",
+      prompt: "Canang Sari adalah...",
+      choices: [
+        { text: "Sesaji harian umat Bali", isCorrect: true },
+        { text: "Alat musik gamelan", isCorrect: false },
+        { text: "Pakaian adat", isCorrect: false },
+        { text: "Tarian sakral", isCorrect: false },
+      ],
+      explanation: "Canang Sari adalah sesaji harian sebagai tanda syukur.",
+      sourceRef: "kb_nyepi · Basis Pengetahuan",
+      level: 2,
+    },
+    {
+      type: "checkpoint_budaya",
+      prompt: "Penjor dipasang saat...",
+      choices: [
+        { text: "Nyepi", isCorrect: false },
+        { text: "Galungan", isCorrect: true },
+        { text: "Hari biasa", isCorrect: false },
+        { text: "Malam hari raya saja", isCorrect: false },
+      ],
+      explanation: "Penjor dipasang saat Galungan sebagai tanda syukur atas kesejahteraan.",
+      sourceRef: "kb_galungan · Basis Pengetahuan",
+      level: 2,
+    },
   ],
 };
 
@@ -325,7 +430,7 @@ for (const [moduleId, bank] of Object.entries(QUIZ_BANK)) {
   QUIZ_BANK[moduleId] = validateQuizBank(moduleId, bank);
 }
 
-const SESSION_COUNT = 3;
+const SESSION_COUNT = 8;
 const MIN_TYPES = 2;
 
 const MODULE_BASE_LEVEL: Record<string, number> = {
@@ -454,15 +559,15 @@ const TYPE_ORDER: Question["type"][] = [
 
 /**
  * Pilih soal sesi: selalu sertakan dengar_pilih bila bank punya, jaga
- * 2+ tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
+ * 3-5 tipe berbeda, utamakan level target (±1), lalu putar urutan per seed
  * agar pengulangan tidak monoton. Deterministik — aman untuk resume.
- * Sesi selalu 3 soal (#85); bank kelebihan tetap di source, tak dipilih.
+ * Sesi screen truth selalu 8 soal; bank 8 per modul, tak ada sisa tak dipilih.
  */
 export function pickSessionQuestions(bank: readonly Question[], opts?: PickOptions): Question[] {
   const level = Math.min(3, Math.max(1, Math.round(opts?.level ?? 1)));
   const count = SESSION_COUNT;
   const seed = Math.max(0, Math.round(opts?.seed ?? 0));
-  const maxTypes = Math.min(5, Math.max(MIN_TYPES, Math.round(opts?.maxTypes ?? 3)));
+  const maxTypes = Math.min(5, Math.max(MIN_TYPES, Math.round(opts?.maxTypes ?? 5)));
   if (bank.length === 0) return [];
 
   const byLevel = [...bank]
@@ -582,7 +687,7 @@ export function buildMixedQuiz(moduleIds: string[] = Object.keys(QUIZ_BANK), see
   return quizSchema.parse({ moduleId: "latihan", questions: rotated });
 }
 
-/** Sesi kuis modul: 3 soal bervariasi, tervalidasi Zod di batas. */
+/** Sesi kuis modul: 8 soal bervariasi, tervalidasi Zod di batas. */
 export function buildSessionQuiz(moduleId: string, opts?: PickOptions): Quiz {
   const bank = QUIZ_BANK[moduleId] ?? QUIZ_BANK.mod_01;
   const level = opts?.level ?? getAdaptiveLevel(moduleId);

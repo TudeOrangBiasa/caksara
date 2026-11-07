@@ -102,7 +102,7 @@ function storeCachedQuiz(moduleId: string, level: number, quiz: Quiz, source: Qu
 
 /**
  * Ambil sesi kuis modul: Edge generate-quiz dulu (Gemini temp 0.3,
- * tepat 3 soal #85, cache TTL pendek), 429/Gemini down/offline → fallback
+ * tepat 8 soal screen truth, cache TTL pendek), 429/Gemini down/offline → fallback
  * bank statis + info offline. Tidak pernah melempar — selalu kembalikan kuis.
  */
 export async function fetchGeneratedQuiz(
@@ -123,7 +123,7 @@ export async function fetchGeneratedQuiz(
   },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
-  const count = 3; // #85: sesi selalu 3 soal offline maupun online.
+  const count = 8; // Screen truth: sesi selalu 8 soal offline maupun online.
   const buildFallback = (failure: QuizFailureReason): GeneratedQuiz => {
     let fallback: Quiz | null = null;
     try {
@@ -148,7 +148,7 @@ export async function fetchGeneratedQuiz(
     const supabase = getSupabase();
     if (!supabase && !opts?.invokeRemote) return buildFallback("offline");
     const cached = readCachedQuiz(moduleId, level);
-    if (cached?.quiz && cached.quiz.questions.length >= 3) return cached;
+    if (cached?.quiz && cached.quiz.questions.length >= 8) return cached;
     // Seam uji: invokeRemote menyuntik hasil Edge tanpa sesi jaringan.
     if (!opts?.invokeRemote) await ensureAnonSession();
     const body: GenerateQuizRequestBody = {

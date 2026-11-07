@@ -29,10 +29,10 @@ describe("sesi kuis #23 — 5 tipe bervariasi + dengar_pilih", () => {
     }
   });
 
-  test("sesi tepat 3 soal dengan 2+ tipe termasuk dengar_pilih", () => {
+  test("sesi tepat 8 soal dengan 2+ tipe termasuk dengar_pilih", () => {
     for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
       const quiz = buildSessionQuiz(mod, { seed: 0 });
-      assert.equal(quiz.questions.length, 3);
+      assert.equal(quiz.questions.length, 8);
       assert.ok(hasVariety(quiz.questions, 2), `${mod} kurang bervariasi`);
       assert.ok(
         quiz.questions.some((q) => q.type === "dengar_pilih"),
