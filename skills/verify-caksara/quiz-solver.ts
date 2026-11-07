@@ -107,6 +107,7 @@ export async function answerCurrentQuestion(page: Page, wantCorrect: boolean): P
  */
 export async function playFullSession(page: Page, wantCorrect: boolean): Promise<string> {
   for (let i = 0; i < 8; i++) {
+    console.log(`    soal ${i + 1}/8 (${wantCorrect ? "lulus" : "gagal"})`);
     // Salah beruntun: hearts habis → overlay GameOver, hentikan loop.
     if (!wantCorrect && (await page.getByRole("dialog").count()) > 0) {
       return "Hati kamu habis";
