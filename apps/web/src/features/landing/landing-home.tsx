@@ -116,7 +116,7 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
             TEBAK AKSARA
           </p>
           <p className="text-center text-[19px] font-extrabold text-foreground">Aksara apa ini?</p>
-          <div className="w-full rounded-2xl border-[2.5px] border-border bg-card px-[18px] py-4 text-center shadow-[0_12px_28px_#8A6D3B38]">
+          <div className="w-full rounded-2xl border-[2.5px] border-border bg-card px-[18px] py-4 text-center shadow-[0_12px_28px_var(--color-border)]">
             <span
               lang="ban"
               className="font-balinese text-[38px] font-bold leading-none text-foreground"
@@ -125,11 +125,11 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
             </span>
           </div>
           <div className="flex w-full flex-col gap-2.5">
-            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-cta bg-cta/10 px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-cta bg-cta/10 px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_var(--color-border)]">
               <span className="font-bold text-cta">A</span>
               <span className="font-semibold text-foreground">Ba</span>
             </span>
-            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-border bg-card px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_#8A6D3B2E]">
+            <span className="flex items-center gap-2.5 rounded-[14px] border-2 border-border bg-card px-[15px] py-[13px] text-[15px] shadow-[0_10px_22px_var(--color-border)]">
               <span className="font-semibold text-muted-foreground">B</span>
               <span className="font-normal text-foreground">Da</span>
             </span>
@@ -140,21 +140,21 @@ function PhoneMock({ reduceMotion }: { reduceMotion: boolean }) {
         </div>
       </div>
       {[
-        { Icon: Mic, cls: "left-[6%] top-[12%]" },
-        { Icon: BookOpen, cls: "right-[6%] top-[8%]" },
-        { Icon: Feather, cls: "right-[8%] bottom-[10%]" },
-        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]" },
-      ].map(({ Icon, cls }, i) => (
+        { Icon: Mic, cls: "left-[6%] top-[12%]", iconCls: "text-primary" },
+        { Icon: BookOpen, cls: "right-[6%] top-[8%]", iconCls: "text-accent" },
+        { Icon: Feather, cls: "right-[8%] bottom-[10%]", iconCls: "text-success" },
+        { Icon: MessageCircle, cls: "left-[4%] bottom-[16%]", iconCls: "text-cta" },
+      ].map(({ Icon, cls, iconCls }, i) => (
         <span
           key={i}
           aria-hidden
           className={cn(
-            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-b-[5px] border-duo-blue/30 bg-card shadow-sm",
+            "absolute flex size-14 items-center justify-center rounded-[20px] border-2 border-b-[5px] border-primary/20 bg-card shadow-sm",
             cls,
             floatCls(i % 2 ? "5s" : "6s"),
           )}
         >
-          <Icon className="size-6 text-duo-blue" />
+          <Icon className={cn("size-6", iconCls)} />
         </span>
       ))}
       <span aria-hidden className="absolute left-[36%] top-[10%] text-[28px] text-accent">
@@ -202,7 +202,7 @@ function DemoKuis() {
   );
 }
 
-function DemoChat() {
+function DemoChat({ onOpenKb }: { onOpenKb?: () => void }) {
   return (
     <div className="flex w-full flex-col gap-2.5 rounded-[20px] border-2 border-border bg-card p-5 shadow-[0_4px_0_0_var(--border)]">
       <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ function DemoChat() {
           <p className="text-base font-extrabold text-foreground">Bedawang Nala</p>
         </div>
         <span className="ml-auto rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
-          Online
+          Online · jawab pakai sumber
         </span>
       </div>
       <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-sm text-primary-foreground">
@@ -226,6 +226,26 @@ function DemoChat() {
           Tahun Baru Saka. Sehari penuh hening: tidak menyalakan api, tidak bekerja, tidak
           bepergian, dan tidak bersenang-senang.
         </p>
+      </div>
+      <div className="flex flex-col gap-1.5 rounded-2xl border border-border/60 bg-background px-3 py-2.5">
+        <p className="text-[11px] font-extrabold tracking-[0.8px] text-muted-foreground">
+          SUMBER RUJUKAN
+        </p>
+        <p className="text-xs font-medium text-foreground">Parasali · Tradisi dan hari raya</p>
+        <p className="text-xs font-medium text-foreground">
+          Balai Bahasa Provinsi Bali · Istilah keagamaan
+        </p>
+        {onOpenKb ? (
+          <button
+            type="button"
+            onClick={onOpenKb}
+            className="mt-1 w-fit text-xs font-bold text-primary transition-colors hover:text-cta"
+          >
+            Buka di Basis Pengetahuan →
+          </button>
+        ) : (
+          <p className="mt-1 w-fit text-xs font-bold text-primary">Buka di Basis Pengetahuan →</p>
+        )}
       </div>
     </div>
   );
@@ -361,6 +381,7 @@ export function LandingHome({
 }) {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const reduceMotion = usePrefersReducedMotion();
+  const [spotlight, setSpotlight] = useState(1);
   const floatCls = (dur: string, reverse = false) =>
     reduceMotion
       ? undefined
@@ -392,9 +413,10 @@ export function LandingHome({
             <button
               type="button"
               onClick={onOpenKb}
+              aria-label="Jelajahi kamus budaya"
               className="inline-flex items-center justify-center whitespace-nowrap rounded-full border-2 border-cta/40 bg-card px-[54px] py-[14px] text-[13px] font-bold text-cta transition-all hover:bg-cta/10"
             >
-              SAYA SUDAH PUNYA AKUN
+              JELAJAHI KB
             </button>
           </div>
         </div>
@@ -476,7 +498,7 @@ export function LandingHome({
           <ZigzagRow
             title="Guru Virtual Cerdas"
             desc="Punya pertanyaan? Tanya kapan saja! Guru virtual siap memberikan penjelasan praktis lengkap dengan contoh penggunaan sehari-hari, aktif 24/7."
-            art={<DemoChat />}
+            art={<DemoChat onOpenKb={onOpenKb} />}
             artFirst
             reduceMotion={reduceMotion}
           />
@@ -512,7 +534,7 @@ export function LandingHome({
             <figure
               key={t.id}
               className={
-                i === 1
+                i === spotlight
                   ? "relative rounded-3xl border-2 border-cta bg-cta/10 px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border-2 lg:bg-cta/10 lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
                   : "relative rounded-3xl border border-border/50 bg-card px-7 pt-14 pb-6 text-center shadow-sm lg:rounded-3xl lg:border lg:px-7 lg:pt-14 lg:pb-6 lg:shadow-none"
               }
@@ -541,18 +563,44 @@ export function LandingHome({
           ))}
         </div>
         <div className="mt-6 flex flex-col items-center gap-4">
-          <div className="flex gap-2" aria-hidden>
-            <span className="h-2 w-6 rounded-full bg-primary" />
-            <span className="size-2 rounded-full bg-muted" />
-            <span className="size-2 rounded-full bg-muted" />
+          <div className="flex gap-2" role="tablist" aria-label="Pilih testimoni sorotan">
+            {LANDING_TESTIMONIES.map((t, i) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={i === spotlight}
+                aria-label={`Sorot testimoni ${t.name}`}
+                onClick={() => setSpotlight(i)}
+                className={
+                  i === spotlight
+                    ? "h-2 w-6 rounded-full bg-primary"
+                    : "size-2 rounded-full bg-muted transition-colors hover:bg-primary/50"
+                }
+              />
+            ))}
           </div>
           <div className="flex gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full border border-border bg-card">
+            <button
+              type="button"
+              aria-label="Testimoni sebelumnya"
+              onClick={() =>
+                setSpotlight(
+                  (s) => (s + LANDING_TESTIMONIES.length - 1) % LANDING_TESTIMONIES.length,
+                )
+              }
+              className="flex size-12 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary"
+            >
               <ChevronLeft className="size-5 text-muted-foreground" />
-            </span>
-            <span className="flex size-12 items-center justify-center rounded-full bg-foreground">
+            </button>
+            <button
+              type="button"
+              aria-label="Testimoni berikutnya"
+              onClick={() => setSpotlight((s) => (s + 1) % LANDING_TESTIMONIES.length)}
+              className="flex size-12 items-center justify-center rounded-full bg-foreground transition-transform active:translate-y-px"
+            >
               <ChevronRight className="size-5 text-background" />
-            </span>
+            </button>
           </div>
         </div>
       </section>
@@ -782,7 +830,7 @@ export function LandingHome({
               </ul>
             </div>
 
-            {/* Column 4: Kontak Kami (data lomba, Pencil T4HbK) */}
+            {/* Column 4: Kontak Kami */}
             <div className="flex flex-col gap-4">
               <h3 className="font-bold text-foreground">Kontak Kami</h3>
               <ul className="flex flex-col gap-3">

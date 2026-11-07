@@ -14,17 +14,17 @@ import {
 
 /** Row Pencil t8BaKT: rank pill rank 1-3, lingkaran inisial, XP grouping id-ID. */
 function rowStyle(rank: number, mine: boolean): string {
-  if (mine) return "border-cta bg-[#D7FFB8]";
-  if (rank === 1) return "border-[#FFC800] bg-[#FFF3C4]";
-  if (rank === 2) return "border-[#C9CFD6] bg-[#F4F6F8]";
-  if (rank === 3) return "border-[#E8A15C] bg-[#FBEFE3]";
-  return "border-[#EDEFF3] bg-card";
+  if (mine) return "border-cta bg-success/15";
+  if (rank === 1) return "border-accent bg-accent/15";
+  if (rank === 2) return "border-muted-foreground/40 bg-muted";
+  if (rank === 3) return "border-secondary-foreground/40 bg-secondary";
+  return "border-border bg-card";
 }
 
 const RANK_PILL = [
-  "bg-[#FFC800] text-white",
-  "bg-[#C9CFD6] text-white",
-  "bg-[#E8A15C] text-white",
+  "bg-accent text-white",
+  "bg-muted-foreground/60 text-white",
+  "bg-secondary-foreground/60 text-white",
 ] as const;
 
 export function LeaderboardCard({
@@ -60,7 +60,7 @@ export function LeaderboardCard({
     >
       <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4 lg:gap-4 lg:px-6 lg:py-5">
         <div className="flex items-center gap-3 lg:gap-4">
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-[#FFF3C4] text-[#FFC800]">
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-accent/15 text-accent">
             <Trophy className="size-7" aria-hidden />
           </span>
           <div>
@@ -72,7 +72,7 @@ export function LeaderboardCard({
             </p>
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-[#FFF3C4] px-3.5 py-1.5 text-xs font-extrabold text-[#8a6100] lg:px-4 lg:py-2 lg:leading-[15px]">
+        <span className="shrink-0 rounded-full bg-accent/15 px-3.5 py-1.5 text-xs font-extrabold text-accent-foreground lg:px-4 lg:py-2 lg:leading-[15px]">
           {isResetMingguIni(parseWitaDate(witaTodayStr())) ? "Reset hari ini" : "Liga mingguan"}
         </span>
       </div>
@@ -112,7 +112,7 @@ export function LeaderboardCard({
                   )}
                   <span
                     aria-hidden
-                    className={`flex size-10 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold ${mine ? "bg-cta text-white" : "bg-[#EDEFF3] text-muted-foreground"}`}
+                    className={`flex size-10 shrink-0 items-center justify-center rounded-full text-[15px] font-extrabold ${mine ? "bg-cta text-white" : "bg-muted text-muted-foreground"}`}
                   >
                     {name.charAt(0).toUpperCase()}
                   </span>

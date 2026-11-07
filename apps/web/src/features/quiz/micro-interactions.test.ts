@@ -6,7 +6,7 @@ const webRoot = join(import.meta.dir, "..", "..", "..");
 const uiRoot = join(webRoot, "..", "..", "packages", "ui", "src", "styles");
 const src = (p: string) => readFileSync(join(webRoot, "src", p), "utf8");
 
-describe("Micro-interactions Digifest (#104)", () => {
+describe("Micro-interactions (#104)", () => {
   test("tanpa pustaka animasi berat", () => {
     const pkg = JSON.parse(readFileSync(join(webRoot, "package.json"), "utf8")) as {
       dependencies?: Record<string, string>;

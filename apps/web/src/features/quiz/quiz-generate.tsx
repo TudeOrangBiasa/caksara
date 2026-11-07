@@ -123,7 +123,7 @@ export async function fetchGeneratedQuiz(
   },
 ): Promise<GeneratedQuiz> {
   const level = getAdaptiveLevel(moduleId);
-  const count = 3; // Digifest #85: sesi selalu 3 soal offline maupun online.
+  const count = 3; // #85: sesi selalu 3 soal offline maupun online.
   const buildFallback = (failure: QuizFailureReason): GeneratedQuiz => {
     let fallback: Quiz | null = null;
     try {

@@ -6,6 +6,9 @@ node_modules
 # Build outputs
 dist
 build
+release
+apps/desktop/release
+caksara.apk
 *.tsbuildinfo
 
 # Capacitor native shells — dihasilkan lokal (`bunx cap add android`),
@@ -33,6 +36,8 @@ local.db-*
 *.swo
 *~
 .DS_Store
+__MACOSX/
+._*
 
 # Logs
 logs
@@ -73,6 +78,9 @@ temp
 *.local.md
 plan.md
 spec.md
+
+# Design dump lokal (Pencil export, puluhan MB) — jangan commit
+docs/design/screen.md
 
 # Secrets
 key.md

@@ -37,6 +37,17 @@ Jangan commit `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `GEMINI_API_
 
 Live skills di `.agents/skills/` & `.claude/skills/` (gitignored cache), backup di `skills/` jika ada. `skills-lock.json` & `bts.jsonc` jangan dihapus.
 
+## Agen rules (craft-correct retrospect Nov 2026)
+
+Tiap aturan punya enforcer. Aturan tanpa enforcer = repeat, naikkan levelnya di change yang sama.
+
+| #   | Aturan                                                                         | Enforcer                                                   |
+| --- | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| 1   | CTA jujur: label tombol = aksinya (dilarang label login dengan aksi buka KB)   | `apps/web/src/features/landing/ui-polish.test.ts` hero CTA |
+| 2   | Demo + jawaban Guru Virtual wajib blok SUMBER RUJUKAN + link Basis Pengetahuan | review + `teacher/guru-remote.test.ts` fallback lokal      |
+| 3   | Screenshot PR visual wajib URL absolut (path relatif tak render di GitHub)     | `pr-lint` + review body sebelum merge manual               |
+| 4   | Ganti warna tombol cek light + dark (secondary bisa gagal di krem)             | proof-ui 390/1280 + baca kedua screenshot sebelum merge    |
+
 ## Verification gate (solo, local verifier)
 
 No GitHub Actions. The gate is `bun run verify` ([docs/agents/verifier.md](docs/agents/verifier.md), mode in [docs/agents/repo-mode.md](docs/agents/repo-mode.md)). The pre-push hook runs it on every push; run it again before `gh pr create` and paste the real output in the PR body. Never `git push --no-verify`. New worktrees: `scripts/ensure-worktree-hooks --worktree <path>`. Merge once the verifier passed at the PR head; do not wait on GitHub checks. App-driving proof: `skills/verify-caksara/`.

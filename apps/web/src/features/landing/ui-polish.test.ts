@@ -5,7 +5,7 @@ import { join } from "node:path";
 const webRoot = join(import.meta.dir, "..", "..", "..");
 const src = (p: string) => readFileSync(join(webRoot, "src", p), "utf8");
 
-describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
+describe("UI — halaman memalukan dihapus (#88)", () => {
   const landing = src("features/landing/landing-home.tsx");
 
   test("tanpa href mati", () => {
@@ -16,11 +16,10 @@ describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
       expect(landing.includes(needle)).toBe(false);
     }
   });
-  test("testimoni + kontak lomba data-driven, bukan hardcode klaim (#160)", () => {
-    // Pengecualian #160 (keputusan Main): testimoni pitching + kontak footer
-    // tampil apa adanya dari Pencil T4HbK karena guidebook lomba melarang
-    // data asli. Guard: nama/kontak hidup di landing-data.ts, komponen hanya
-    // render via LANDING_TESTIMONIES/LANDING_CONTACTS.
+  test("testimoni + kontak data-driven, bukan hardcode klaim (#160)", () => {
+    // Pengecualian #160: testimoni + kontak footer tampil apa adanya dari
+    // Pencil T4HbK, bukan data asli. Guard: nama/kontak hidup di
+    // landing-data.ts, komponen hanya render via LANDING_TESTIMONIES/LANDING_CONTACTS.
     expect(landing.includes("LANDING_TESTIMONIES")).toBe(true);
     expect(landing.includes("LANDING_CONTACTS")).toBe(true);
     const dataDriven = [
@@ -43,11 +42,13 @@ describe("UI Digifest — halaman memalukan dihapus (#88)", () => {
   test("hero dua CTA ala Pencil T4HbK (primer + sekunder)", () => {
     const hero = landing.slice(landing.indexOf("{/* HERO */}"), landing.indexOf("{/* WHY US */}"));
     expect(hero.includes("MULAI BELAJAR")).toBe(true);
-    expect(hero.includes("SAYA SUDAH PUNYA AKUN")).toBe(true);
+    // Beranda Pencil menulis SAYA SUDAH PUNYA AKUN tapi aksi website adalah buka KB,
+    // jadi label jujur adalah JELAJAHI KB (audit Beranda frame, Nov 2026).
+    expect(hero.includes("JELAJAHI KB")).toBe(true);
   });
 });
 
-describe("UI Digifest — ikon lucide-react saja (#103)", () => {
+describe("UI — ikon lucide-react saja (#103)", () => {
   test("tanpa pustaka ikon selain lucide", () => {
     const libs = ["pho" + "sphor", "react" + "-icons", "font" + "awesome"];
     for (const f of [
@@ -78,7 +79,7 @@ describe("UI Digifest — ikon lucide-react saja (#103)", () => {
   });
 });
 
-describe("UI Digifest — brand Bedawang konsisten (#98)", () => {
+describe("UI — brand Bedawang konsisten (#98)", () => {
   test("header + top-nav + splash memakai komponen Bedawang", () => {
     expect(src("components/header.tsx").includes("<Bedawang")).toBe(true);
     expect(src("components/top-nav.tsx").includes("<Bedawang")).toBe(true);
