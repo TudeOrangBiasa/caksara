@@ -77,6 +77,9 @@ temp
 plan.md
 spec.md
 
+# Design dump lokal (Pencil export, puluhan MB) — jangan commit
+docs/design/screen.md
+
 # Secrets
 key.md
 
