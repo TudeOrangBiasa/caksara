@@ -14,14 +14,9 @@ import { MAX_HEARTS, XP_PER_CORRECT } from "../../lib/game-rules";
 import { notifyHeartsRefilled } from "../../lib/notify";
 import { playCue } from "../../lib/sound";
 import { QuizFeedback } from "./quiz-feedback";
-import {
-  createSession,
-  getScore,
-  isSessionComplete,
-  isAnswerCorrect,
-  quizReducer,
-} from "./quiz-store";
+import { createSession, getScore, isSessionComplete, quizReducer } from "./quiz-store";
 import type { QuizAnswer } from "./quiz-store";
+import { gradeAnswer } from "./quiz-kind";
 import type { QuizResume } from "./quiz-resume";
 import { clearResume, loadResume, saveResume } from "./quiz-resume";
 import type { Quiz } from "../../lib/zod/question";
@@ -63,7 +58,7 @@ export function QuizShell({
     dispatch({ type: "ANSWER", questionIndex, answer });
 
     const question = quiz.questions[questionIndex];
-    if (isAnswerCorrect(question, answer)) {
+    if (question && gradeAnswer(question, answer)) {
       addXp(XP_PER_CORRECT);
       playCue("success");
     } else if (hearts > 0) {
@@ -82,7 +77,7 @@ export function QuizShell({
           const q = quiz.questions[questionIndex];
           return {
             questionIndex,
-            correct: q ? isAnswerCorrect(q, answer) : false,
+            correct: q ? gradeAnswer(q, answer) : false,
             aksaraId: q?.aksaraId,
           };
         },
@@ -278,7 +273,7 @@ export function QuizShell({
 
         {session.showFeedback && (
           <QuizFeedback
-            isCorrect={isAnswerCorrect(current, session.answers.get(session.currentIndex) ?? {})}
+            isCorrect={gradeAnswer(current, session.answers.get(session.currentIndex) ?? {})}
             explanation={current.explanation}
             sourceRef={current.sourceRef}
             aksaraId={current.aksaraId}

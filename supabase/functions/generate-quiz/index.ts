@@ -10,6 +10,7 @@
 import { allQuestionsGrounded } from "./quiz-grounding.ts";
 import { quizSchema } from "./question.ts";
 import type { Question } from "./question.ts";
+import { pickSessionQuestions } from "./pick-shared.ts";
 import { secretFromJsonPlural } from "./secret-keys.ts";
 import { canUseFastPath, rateLimited, windowHourStart } from "./rate-window.ts";
 import type { QuizCallRow } from "./rate-window.ts";
@@ -479,7 +480,8 @@ function clampLevel(v: unknown): number {
 }
 function pickFallback(moduleId: string, count: number): Question[] {
   const bank = FALLBACK_BANK[moduleId] ?? FALLBACK_BANK.mod_01 ?? [];
-  const sliced = bank.slice(0, Math.min(count, Math.max(3, bank.length)));
+  const picked = pickSessionQuestions(bank, { level: 1, seed: 0 });
+  const sliced = picked.slice(0, Math.min(count, Math.max(3, picked.length)));
   const parsed = quizSchema.safeParse({ moduleId, questions: sliced });
   if (parsed.success) return parsed.data.questions;
   const first = quizSchema.safeParse({ moduleId, questions: FALLBACK_BANK.mod_01 ?? [] });

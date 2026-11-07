@@ -3,8 +3,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { quizSchema } from "../../../apps/web/src/lib/zod/question";
+import { QUIZ_BANK } from "../../../apps/web/src/features/quiz/quiz-data";
+import { pickSessionQuestions as pickFE } from "../../../apps/web/src/features/quiz/quiz-pick";
+import { pickSessionQuestions as pickEdge } from "./pick-shared";
 import {
   buildVendoredBlock,
+  buildVendoredPicker,
   extractBlock,
   spliceVendoredBlock,
   VENDOR_HEADER,
@@ -52,6 +56,27 @@ describe("vendor-bank #57 — blok vendored dari QUIZ_BANK FE", () => {
     ] as const) {
       const { start, end } = extractBlock(source, marker, label);
       assert.ok(end > start);
+    }
+  });
+
+  test("picker vendored identik FE: pick-shared.ts = quiz-pick.ts + rewrite import", () => {
+    const fePick = readFileSync(join(root, "apps/web/src/features/quiz/quiz-pick.ts"), "utf8");
+    const edgePick = readFileSync(
+      join(root, "supabase/functions/generate-quiz/pick-shared.ts"),
+      "utf8",
+    );
+    assert.equal(edgePick, buildVendoredPicker(fePick));
+    assert.ok(edgePick.includes('from "./question.ts"'));
+    assert.ok(!edgePick.includes("../../lib/zod/question"));
+  });
+
+  test("FE dan Edge pilih himpunan sama: pickSessionQuestions deterministik", () => {
+    for (const mod of ["mod_01", "mod_02", "mod_03", "mod_04"]) {
+      const bank = QUIZ_BANK[mod] ?? [];
+      assert.deepEqual(
+        pickEdge(bank, { level: 1, seed: 0 }).map((q) => q.prompt),
+        pickFE(bank, { level: 1, seed: 0 }).map((q) => q.prompt),
+      );
     }
   });
 });
