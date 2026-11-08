@@ -258,7 +258,9 @@ async function driveAll(evidenceDir: string): Promise<ViewportReport[]> {
         if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
       }
     } finally {
-      await browser.close();
+      // browser.close() tanpa timeout bisa macet bila child Chromium
+      // menolak mati: paksa tutup dalam 15s agar run tak gantung.
+      await Promise.race([browser.close().catch(() => {}), Bun.sleep(15000)]);
     }
   }
   return reports;
