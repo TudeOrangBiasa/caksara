@@ -82,7 +82,7 @@ spec.md
 # Design dump lokal (Pencil export, puluhan MB) — jangan commit
 docs/design/screen.md
 
- # Secrets
+# Secrets
 key.md
 *.jks
 *.keystore
