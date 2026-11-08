@@ -85,6 +85,6 @@ docs/design/screen.md
 # Secrets
 key.md
 
-# Skills cache lokal (Live skills, lihat AGENTS.md) — jangan commit
-.agents/skills/
-.claude/skills/
+# Skills: `.agents/skills/` + `.claude/skills/` TER-TRACK di git (bukan cache) —
+# jangan tambah pola ignore untuk dua path itu (gitignore tak berlaku untuk file
+# ter-track). Lihat AGENTS.md § Skills untuk peta lock vs lokal.

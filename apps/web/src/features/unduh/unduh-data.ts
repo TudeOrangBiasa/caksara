@@ -6,9 +6,11 @@ import { AppWindow, Smartphone, Terminal } from "lucide-react";
  * Tiga artefak: Linux .AppImage saja, Windows .exe (nsis 64-bit),
  * Android .apk (Capacitor). Tanpa iPhone: iOS out of scope (ADR-0014).
  * Ikon lucide per kartu (Pencil: android/windows/terminal).
- * Tombol mengarah ke GitHub Releases latest; artefak dibangun lokal
- * via `bun run package:local` (gate website matang dulu) lalu
- * diunggah manual ke tag v*.
+ * Catatan 2026-11-08: ketiga tombol berlabel "Unduh" padahal hanya membuka
+ * halaman daftar rilis, dan `gh release list` hari ini kosong (belum ada rilis).
+ * Ini utang Rule 1 CTA jujur di AGENTS.md. Perbaikan jujur: label jadi
+ * "Buka halaman rilis", atau nonaktifkan tombol plus tulis "segera hadir",
+ * atau tautkan langsung ke aset per artefak setelah rilis v* diterbitkan.
  */
 export interface UnduhArtifact {
   id: "linux" | "windows" | "android";
