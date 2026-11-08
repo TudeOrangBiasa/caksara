@@ -17,6 +17,9 @@
     "target": ["AppImage"]
   },
   "win": {
-    "target": ["nsis"]
+    "target": ["portable"]
+  },
+  "portable": {
+    "artifactName": "CAKSARA-${version}-win-x64.${ext}"
   }
 }

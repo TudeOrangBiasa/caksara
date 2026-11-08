@@ -1,6 +1,6 @@
 import { Download } from "lucide-react";
 
-import { UNDUH_ARTIFACTS, UNDUH_RELEASES_URL } from "./unduh-data";
+import { UNDUH_ARTIFACTS } from "./unduh-data";
 
 /**
  * Halaman Unduh (nav "Unduh", Pencil IpWol).
@@ -36,7 +36,7 @@ export function UnduhPage() {
               <p className="text-xs text-muted-foreground">Berkas: {a.filePattern}</p>
             </div>
             <a
-              href={UNDUH_RELEASES_URL}
+              href={a.href}
               className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
             >
               <Download className="size-4" aria-hidden />

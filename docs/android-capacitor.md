@@ -4,9 +4,11 @@ Wrap `apps/web` untuk **Android saja** (`appId app.caksara.web`). Platform
 Apple out of scope: jangan commit `ios/`, jangan sentuh Xcode/App Store
 sampai keputusan baru (#99).
 
-## Prasyarat (mesin build Tude, bukan repo)
-
-- JDK 17 + Android SDK (API 34) + `local.properties` menunjuk `sdk.dir`.
+- JDK **21+** + Android SDK (API 34) + `local.properties` menunjuk `sdk.dir`.
+  Alasan: AGP 8.13 + `capacitor-android` 8.6 menetapkan
+  `sourceCompatibility = JavaVersion.VERSION_21` — JDK 17 gagal dengan
+  `invalid source release: 21`. `org.gradle.java.home` wajib ke JDK 21 di
+  `android/gradle.properties` (daemon bisa mengabaikan `JAVA_HOME` shell).
   `android/` dan `local.properties` gitignored — dihasilkan lokal via
   `bunx cap add android`, tidak pernah di-commit.
 - Supabase Dashboard > Authentication > URL Configuration > Redirect URLs
@@ -21,6 +23,25 @@ bun run build            # react-router → apps/web/build/client (+ server, dia
 bunx cap sync            # salin webDir + sinkron plugin (butuh android/ lokal)
 bunx cap open android    # buka Android Studio → Run / Generate APK
 ```
+
+## APK rilis (v1.0.0)
+
+`android/` gitignored — signing rilis reproducible via env, bukan file
+commit. Keystore sekali buat, simpan di `~/.local/share/caksara/` (chmod 600):
+
+```bash
+export JAVA_HOME=~/.local/share/jdk-21   # AGP 8.13 butuh JDK 21+
+keytool -genkeypair -keystore ~/.local/share/caksara/caksara-release.jks \
+  -alias caksara -keyalg RSA -keysize 2048 -validity 9125
+export CAKSARA_KEYSTORE=~/.local/share/caksara/caksara-release.jks
+export CAKSARA_STOREPASS=… CAKSARA_KEYALIAS=caksara CAKSARA_KEYPASS=…
+./gradlew assembleRelease --no-daemon   # → app/build/outputs/apk/release/app-release.apk
+cp app/build/outputs/apk/release/app-release.apk ~/caksara-rilis-v1.0.0/caksara.apk
+```
+
+`android/app/build.gradle` membaca keempat env di atas (fallback keystore
+`/tmp` hanya untuk dev lokal). Nama rilis final: `caksara.apk` (sesuai
+kolom `file` di `unduh-data.ts`).
 
 `capacitor.config.ts` (root): `webDir apps/web/build/client`, plugin
 SplashScreen (latar `#faf1e2` = `--card-bg` parchment, auto-hide
