@@ -50,7 +50,17 @@ export async function settleToasts(page: Page): Promise<void> {
   });
   await page.waitForTimeout(2000);
 }
+async function waitToastGone(page: Page): Promise<void> {
+  // Toast Sonner (li.cn-toast, ~4s, headless bisa molor) menutupi tombol
+  // Lanjut/pilihan: klik Playwright auto-wait (stabil/hit-target) macet
+  // intermiten bila toast muncul tepat saat klik. Tunggu hilang dulu.
+  await page
+    .locator("li.cn-toast")
+    .waitFor({ state: "detached", timeout: 15000 })
+    .catch(() => {});
+}
 async function next(page: Page, isLast: boolean): Promise<void> {
+  await waitToastGone(page);
   if (isLast) await page.getByRole("button", { name: "Lihat hasil" }).click();
   else await page.getByRole("button", { name: /Lanjut/u }).click();
 }
