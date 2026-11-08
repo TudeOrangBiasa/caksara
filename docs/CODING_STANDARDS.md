@@ -14,12 +14,13 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 
 - `oxlint` (bukan ESLint) + `oxfmt`. Jalankan `bun run check` sebelum commit.
 - Config: `.oxlintrc.json`, `.oxfmtrc.json`. Jangan tambah ESLint/Prettier.
-- **Tailwind lint** — `bun run lint:tailwind` wajib hijau (= skrip lokal cek duplikat + `oxlint` memuat 6 aturan `@shadcn/lint`, semua `warn`). Keputusan dikunci di ADR 0012 (baseline 356: arbitrary 234/raw 42/restyle 40/inline 27/unknown 13/static 0; review ulang 2026-10-23). Cek bad codes Tailwind: no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
+- **Tailwind lint** — `bun run lint:tailwind` wajib hijau (= skrip lokal cek duplikat + `oxlint` memuat 6 aturan `@shadcn/lint`, semua `warn`). Keputusan dikunci di ADR 0012 (baseline awal 356 per 2026-09-23; review ulang terjadwal 2026-10-23 sudah lewat — rebase baseline bila hitungan kini beda, jangan jadikan angka itu gate). Cek bad codes Tailwind: no duplicate, no arbitrary values tanpa alasan, no `!important` kecuali perlu. Pre-commit jalankan ini bareng `oxlint`.
 
-## 3. Struktur (Dev Guide §3)
+## 3. Struktur (aktual, bukan Dev Guide generik)
 
-- `supabase/migrations/` + `supabase/schema.ts` (Drizzle), `supabase/functions/generate-quiz/`
-- `apps/web/src/app/` (routes), `components/`, `features/quiz|progress|kb|teacher/`, `lib/supabase.ts`, `lib/zod/`, `lib/store.ts`, `styles/aksara.css`
+- `supabase/schema.ts` (Drizzle) + `supabase/migrations/` + `supabase/rls/0001_rls.sql` + `supabase/cron/` + `supabase/functions/generate-quiz|guru-rag/`
+- `apps/web/src/routes/` (React Router: `_index.tsx`, `kb.$id.tsx`, `auth.callback.tsx`, `$.tsx`) + `features/landing|dashboard|module|quiz|kb|teacher|leaderboard|settings|share|onboarding|profil/` + `components/` + `lib/supabase.ts` + `lib/profile-store.ts` + `lib/zod/` + `styles/aksara.css` (`index.css` re-export `@caksara/ui/globals.css`)
+- SSOT token: `packages/ui/src/lib/tokens.ts` + `packages/ui/src/styles/globals.css`; env boundary: `packages/env/` (`VITE_*` opsional → mode lokal tanpa backend, lihat `packages/env/src/web.ts`)
 
 ## 4. DB & Drizzle
 
@@ -53,17 +54,17 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
 
 ## 10. Skills & Code Review
 
-- **React Best Practice (Vercel)** — pakai skill `vercel-labs/agent-skills` (terutama `web-design-guidelines` + `react-best-practices` di mana tersedia) sebagai rujukan di `AGENTS.md`/`docs/agents/`. Pattern: server/client boundary, Suspense, key, memo, a11y, Tailwind M3.
-- **Matt Pocock Skills (Code Review)** — skill `code-review` (Standards + Spec two-axis) wajib jalan sebelum merge. Directory `docs/agents/` + `CONTEXT.md` adalah source of truth untuk review.
-- **Pre-commit wajib run code review** — `.husky/pre-commit` akan menjalankan `bun run check` (oxlint+oxfmt) + `bun run check-types` + `code-review` check (via `gh` atau script) sebelum push. Gagal = commit ditolak.
+- **React Best Practice (Vercel)** — skill upstream di `.agents/skills/vercel-react-best-practices/` (`vercel-labs/agent-skills`, dikunci `skills-lock.json`) + `vercel-composition-patterns` + `web-design-guidelines`. Pattern: server/client boundary, Suspense, key, memo, a11y, Tailwind M3.
+- **Matt Pocock Skills (Code Review)** — skill lokal `.agents/skills/code-review/SKILL.md` (Standards + Spec two-axis, tak ada di `skills-lock.json`) wajib jalan manual sebelum merge. `docs/agents/` + `CONTEXT.md` adalah source of truth untuk review.
+- **Pre-commit** — `.husky/pre-commit` menjalankan `lint-staged` (oxlint+oxfmt) + `bun run check-types` + `bun run check:loc` + `bun run check:secrets` + `bun run lint:tailwind` + target `bun run code-review` (saat ini = stub `echo` + `oxlint`, bukan review dua-aksi). Gagal = commit ditolak.
 
 ## 11. Git
 
 - Commit tracer-bullet per tiket, blockers-first. `bts.jsonc` jangan dihapus.
 - **Branch per tiket, push hanya via PR.** Setiap fitur/fix tiket = branch baru
   `feat/<nama-fitur>` (fix kecil: `fix/<nama>`, chores/ci: `chore/<nama>`) dari
-  `develop` yang sudah sync ke `origin/main`. Push langsung ke `develop`/`main`
-  dilarang — semua perubahan masuk lewat PR + review + `bun run verify` hijau.
+  `main` yang sudah sync ke `origin/main`. Tidak ada branch `develop`.
+  Push langsung ke `main` dilarang — semua perubahan masuk lewat PR + `bun run verify` hijau.
 - **PR wajib pakai template** (`.github/pull_request_template.md`): What/Why,
   Test plan (perintah + hasil), Screenshots (bila UI), Risk & rollback.
   PR tanpa bagian Test plan diisi = belum siap review.
@@ -72,7 +73,9 @@ Konsisten dengan ADR-0001: React+Vite+TS · Tailwind+M3 · oxlint · Zod · Driz
   390px/1280px + light/dark + rekaman `flow.webm`. Pasang pola before/after
   pr-screenshots langsung di body, tanpa `<details>`. Panduan lengkap:
   `docs/agents/ui-proof.md`. Install: `npm i -g agent-browser && agent-browser install`.
-- `main` protected (require 1 approving + strict status checks).
+  Semua URL gambar harus absolut (https) — path relatif tak render di GitHub
+  (cek: `bun run lint:pr-body`).
+- `main` tanpa required reviews, tanpa status checks wajib (cek API 2026-11-08). Gate satu-satunya = `bun run verify` lokal hijau + `bun run lint:pr-body` hijau. Agen merge sendiri setelah keduanya hijau (lihat AGENTS.md § Workflow butir 6).
 - **Linter PR body (CI):** workflow `pr-lint` fail bila body kosong, masih berisi
   placeholder `url-gambar-*`, tanpa perintah test (`bun|bunx|npm`), atau bagian
   Screenshots tanpa gambar dan tanpa kata `backend-only`.
