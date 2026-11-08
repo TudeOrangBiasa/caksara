@@ -14,10 +14,7 @@
   ],
   "linux": {
     "category": "Education",
-    "target": ["AppImage"],
-    "desktop": {
-      "MimeType": "x-scheme-handler/caksara"
-    }
+    "target": ["AppImage"]
   },
   "win": {
     "target": ["nsis"]
