@@ -6,11 +6,8 @@ import { AppWindow, Smartphone, Terminal } from "lucide-react";
  * Tiga artefak: Linux .AppImage saja, Windows .exe (nsis 64-bit),
  * Android .apk (Capacitor). Tanpa iPhone: iOS out of scope (ADR-0014).
  * Ikon lucide per kartu (Pencil: android/windows/terminal).
- * Catatan 2026-11-08: ketiga tombol berlabel "Unduh" padahal hanya membuka
- * halaman daftar rilis, dan `gh release list` hari ini kosong (belum ada rilis).
- * Ini utang Rule 1 CTA jujur di AGENTS.md. Perbaikan jujur: label jadi
- * "Buka halaman rilis", atau nonaktifkan tombol plus tulis "segera hadir",
- * atau tautkan langsung ke aset per artefak setelah rilis v* diterbitkan.
+ * Setiap tombol menaut LANGSUNG ke aset rilis (Rule 1 CTA jujur):
+ * label "Unduh" = berkas terunduh, bukan halaman daftar.
  */
 export interface UnduhArtifact {
   id: "linux" | "windows" | "android";
@@ -18,10 +15,14 @@ export interface UnduhArtifact {
   spec: string;
   desc: string;
   filePattern: string;
+  file: string;
+  href: string;
   icon: LucideIcon;
 }
 
-const RELEASE_LATEST = "https://github.com/TudeOrangBiasa/caksara/releases/latest";
+export const UNDUH_RELEASE_TAG = "v1.0.0";
+
+const RELEASE_DOWNLOAD = `https://github.com/TudeOrangBiasa/caksara/releases/download/${UNDUH_RELEASE_TAG}`;
 
 export const UNDUH_ARTIFACTS: UnduhArtifact[] = [
   {
@@ -30,14 +31,18 @@ export const UNDUH_ARTIFACTS: UnduhArtifact[] = [
     spec: "ANDROID 8.0+ • APK",
     desc: "Aplikasi resmi Caksara. Belajar offline, sinkron otomatis saat online.",
     filePattern: "caksara.apk",
+    file: "caksara.apk",
+    href: `${RELEASE_DOWNLOAD}/caksara.apk`,
     icon: Smartphone,
   },
   {
     id: "windows",
     title: "Windows",
     spec: "WINDOWS 10 / 11 • 64-BIT • .EXE",
-    desc: "Installer resmi. Ringan, bisa offline, terpasang seperti aplikasi desktop biasa.",
+    desc: "Aplikasi desktop resmi. Portable tanpa instal, bisa offline.",
     filePattern: "CAKSARA-*-win-x64.exe",
+    file: "CAKSARA-1.0.0-win-x64.exe",
+    href: `${RELEASE_DOWNLOAD}/CAKSARA-1.0.0-win-x64.exe`,
     icon: AppWindow,
   },
   {
@@ -46,8 +51,10 @@ export const UNDUH_ARTIFACTS: UnduhArtifact[] = [
     spec: "LINUX • 64-BIT • .APPIMAGE",
     desc: "Build resmi untuk Linux. Satu berkas AppImage, jalan di semua distro modern.",
     filePattern: "CAKSARA-*.AppImage",
+    file: "CAKSARA-1.0.0.AppImage",
+    href: `${RELEASE_DOWNLOAD}/CAKSARA-1.0.0.AppImage`,
     icon: Terminal,
   },
 ];
 
-export const UNDUH_RELEASES_URL = RELEASE_LATEST;
+export const UNDUH_RELEASES_URL = `https://github.com/TudeOrangBiasa/caksara/releases/tag/${UNDUH_RELEASE_TAG}`;

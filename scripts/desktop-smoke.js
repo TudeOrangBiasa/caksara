@@ -46,7 +46,7 @@ if (existsSync(electronConfig)) {
   const linux = cfg.linux?.target ?? [];
   const win = cfg.win?.target ?? [];
   check("linux target = AppImage saja", linux.length === 1 && linux[0] === "AppImage");
-  check("win target = nsis (.exe)", win.includes("nsis"));
+  check("win target = portable (.exe, tanpa wine)", win.includes("portable"));
 }
 
 const webIndex = join(root, "apps", "web", "build", "client", "index.html");

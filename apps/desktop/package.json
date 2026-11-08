@@ -1,6 +1,6 @@
 {
   "name": "@caksara/desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "CAKSARA desktop shell — Electron, memuat apps/web, OAuth Google via loopback.",
   "type": "module",

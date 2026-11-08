@@ -84,6 +84,9 @@ docs/design/screen.md
 
 # Secrets
 key.md
+*.jks
+*.keystore
+keystore.properties
 
 # Skills: `.agents/skills/` + `.claude/skills/` TER-TRACK di git (bukan cache) —
 # jangan tambah pola ignore untuk dua path itu (gitignore tak berlaku untuk file

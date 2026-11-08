@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { UNDUH_ARTIFACTS, UNDUH_RELEASES_URL } from "./unduh-data";
+import { UNDUH_ARTIFACTS } from "./unduh-data";
 
 const webRoot = join(import.meta.dir, "..", "..", "..");
 const repoRoot = join(webRoot, "..", "..");
@@ -27,12 +27,15 @@ describe("Unduh — matriks 3 artefak (CONTEXT.md + ADR-0014)", () => {
     }
   });
 
-  test("tiap kartu tombol Unduh ke releases/latest + nama berkas jujur", () => {
+  test("tiap kartu tombol Unduh langsung ke berkas rilis (CTA jujur)", () => {
     const page = src("features/unduh/unduh-page.tsx");
-    expect(page.includes("UNDUH_RELEASES_URL")).toBe(true);
+    expect(page.includes("href={a.href}")).toBe(true);
     expect(page.includes('href="#"')).toBe(false);
-    expect(UNDUH_RELEASES_URL).toContain("github.com");
-    expect(UNDUH_RELEASES_URL).toContain("releases/latest");
+    for (const a of UNDUH_ARTIFACTS) {
+      expect(a.href).toContain("github.com");
+      expect(a.href).toContain("releases/download/v1.0.0");
+      expect(a.href.endsWith(a.file)).toBe(true);
+    }
   });
 
   test("tanpa CI builder: tanpa workflow release, builder lokal + gate", () => {

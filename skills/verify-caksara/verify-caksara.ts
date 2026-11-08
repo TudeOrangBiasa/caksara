@@ -224,8 +224,14 @@ async function launch(): Promise<ChildProcess | null> {
   try {
     const dpage = await dctx.newPage();
     await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-    // Cold-start Vite: kompilasi awal lambat → 60 dtk.
-    await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 60000 });
+    // Cold-start Vite: kompilasi awal lambat → 2x120 dtk (hook build + verify
+    // berbagi CPU; headless throttle timer). Doctor manual 3 dtk saat hangat.
+    try {
+      await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 120000 });
+    } catch {
+      await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+      await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 120000 });
+    }
   } finally {
     await dctx.close();
     await doctor.close();
@@ -258,7 +264,9 @@ async function driveAll(evidenceDir: string): Promise<ViewportReport[]> {
         if (s.doc > 0 || s.body > 0) console.log(`    FAIL ${s.step}: doc=${s.doc} body=${s.body}`);
       }
     } finally {
-      await browser.close();
+      // browser.close() tanpa timeout bisa macet bila child Chromium
+      // menolak mati: paksa tutup dalam 15s agar run tak gantung.
+      await Promise.race([browser.close().catch(() => {}), Bun.sleep(15000)]);
     }
   }
   return reports;

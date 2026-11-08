@@ -50,7 +50,17 @@ export async function settleToasts(page: Page): Promise<void> {
   });
   await page.waitForTimeout(2000);
 }
+async function waitToastGone(page: Page): Promise<void> {
+  // Toast Sonner (li.cn-toast, ~4s, headless bisa molor 20s+) menutupi tombol
+  // Lanjut/pilihan: klik Playwright auto-wait (stabil/hit-target) ikut molor
+  // per soal hingga run tampak "hang". Tunggu hilang dulu, klik tetap nyata.
+  await page
+    .locator("li.cn-toast")
+    .waitFor({ state: "detached", timeout: 30000 })
+    .catch(() => {});
+}
 async function next(page: Page, isLast: boolean): Promise<void> {
+  await waitToastGone(page);
   if (isLast) await page.getByRole("button", { name: "Lihat hasil" }).click();
   else await page.getByRole("button", { name: /Lanjut/u }).click();
 }
@@ -106,18 +116,28 @@ export async function answerCurrentQuestion(page: Page, wantCorrect: boolean): P
  * ("Hati kamu habis"), bukan layar hasil. Caller lanjut dari overlay.
  */
 export async function playFullSession(page: Page, wantCorrect: boolean): Promise<string> {
+  const trace =
+    process.env.CAKSARA_TRACE === "1"
+      ? (s: string) => console.log(`    [${new Date().toISOString().slice(14, 23)}] ${s}`)
+      : () => {};
   for (let i = 0; i < 8; i++) {
+    trace(`soal ${i + 1}/8 mulai (${wantCorrect ? "lulus" : "gagal"})`);
     console.log(`    soal ${i + 1}/8 (${wantCorrect ? "lulus" : "gagal"})`);
     // Salah beruntun: hearts habis → overlay GameOver, hentikan loop.
     if (!wantCorrect && (await page.getByRole("dialog").count()) > 0) {
       return "Hati kamu habis";
     }
+    trace(`soal ${i + 1}: tunggu selector`);
     await page.waitForSelector(`text=/Soal ${i + 1} \\//`);
+    trace(`soal ${i + 1}: jawab`);
     await answerCurrentQuestion(page, wantCorrect);
+    trace(`soal ${i + 1}: terjawab, cek gameover`);
     if (!wantCorrect && (await page.getByRole("button", { name: "Coba Lagi" }).count()) > 0) {
       return "Hati kamu habis";
     }
+    trace(`soal ${i + 1}: next`);
     await next(page, i === 7);
+    trace(`soal ${i + 1}: next ok`);
   }
   await page.waitForTimeout(1200);
   return ((await page.textContent("h1")) ?? "").trim();

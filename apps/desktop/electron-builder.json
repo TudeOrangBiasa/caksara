@@ -14,12 +14,12 @@
   ],
   "linux": {
     "category": "Education",
-    "target": ["AppImage"],
-    "desktop": {
-      "MimeType": "x-scheme-handler/caksara"
-    }
+    "target": ["AppImage"]
   },
   "win": {
-    "target": ["nsis"]
+    "target": ["portable"]
+  },
+  "portable": {
+    "artifactName": "CAKSARA-${version}-win-x64.${ext}"
   }
 }
