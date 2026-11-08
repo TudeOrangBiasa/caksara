@@ -224,9 +224,14 @@ async function launch(): Promise<ChildProcess | null> {
   try {
     const dpage = await dctx.newPage();
     await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-    // Cold-start Vite: kompilasi awal lambat → 120 dtk (hook build + verify
-    // berbagi CPU; headless throttle timer).
-    await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 120000 });
+    // Cold-start Vite: kompilasi awal lambat → 2x120 dtk (hook build + verify
+    // berbagi CPU; headless throttle timer). Doctor manual 3 dtk saat hangat.
+    try {
+      await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 120000 });
+    } catch {
+      await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
+      await dpage.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 120000 });
+    }
   } finally {
     await dctx.close();
     await doctor.close();
