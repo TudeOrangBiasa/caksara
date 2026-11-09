@@ -155,7 +155,7 @@ function QuizLaunchView({
               >
                 <RotateCcw className="size-4" aria-hidden /> Coba Lagi
               </Button>
-              <Button variant="outline" className="h-12 w-full rounded-full" onClick={onBack}>
+              <Button variant="outline" className="h-12 w-full" onClick={onBack}>
                 Kembali
               </Button>
             </div>

@@ -52,7 +52,7 @@ export function ResumeDialog({ resume, total, onResume, onRestart }: ResumeDialo
       <div className="mt-6 flex w-full max-w-xs gap-3 lg:mt-0 lg:max-w-[400px] lg:flex-col lg:gap-3 lg:pt-6">
         <Button
           variant="outline"
-          className="h-12 flex-1 rounded-pill border-2 border-b-4 lg:h-[50px] lg:flex-none lg:rounded-2xl lg:text-[15px] lg:font-bold lg:uppercase lg:text-muted-foreground"
+          className="h-12 flex-1 rounded-pill border-2 border-b-4 lg:h-[50px] lg:flex-none lg:text-[15px] lg:font-bold lg:uppercase lg:text-muted-foreground"
           onClick={onRestart}
         >
           Mulai ulang

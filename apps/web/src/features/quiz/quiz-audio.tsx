@@ -67,7 +67,7 @@ export function QuizAudio({ audioUrl, label, audioType, latinText, showFeedback 
         }}
         // Label generik pra-jawaban: aria-label berisi jawaban ikut bocor ke DOM.
         aria-label={showLatin ? `Dengarkan: ${latin}` : "Putar audio"}
-        className="h-11 gap-2 rounded-full bg-primary px-5 text-sm font-extrabold text-primary-foreground shadow-sm hover:bg-primary/90 lg:h-10 lg:gap-1.5 lg:rounded-xl lg:px-[18px] lg:text-[13px] lg:shadow-none"
+        className="h-11 gap-2 rounded-full bg-primary px-5 text-sm font-extrabold text-primary-foreground shadow-sm hover:bg-primary/90 lg:h-10 lg:gap-1.5 lg:rounded-pill lg:px-[18px] lg:text-[13px] lg:shadow-none"
       >
         <Volume2
           className={playing ? "size-5 animate-pulse lg:size-5" : "size-5 lg:size-5"}
