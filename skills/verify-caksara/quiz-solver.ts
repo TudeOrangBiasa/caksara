@@ -6,22 +6,39 @@ import type { Page } from "playwright-core";
 import { QUIZ_BANK } from "../../apps/web/src/features/quiz/quiz-data";
 import type { Question } from "../../apps/web/src/lib/zod/question";
 
-function currentPrompt(page: Page): Promise<string> {
-  return (async () => {
-    // kenali_visual tanpa h2: prompt dirender sebagai glyph di bubble.
+async function currentPrompt(
+  page: Page,
+): Promise<{ kind: "text"; prompt: string } | { kind: "dengar"; latin: string | null }> {
+  // Label "Soal N" sudah tampil sementara React belum mount soal baru
+  // (stale soal lama → unmount → mount). Retry baca sampai non-kosong.
+  for (let i = 0; i < 40; i++) {
+    if ((await page.getByText("Dengar, lalu pilih jawaban", { exact: false }).count()) > 0) {
+      const latinBtn = page.getByRole("button", { name: /^Dengarkan: /u });
+      const latin =
+        (await latinBtn.count()) > 0
+          ? ((await latinBtn.first().getAttribute("aria-label")) ?? "").replace(/^Dengarkan: /u, "")
+          : null;
+      return { kind: "dengar", latin: latin || null };
+    }
     const h2 = await page
       .locator("h2")
       .first()
-      .textContent()
+      .textContent({ timeout: 2000 })
       .catch(() => null);
-    if (h2?.trim()) return h2.trim();
+    if (h2?.trim()) return { kind: "text", prompt: h2.trim() };
     const bubble = await page
       .locator("p[lang='ban']")
       .first()
-      .textContent()
+      .textContent({ timeout: 2000 })
       .catch(() => null);
-    return (bubble ?? "").trim();
-  })();
+    if (bubble?.trim()) return { kind: "text", prompt: bubble.trim() };
+    await page.waitForTimeout(200);
+  }
+  // Dengar tanpa showLatin: tak ada h2/p[ban] — samakan ke satu-satunya
+  // dengar non-latin bank sesi ini via latin=null.
+  if ((await page.getByRole("button", { name: "Putar audio" }).count()) > 0)
+    return { kind: "dengar", latin: null };
+  throw new Error("prompt tak muncul 60s (h2/p-ban/dengar kosong)");
 }
 
 function findQuestion(prompt: string): Question {
@@ -66,19 +83,49 @@ async function next(page: Page, isLast: boolean): Promise<void> {
 }
 
 export async function answerCurrentQuestion(page: Page, wantCorrect: boolean): Promise<void> {
-  const prompt = await currentPrompt(page);
-  // Dengar: prompt diamankan ("Dengar, lalu pilih jawaban yang benar…").
-  // Cocokkan prompt ke bank via latinText/audio: satu-satunya dengar di
-  // sesi tamu Modul 1 adalah latinText bank (fallback offline, seed 0).
+  const got = await currentPrompt(page);
+  // Dengar: prompt diamankan. Cocokkan via latin (aria-label tombol audio);
+  // satu dengar latinText bank per sesi tamu (fallback offline, seed 0).
   let q: Question | undefined;
-  if (prompt.startsWith("Dengar, lalu pilih jawaban")) {
-    q = Object.values(QUIZ_BANK)
+  if (got.kind === "dengar") {
+    const dengars = Object.values(QUIZ_BANK)
       .flat()
-      .find((x) => x.type === "dengar_pilih");
+      .filter((x) => x.type === "dengar_pilih");
+    if (got.latin != null) {
+      q = dengars.find((x) => "latinText" in x && x.latinText === got.latin);
+    } else {
+      // Tanpa latin terungkap (tombol audio null di headless): identifikasi
+      // via himpunan teks choices yang dirender — unik per soal dengar.
+      const shown = new Set<string>();
+      for (let i = 0; i < 4; i++) {
+        const t = await page
+          .getByRole("button", { name: new RegExp(`^Pilihan ${i + 1}\\b`, "u") })
+          .first()
+          .textContent({ timeout: 5000 })
+          .catch(() => null);
+        // Teks tombol = "AOm Swastiastu" (huruf opsi + teks tanpa spasi).
+        const clean = (t ?? "").trim().replace(/^[A-D]/u, "");
+        if (clean) shown.add(clean);
+      }
+      const cands = dengars.filter(
+        (x) =>
+          "choices" in x &&
+          x.choices &&
+          x.choices.length === shown.size &&
+          x.choices.every((c) => shown.has(c.text)),
+      );
+      if (cands.length !== 1)
+        throw new Error(`dengar ambigu: ${cands.length} kandidat untuk [${[...shown].join("|")}]`);
+      q = cands[0];
+    }
   } else {
-    q = findQuestion(prompt);
+    q = findQuestion(got.prompt);
   }
-  if (!q) throw new Error(`soal tak dikenal: ${prompt.slice(0, 60)}`);
+  if (!q) {
+    const shown =
+      got.kind === "dengar" ? `dengar latin=${got.latin ?? "?"}` : got.prompt.slice(0, 60);
+    throw new Error(`soal tak dikenal: ${shown}`);
+  }
   if (q.type === "susun_aksara" && q.tiles) {
     // tiles = urutan benar bank; pool ter-shuffle, klik by text sesuai tiles.
     const order = wantCorrect ? q.tiles : q.tiles.toReversed();

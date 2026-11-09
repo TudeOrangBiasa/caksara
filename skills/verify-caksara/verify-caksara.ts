@@ -86,10 +86,27 @@ async function shot(ctx: DriveCtx, name: string): Promise<void> {
   await ctx.page.screenshot({ path: join(ctx.evidenceDir, `${ctx.vp.name}-${name}`) });
 }
 
+/**
+ * Navigasi awal dengan retry: dev-server Vite lambat melayani browser
+ * berikutnya — goto default 20s melempar sebelum waitFor Lewati sempat
+ * jalan (desktop cuma 00-onboarding tanpa 01-home). 2x120s.
+ */
+async function gotoHome(page: Page, where: string): Promise<void> {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
+      return;
+    } catch {
+      if (attempt === 2) throw new Error(`goto home macet 2x120s di ${where}`);
+    }
+  }
+}
 async function passOnboarding(ctx: DriveCtx): Promise<void> {
   const { page } = ctx;
-  await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
-  await page.getByRole("button", { name: "Lewati" }).waitFor();
+  await gotoHome(page, "passOnboarding");
+  // Splash 1500ms + render React molor di VP ketiga (hook berbagi CPU):
+  // tunggu Lewati nyata dulu, shot 00 = onboarding bukan splash.
+  await page.getByRole("button", { name: "Lewati" }).waitFor({ timeout: 60000 });
   await shot(ctx, "00-onboarding.png");
   await page.getByRole("button", { name: "Lewati" }).click();
   await page.getByRole("button", { name: /Mulai Petualangan/u }).click();
@@ -195,9 +212,15 @@ async function driveViewport(
     viewport: { width: vp.width, height: vp.height },
     deviceScaleFactor: vp.dsf,
     locale: "id-ID",
+    // Matikan animasi/transisi: progress duration-1000 + transition-all
+    // modul-card tak pernah stable untuk Playwright auto-wait (flake
+    // "element is not stable" di ol button desktop). Uji perilaku, bukan gerak.
+    reducedMotion: "reduce",
   });
   const page = await context.newPage();
-  page.setDefaultTimeout(20000);
+  // Hook berbagi CPU (lint+build+verify): transisi soal di VP ketiga
+  // (desktop) molor >20s. 60s, bukan produk — hanya bound tunggu.
+  page.setDefaultTimeout(60000);
   const ctx: DriveCtx = { page, vp, evidenceDir, samples };
   await passOnboarding(ctx);
   await passMateri(ctx);
@@ -220,7 +243,10 @@ async function launch(): Promise<ChildProcess | null> {
     if (!up) throw new Error("dev:web tidak menjawab 200 dalam ~120 dtk");
   }
   const doctor = await chromium.launch({ timeout: 30000 });
-  const dctx = await doctor.newContext({ viewport: { width: 390, height: 844 } });
+  const dctx = await doctor.newContext({
+    viewport: { width: 390, height: 844 },
+    reducedMotion: "reduce",
+  });
   try {
     const dpage = await dctx.newPage();
     await dpage.goto(BASE_URL, { waitUntil: "domcontentloaded" });
