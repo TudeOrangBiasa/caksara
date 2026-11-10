@@ -135,11 +135,13 @@ async function passMateri(ctx: DriveCtx): Promise<void> {
   await page.getByRole("button", { name: "Buka Belajar", exact: true }).click();
   await page.waitForSelector("text=Daftar modul");
   await page.locator("ol button").first().click();
+  // Flake "element is not stable" khusus desktop (animasi entrance modul
+  // tak ter-reduce): force, tombol CTA navigasi deterministik.
   await page
     .getByRole("button", { name: "Mulai belajar" })
     .filter({ visible: true })
     .first()
-    .click();
+    .click({ force: true });
   await passMateriLoop(page);
   ctx.samples.push(await sampleOverflow(page, "materi"));
 }
