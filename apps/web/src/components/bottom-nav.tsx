@@ -7,7 +7,10 @@ export type { NavTab };
 
 export function BottomNav({ active, onSelect }: { active: NavTab; onSelect: (t: NavTab) => void }) {
   return (
-    <nav aria-label="Navigasi utama" className="bg-transparent px-4 pb-4">
+    <nav
+      aria-label="Navigasi utama"
+      className="bg-transparent px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+    >
       <div className="mx-auto grid w-full max-w-lg md:max-w-2xl lg:max-w-4xl grid-cols-7 gap-1 rounded-3xl bg-card p-2">
         {tabs.map((tab) => {
           const isActive = tab.id === active;
@@ -17,7 +20,7 @@ export function BottomNav({ active, onSelect }: { active: NavTab; onSelect: (t: 
               type="button"
               onClick={() => onSelect(tab.id)}
               aria-current={isActive ? "page" : undefined}
-              aria-label={tab.label}
+              aria-label={`Buka ${tab.label}`}
               className={cn(
                 "flex min-w-0 flex-col items-center gap-1 rounded-2xl py-2 text-[10px] font-medium transition-colors",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
