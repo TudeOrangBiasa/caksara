@@ -63,6 +63,7 @@ export function TopNav({ active, onSelect }: { active: NavTab; onSelect: (t: Nav
                 type="button"
                 onClick={() => onSelect(tab.id)}
                 aria-current={isActive ? "page" : undefined}
+                aria-label={`Buka ${tab.label}`}
                 className={cn(
                   "whitespace-nowrap rounded-full px-[18px] py-[9px] text-sm transition-all duration-200",
                   isActive

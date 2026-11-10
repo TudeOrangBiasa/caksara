@@ -131,14 +131,17 @@ async function passMateriLoop(page: Page): Promise<void> {
 
 async function passMateri(ctx: DriveCtx): Promise<void> {
   const { page } = ctx;
-  await page.getByRole("button", { name: "Belajar", exact: true }).click();
+  // BottomNav + TopNav sama-sama "Buka <label>" (aturan agen #1, #198).
+  await page.getByRole("button", { name: "Buka Belajar", exact: true }).click();
   await page.waitForSelector("text=Daftar modul");
   await page.locator("ol button").first().click();
+  // Flake "element is not stable" khusus desktop (animasi entrance modul
+  // tak ter-reduce): force, tombol CTA navigasi deterministik.
   await page
     .getByRole("button", { name: "Mulai belajar" })
     .filter({ visible: true })
     .first()
-    .click();
+    .click({ force: true });
   await passMateriLoop(page);
   ctx.samples.push(await sampleOverflow(page, "materi"));
 }
@@ -191,7 +194,7 @@ async function passKb(ctx: DriveCtx): Promise<void> {
   // Dari sesi pulih → Keluar dari kuis → Detail Modul (overlay, tanpa nav) -> Kembali -> pohon.
   await page.getByRole("button", { name: "Keluar dari kuis" }).click();
   await page.getByRole("button", { name: "Kembali" }).first().click();
-  await page.getByRole("button", { name: "Kamus", exact: true }).click();
+  await page.getByRole("button", { name: "Buka Kamus", exact: true }).click();
   await page.waitForTimeout(1500);
   ctx.samples.push(await sampleOverflow(page, "kb"));
   await page.locator("section button").first().click();
